@@ -9,12 +9,19 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource('groups', GroupController::class);
+
 Route::apiResource('lessons', LessonController::class);
+Route::post('/lessons/{lesson}/teachers', [LessonController::class, 'attachTeacher']);
+Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTeacher']);
+
 Route::apiResource('schedules', ScheduleController::class);
+
 Route::apiResource('subjects', SubjectController::class);
+
 Route::apiResource('teachers', TeacherController::class);
 Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSubject']);
 Route::delete('/teachers/{teacher}/subjects', [TeacherController::class, 'detachSubject']);
+
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');

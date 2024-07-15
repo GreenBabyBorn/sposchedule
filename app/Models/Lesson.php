@@ -15,4 +15,14 @@ class Lesson extends Model
         'cabinet',
         'index'
     ];
+
+    public function subject()
+    {
+        return $this->belongsTo(Subject::class);
+    }
+
+    public function teachers()
+    {
+        return $this->belongsToMany(Teacher::class);
+    }
 }
