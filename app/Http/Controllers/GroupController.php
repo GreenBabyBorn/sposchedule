@@ -51,6 +51,6 @@ class GroupController extends Controller
     public function destroy(Group $group)
     {
         $group->delete();
-        return response(null, 204);
+        return response()->noContent();
     }
 }

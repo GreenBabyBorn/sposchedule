@@ -12,7 +12,7 @@ Route::apiResource('groups', GroupController::class);
 Route::apiResource('lessons', LessonController::class);
 Route::apiResource('schedules', ScheduleController::class);
 Route::apiResource('subjects', SubjectController::class);
-Route::apiResource('subjects', TeacherController::class);
+Route::apiResource('teachers', TeacherController::class);
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSubjectRequest;
+use App\Http\Requests\UpdateSubjectRequest;
+use App\Http\Resources\SubjectResource;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 
@@ -12,15 +15,16 @@ class SubjectController extends Controller
      */
     public function index()
     {
-        //
+        return SubjectResource::collection(Subject::all());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSubjectRequest $request)
     {
-        //
+        $subject = Subject::create($request->all());
+        return new SubjectResource($subject);
     }
 
     /**
@@ -28,15 +32,16 @@ class SubjectController extends Controller
      */
     public function show(Subject $subject)
     {
-        //
+        return new SubjectResource($subject);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Subject $subject)
+    public function update(UpdateSubjectRequest $request, Subject $subject)
     {
-        //
+        $subject->update($request->all());
+        return new SubjectResource($subject);
     }
 
     /**
@@ -44,6 +49,8 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
-        //
+        $subject->delete();
+        return response()->noContent();
+
     }
 }
