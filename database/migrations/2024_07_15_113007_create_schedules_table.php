@@ -18,8 +18,8 @@ return new class extends Migration
             $table->enum('type', ['main', 'changes']);
             $table->enum('week_type', ['ЗНАМ', 'ЧИСЛ']);
             $table->enum('week_day', ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']);
-            $table->enum('view_mode', ['table', 'message']);
-            $table->text('message');
+            $table->enum('view_mode', ['table', 'message'])->default('table');
+            $table->text('message')->nullable();
 
             $table->timestamps();
         });

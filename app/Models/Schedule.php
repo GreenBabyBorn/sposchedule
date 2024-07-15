@@ -18,4 +18,14 @@ class Schedule extends Model
         'view_mode',
         'message',
     ];
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class);
+    }
+
+    public function lessons()
+    {
+        return $this->hasMany(Lesson::class);
+    }
 }
