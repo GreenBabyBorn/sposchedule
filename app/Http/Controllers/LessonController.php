@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLessonRequest;
 use App\Http\Requests\UpdateLessonRequest;
+use App\Http\Resources\SubjectResource;
 use App\Models\Lesson;
 
 class LessonController extends Controller
@@ -13,7 +14,7 @@ class LessonController extends Controller
      */
     public function index()
     {
-        //
+        // return LessonResource::collection(Lesson::all());
     }
 
     /**

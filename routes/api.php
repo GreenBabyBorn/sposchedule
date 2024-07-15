@@ -13,6 +13,8 @@ Route::apiResource('lessons', LessonController::class);
 Route::apiResource('schedules', ScheduleController::class);
 Route::apiResource('subjects', SubjectController::class);
 Route::apiResource('teachers', TeacherController::class);
+Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSubject']);
+Route::delete('/teachers/{teacher}/subjects', [TeacherController::class, 'detachSubject']);
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');
