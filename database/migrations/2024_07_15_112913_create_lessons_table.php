@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('schedule_id');
             $table->string('cabinet');
             $table->integer('index')->min(0)->max(10); // Номер пары
+            $table->integer('building')->min(1); // Номер корпуса
             $table->timestamps();
         });
     }
