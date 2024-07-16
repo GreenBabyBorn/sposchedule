@@ -6,6 +6,7 @@ use App\Http\Requests\StoreGroupRequest;
 use App\Http\Requests\UpdateGroupRequest;
 use App\Http\Resources\GroupResource;
 use App\Models\Group;
+use Illuminate\Support\Facades\Validator;
 
 class GroupController extends Controller
 {
@@ -42,7 +43,6 @@ class GroupController extends Controller
     {
         $group->update($request->all());
         return new GroupResource($group);
-        // return $request->all();
     }
 
     /**

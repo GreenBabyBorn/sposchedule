@@ -24,9 +24,6 @@ class TeacherController extends Controller
      */
     public function store(StoreTeacherRequest $request)
     {
-        // if($request->subjects){
-
-        // }
         $teacher = Teacher::create($request->all());
         return new TeacherResource($teacher);
     }
@@ -57,6 +54,9 @@ class TeacherController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Attach a subject to a teacher
+     */
     public function attachSubject(Request $request, Teacher $teacher)
     {
         $subject = Subject::find($request->subject_id);
@@ -71,6 +71,9 @@ class TeacherController extends Controller
         return response()->json(['message' => 'Предмет успешно добавлен к преподавателю.', "subject"=>$subject]);
     }
 
+    /**
+     * Detach a subject from a teacher
+     */
     public function detachSubject(Request $request, Teacher $teacher)
     {
         $subject = Subject::find($request->subject_id);
