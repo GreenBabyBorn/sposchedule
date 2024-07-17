@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Teacher\AttachSubjectRequest;
+use App\Http\Requests\Teacher\DetachSubjectRequest;
 use App\Http\Requests\Teacher\StoreTeacherRequest;
 use App\Http\Requests\Teacher\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
@@ -58,16 +60,9 @@ class TeacherController extends Controller
     /**
      * Attach a subject to a teacher
      */
-    public function attachSubject(Request $request, Teacher $teacher)
+    public function attachSubject(AttachSubjectRequest $request, Teacher $teacher)
     {
-        $subject = Subject::find($request->subject_id);
-        if (!$subject) {
-            return response()->json(['message' => 'Предмет не найден.'], 404);
-        }
-
-        if ($teacher->subjects()->where('subject_id', $subject->id)->exists()) {
-            return response()->json(['message' => 'Этот предмент уже добавлен к этому преподавателю.'], 409);
-        }
+        $subject = Subject::findOrFail($request->subject_id);
         $teacher->subjects()->attach($subject);
         return response()->json(['message' => 'Предмет успешно добавлен к преподавателю.', "subject" => $subject]);
     }
@@ -75,17 +70,9 @@ class TeacherController extends Controller
     /**
      * Detach a subject from a teacher
      */
-    public function detachSubject(Request $request, Teacher $teacher)
+    public function detachSubject(DetachSubjectRequest $request, Teacher $teacher)
     {
-        $subject = Subject::find($request->subject_id);
-
-        if (!$subject) {
-            return response()->json(['message' => 'Предмет не найден.'], 404);
-        }
-
-        if (!$teacher->subjects()->where('subject_id', $subject->id)->exists()) {
-            return response()->json(['message' => 'Этот предмет не прикреплен к этому преподавтелю.'], 409);
-        }
+        $subject = Subject::findOrFail($request->subject_id);
         $teacher->subjects()->detach($subject);
         return response()->json(['message' => 'Предмет отвязан от преподавателя.', "subject" => $subject ]);
     }

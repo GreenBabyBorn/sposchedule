@@ -22,4 +22,5 @@ class TeacherResource extends JsonResource
             'subjects' => SubjectResource::collection($this->subjects),
         ];
     }
+
 }
