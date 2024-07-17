@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreTeacherRequest;
-use App\Http\Requests\UpdateTeacherRequest;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Teacher\StoreTeacherRequest;
+use App\Http\Requests\Teacher\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
 use App\Models\Subject;
 use App\Models\Teacher;
@@ -68,7 +69,7 @@ class TeacherController extends Controller
             return response()->json(['message' => 'Этот предмент уже добавлен к этому преподавателю.'], 409);
         }
         $teacher->subjects()->attach($subject);
-        return response()->json(['message' => 'Предмет успешно добавлен к преподавателю.', "subject"=>$subject]);
+        return response()->json(['message' => 'Предмет успешно добавлен к преподавателю.', "subject" => $subject]);
     }
 
     /**
@@ -86,6 +87,6 @@ class TeacherController extends Controller
             return response()->json(['message' => 'Этот предмет не прикреплен к этому преподавтелю.'], 409);
         }
         $teacher->subjects()->detach($subject);
-        return response()->json(['message' => 'Предмет отвязан от преподавателя.', "subject"=>$subject ]);
+        return response()->json(['message' => 'Предмет отвязан от преподавателя.', "subject" => $subject ]);
     }
 }

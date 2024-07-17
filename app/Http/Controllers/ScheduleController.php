@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreScheduleRequest;
-use App\Http\Requests\UpdateScheduleRequest;
+use App\Http\Requests\Schedule\StoreScheduleRequest;
+use App\Http\Requests\Schedule\UpdateScheduleRequest;
 use App\Http\Resources\ScheduleResource;
 use App\Models\Schedule;
 

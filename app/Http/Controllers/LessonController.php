@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreLessonRequest;
-use App\Http\Requests\UpdateLessonRequest;
-use App\Http\Resources\LessonResource;
-use App\Http\Resources\SubjectResource;
+use App\Http\Requests\Lesson\UpdateLessonRequest;
+use App\Http\Resources\Lesson\LessonResource;
 use App\Models\Lesson;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
@@ -66,7 +65,7 @@ class LessonController extends Controller
             return response()->json(['message' => 'Этот преподаватель уже добавлен к этой паре.'], 409);
         }
         $lesson->teachers()->attach($teacher);
-        return response()->json(['message' => 'Преподаватель успешно добавлен к паре.', "teacher"=>$teacher]);
+        return response()->json(['message' => 'Преподаватель успешно добавлен к паре.', "teacher" => $teacher]);
     }
 
     public function detachTeacher(Request $request, Lesson $lesson)
@@ -81,6 +80,6 @@ class LessonController extends Controller
             return response()->json(['message' => 'Этот преподаватель не прикреплен к этой паре.'], 409);
         }
         $lesson->teachers()->detach($teacher);
-        return response()->json(['message' => 'Преподаватель отвязан от пары.', "teacher"=>$teacher ]);
+        return response()->json(['message' => 'Преподаватель отвязан от пары.', "teacher" => $teacher ]);
     }
 }

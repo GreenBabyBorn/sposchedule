@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Route;
 Route::apiResource('groups', GroupController::class)->where(['group' => '[0-9]+']);
 
 Route::post('/lessons/{lesson}/teachers', [LessonController::class, 'attachTeacher'])->where(['lesson' => '[0-9]+']);
-Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTeacher'])->where(['lesson' => '[0-9]+']);;
-Route::apiResource('lessons', LessonController::class)->where(['lesson' => '[0-9]+']);;
+Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTeacher'])->where(['lesson' => '[0-9]+']);
+Route::apiResource('lessons', LessonController::class)->where(['lesson' => '[0-9]+']);
 
 Route::apiResource('schedules', ScheduleController::class);
 

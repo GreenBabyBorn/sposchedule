@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Schedule;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateLessonRequest extends FormRequest
+class StoreScheduleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
