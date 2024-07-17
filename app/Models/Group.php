@@ -14,6 +14,7 @@ class Group extends Model
         'course',
         'index',
         'specialization',
+        'name',
     ];
 
 

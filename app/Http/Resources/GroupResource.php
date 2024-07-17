@@ -19,7 +19,7 @@ class GroupResource extends JsonResource
             'course' => $this->course,
             'index' => $this->index,
             'specialization' => $this->specialization,
-            'name' => $this->specialization . "-" . $this->course . $this->index,
+            'name'=> $this->name,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

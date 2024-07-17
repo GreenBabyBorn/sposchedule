@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Group;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreGroupRequest extends FormRequest
@@ -45,5 +46,29 @@ class StoreGroupRequest extends FormRequest
             'specialization.string' => 'Поле "специальность" должно быть строкой.',
             'specialization.max' => 'Поле "специальность" не должно превышать 255 символов.',
         ];
+    }
+
+        /**
+     * Prepare the data for validation.
+     */
+    protected function prepareForValidation()
+    {
+        $this->merge([
+            'name' => $this->specialization . "-" . $this->course . $this->index,
+        ]);
+    }
+
+    protected function getValidatorInstance()
+    {
+        $validator = parent::getValidatorInstance();
+
+        $validator->after(function ($validator) {
+            $name = $this->specialization . "-" . $this->course . $this->index;
+            if (Group::where('name', $name)->exists()) {
+                $validator->errors()->add('name', 'Группа с таким именем уже существует.');
+            }
+        });
+
+        return $validator;
     }
 }

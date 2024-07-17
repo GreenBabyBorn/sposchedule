@@ -23,7 +23,13 @@ class GroupController extends Controller
      */
     public function store(StoreGroupRequest $request)
     {
-        $group = Group::create($request->all());
+        $name = $request->name;
+
+        $group = Group::create([
+            ...$request->all(),
+            "name" => $name,
+
+        ]);
         return new GroupResource($group);
     }
 
