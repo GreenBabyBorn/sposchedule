@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
+            
             $table->foreignId('group_id');
             $table->string('date');
             $table->enum('type', ['main', 'changes']);

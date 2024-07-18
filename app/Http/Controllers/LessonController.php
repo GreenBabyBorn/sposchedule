@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreLessonRequest;
+use App\Http\Requests\Lesson\StoreLessonRequest;
 use App\Http\Requests\Lesson\UpdateLessonRequest;
-use App\Http\Resources\Lesson\LessonResource;
+use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
 use App\Models\Teacher;
 use Illuminate\Http\Request;

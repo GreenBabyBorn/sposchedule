@@ -14,7 +14,8 @@ class Lesson extends Model
         'subject_id',
         'schedule_id',
         'cabinet',
-        'index'
+        'index',
+        'building'
     ];
 
     public function subject()
