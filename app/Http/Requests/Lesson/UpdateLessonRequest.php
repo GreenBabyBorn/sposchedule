@@ -32,7 +32,7 @@ class UpdateLessonRequest extends FormRequest
                 'min:0',
                 'max:10',
                 Rule::unique('lessons')->where(function ($query) {
-                    return $query->where('schedule_id', $this->input('schedule_id'));
+                    return $query->where('schedule_id', $this->safe()->input('schedule_id'));
                 })
             ],
             'building' => 'required|integer|min:1',

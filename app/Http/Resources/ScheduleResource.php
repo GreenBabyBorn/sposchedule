@@ -16,8 +16,16 @@ class ScheduleResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'date' => $this->date,
+            'type' => $this->type,
+            'week_type' => $this->week_type,
+            'week_day' => $this->week_day,
+            'view_mode' => $this->view_mode,
+            'message' => $this->when($this->message !== null, $this->message),
             'group' => new GroupResource($this->group),
             'lessons' => LessonResource::collection($this->lessons),
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
         ];
     }
 }

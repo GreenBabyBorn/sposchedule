@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             
             $table->foreignId('group_id');
-            $table->string('date');
+            $table->date('date')->nullable();
             $table->enum('type', ['main', 'changes']);
-            $table->enum('week_type', ['ЗНАМ', 'ЧИСЛ']);
-            $table->enum('week_day', ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']);
+            $table->enum('week_type', ['ЗНАМ', 'ЧИСЛ'])->nullable();
+            $table->enum('week_day', ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'])->nullable();
             $table->enum('view_mode', ['table', 'message'])->default('table');
             $table->text('message')->nullable();
 
