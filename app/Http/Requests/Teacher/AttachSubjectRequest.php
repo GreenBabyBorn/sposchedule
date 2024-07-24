@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Teacher;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class AttachSubjectRequest extends FormRequest
 {
@@ -22,11 +24,26 @@ class AttachSubjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            "subject_id" => 'required|integer|exists:subjects,id|unique:subject_teacher'
+            // "subject_id" => 'required|integer|exists:subjects,id|unique:subject_teacher'
+            "subject_id" => [
+                'required',
+                'integer',
+                'exists:subjects,id',
+            ]
         ];
     }
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            $subjectId = $this->input('subject_id');
+            $teacherId = $this->route('teacher')->id;
 
-      /**
+            if (DB::table('subject_teacher')->where('subject_id', $subjectId)->where('teacher_id', $teacherId)->exists()) {
+                $validator->errors()->add('subject_id', 'Этот предмет уже прикреплен к этому преподавателю.');
+            }
+        });
+    }
+    /**
      * Get custom messages for validator errors.
      *
      * @return array

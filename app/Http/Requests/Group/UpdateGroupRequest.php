@@ -15,9 +15,9 @@ class UpdateGroupRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'course' => 'required|integer',
-            'index' => 'required|string|max:255',
-            'specialization' => 'required|string|max:255',
+            'course' => 'nullable|integer',
+            'index' => 'nullable|string|max:255',
+            'specialization' => 'nullable|string|max:255',
         ];
     }
 
@@ -43,19 +43,20 @@ class UpdateGroupRequest extends FormRequest
     /**
      * Prepare the data for validation.
      */
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'name' => $this->specialization . "-" . $this->course . $this->index,
-        ]);
-    }
+    // protected function prepareForValidation()
+    // {
+    //     $this->merge([
+    //         'name' => $this->specialization . "-" . $this->course . $this->index,
+    //     ]);
+    // }
 
     protected function getValidatorInstance()
     {
+        
         $validator = parent::getValidatorInstance();
 
         $validator->after(function ($validator) {
-            $name = $this->specialization . "-" . $this->course . $this->index;
+            $name = $this->safe()->specialization . "-" . $this->safe()->course . $this->safe()->index;
             if (Group::where('name', $name)->exists()) {
                 $validator->errors()->add('name', 'Группа с таким именем уже существует.');
             }

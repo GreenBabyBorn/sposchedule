@@ -51,12 +51,12 @@ class StoreGroupRequest extends FormRequest
     /**
      * Prepare the data for validation.
      */
-    protected function prepareForValidation()
-    {
-        $this->merge([
-            'name' => $this->specialization . "-" . $this->course . $this->index,
-        ]);
-    }
+    // protected function prepareForValidation()
+    // {
+    //     $this->merge([
+    //         'name' => $this->specialization . "-" . $this->course . $this->index,
+    //     ]);
+    // }
 
     protected function getValidatorInstance()
     {

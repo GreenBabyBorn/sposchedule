@@ -20,6 +20,24 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->timestamps();
         });
+
+        // Создаем функцию для генерации поля name
+        DB::statement('
+            CREATE OR REPLACE FUNCTION generate_group_name() RETURNS TRIGGER AS $$
+            BEGIN
+                NEW.name := NEW.specialization || \'-\' || NEW.course || NEW.index;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        ');
+
+        // Создаем триггер, который будет вызывать функцию при вставке или обновлении записей
+        DB::statement('
+            CREATE TRIGGER trigger_generate_group_name
+            BEFORE INSERT OR UPDATE ON groups
+            FOR EACH ROW
+            EXECUTE FUNCTION generate_group_name();
+        ');
     }
 
     /**
@@ -27,6 +45,9 @@ return new class extends Migration
      */
     public function down(): void
     {
+        DB::statement('DROP TRIGGER IF EXISTS trigger_generate_group_name ON groups;');
+        DB::statement('DROP FUNCTION IF EXISTS generate_group_name();');
+
         Schema::dropIfExists('groups');
     }
 };

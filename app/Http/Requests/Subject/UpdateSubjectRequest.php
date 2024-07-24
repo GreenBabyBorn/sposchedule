@@ -22,7 +22,22 @@ class UpdateSubjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:255|unique:subjects,name'
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array
+     */
+    public function messages()
+    {
+        return [
+            'name.required' => 'Поле является обязательным для заполнения.',
+            'name.string' => 'Название предмета должно быть строкой.',
+            'name.max' => 'Длина названия предмета не должна превышать 255 символов.',
+            'name.unique' => 'Такой предмет уже существует.',
         ];
     }
 }

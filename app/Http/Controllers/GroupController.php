@@ -30,6 +30,7 @@ class GroupController extends Controller
             "name" => $name,
 
         ]);
+        $group->refresh();
         return new GroupResource($group);
     }
 
@@ -48,6 +49,7 @@ class GroupController extends Controller
     public function update(UpdateGroupRequest $request, Group $group)
     {
         $group->update($request->all());
+        $group->refresh();
         return new GroupResource($group);
     }
 
