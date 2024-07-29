@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use App\Models\Semester;
 
 class Group extends Model
 {
@@ -17,5 +17,8 @@ class Group extends Model
         'name',
     ];
 
-
+    public function semesters()
+    {
+        return $this->belongsToMany(Semester::class);
+    }
 }

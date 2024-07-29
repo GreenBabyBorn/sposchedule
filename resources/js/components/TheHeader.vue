@@ -10,7 +10,7 @@
                     <RouterLink to="/">Главная</RouterLink>
                 </li>
                 <li>
-                    <RouterLink to="/admin/teachers">Админ</RouterLink>
+                    <RouterLink to="/admin/schedules">Админ</RouterLink>
                 </li>
             </ul>
         </nav>

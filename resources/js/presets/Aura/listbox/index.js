@@ -16,18 +16,16 @@ export default {
             { 'border-red-500 dark:border-red-400': props.invalid }
         ]
     }),
-    wrapper: {
-        class: [
-            // Overflow
-            'overflow-auto'
-        ]
-    },
+    listContainer: 'overflow-auto',
     list: {
         class: 'p-1 list-none m-0 outline-none'
     },
-    item: ({ context }) => ({
+    option: ({ context }) => ({
         class: [
             'relative',
+
+            // Flex
+            'flex items-center',
 
             // Font
             'leading-none',
@@ -44,14 +42,12 @@ export default {
                 'text-surface-700 dark:text-white/80': !context.focused && !context.selected,
                 'bg-surface-200 dark:bg-surface-600/60': context.focused && !context.selected,
                 'text-surface-700 dark:text-white/80': context.focused && !context.selected,
-
-                'text-primary-highlight-inverse': context.selected,
-                'bg-primary-highlight': context.selected
+                'bg-highlight': context.selected
             },
 
             //States
             { 'hover:bg-surface-100 dark:hover:bg-[rgba(255,255,255,0.03)]': !context.focused && !context.selected },
-            { 'hover:bg-primary-highlight-hover': context.selected },
+            { 'hover:bg-highlight-emphasis': context.selected },
             { 'hover:text-surface-700 hover:bg-surface-100 dark:hover:text-white dark:hover:bg-[rgba(255,255,255,0.03)]': context.focused && !context.selected },
 
             // Transition
@@ -61,7 +57,7 @@ export default {
             'cursor-pointer overflow-hidden whitespace-nowrap'
         ]
     }),
-    itemgroup: {
+    optionGroup: {
         class: [
             'font-semibold',
 
@@ -75,7 +71,8 @@ export default {
             'cursor-auto'
         ]
     },
-    emptymessage: {
+    optionCheckIcon: 'relative -ms-1.5 me-1.5 text-surface-700 dark:text-white/80 w-4 h-4',
+    emptyMessage: {
         class: [
             // Font
             'leading-none',
@@ -102,45 +99,9 @@ export default {
             // Color
             'text-surface-700 dark:text-white/80',
             'bg-surface-0 dark:bg-surface-900',
-            'border-surface-300 dark:border-surface-700'
+            'border-surface-300 dark:border-surface-700',
+
+            '[&_[data-pc-name=pcfilter]]:w-full'
         ]
-    },
-    filtercontainer: {
-        class: 'relative'
-    },
-    filterinput: {
-        class: [
-            // Font
-            'leading-[normal]',
-
-            // Sizing
-            'py-2 pl-3 pr-7',
-            '-mr-7',
-            'w-full',
-
-            //Color
-            'text-surface-700 dark:text-white/80',
-            'bg-surface-0 dark:bg-surface-950',
-            'border-surface-200 dark:border-surface-700',
-
-            // Shape
-            'border',
-            'rounded-lg',
-            'appearance-none',
-
-            // Transitions
-            'transition',
-            'duration-200',
-
-            // States
-            'hover:border-surface-400 dark:hover:border-surface-600',
-            'focus:outline-none focus:outline-offset-0 focus:ring-1 focus:ring-primary-500 dark:focus:ring-primary-400 focus:z-10',
-
-            // Misc
-            'appearance-none'
-        ]
-    },
-    filtericon: {
-        class: ['absolute', 'top-1/2 right-3', '-mt-2']
     }
 };

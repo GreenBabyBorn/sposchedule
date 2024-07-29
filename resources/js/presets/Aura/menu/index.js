@@ -14,7 +14,7 @@ export default {
       'border border-surface-200 dark:border-surface-700',
     ],
   },
-  menu: {
+  list: {
     class: [
       // Spacings and Shape
       'list-none',
@@ -23,10 +23,10 @@ export default {
       'outline-none',
     ],
   },
-  menuitem: {
+  item: {
     class: 'relative my-[2px] [&:first-child]:mt-0',
   },
-  content: ({ context }) => ({
+  itemContent: ({ context }) => ({
     class: [
       //Shape
       'rounded-[4px]',
@@ -36,9 +36,9 @@ export default {
       {
         'text-surface-500 dark:text-white/70':
           !context.focused && !context.active,
-        'text-surface-500 dark:text-white/70 bg-surface-200 dark: bg-[rgba(255,255,255,0.05)]':
+        'text-surface-500 dark:text-white/70 bg-[rgba(255,255,255,0.03)]':
           context.focused && !context.active,
-        'text-primary-highlight-inverse bg-primary-highlight':
+        'bg-highlight':
           (context.focused && context.active) ||
           context.active ||
           (!context.focused && context.active),
@@ -50,17 +50,16 @@ export default {
 
       // States
       {
-        'hover:bg-surface-100 dark:hover:bg-[rgba(255,255,255,0.05)]':
+        'hover:bg-surface-100 dark:hover:bg-[rgba(255,255,255,0.03)]':
           !context.active,
-        'hover:bg-primary-highlight-hover text-primary-highlight-inverse':
-          context.active,
+        'hover:bg-highlight-emphasis': context.active,
       },
 
       // Disabled
       { 'opacity-60 pointer-events-none cursor-default': context.disabled },
     ],
   }),
-  action: {
+  itemLink: {
     class: [
       'relative',
       // Flexbox
@@ -82,7 +81,7 @@ export default {
       'select-none',
     ],
   },
-  icon: {
+  itemIcon: {
     class: [
       // Spacing
       'mr-2',
@@ -91,10 +90,10 @@ export default {
       'text-surface-600 dark:text-white/70',
     ],
   },
-  label: {
+  itemLabel: {
     class: ['leading-[normal]'],
   },
-  submenuheader: {
+  submenuLabel: {
     class: [
       // Font
       'font-bold',

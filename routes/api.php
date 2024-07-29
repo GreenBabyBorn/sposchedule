@@ -3,6 +3,7 @@
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,7 @@ Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSu
 Route::delete('/teachers/{teacher}/subjects', [TeacherController::class, 'detachSubject'])->where(['teacher' => '[0-9]+']);
 Route::apiResource('teachers', TeacherController::class)->where(['teacher' => '[0-9]+']);
 
+Route::apiResource('semesters', SemesterController::class)->where(['semester' => '[0-9]+']);
 // Route::get('/user', function (Request $request) {
 //     return $request->user();
 // })->middleware('auth:sanctum');

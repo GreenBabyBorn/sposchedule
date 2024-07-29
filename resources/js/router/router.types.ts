@@ -1,7 +1,7 @@
-import type { VueElement } from "vue";
-import type { AppLayoutsEnum } from "@/layouts/layouts.types";
+import type { VueElement } from 'vue';
+import type { AppLayoutsEnum } from '@/layouts/layouts.types';
 
-declare module "vue-router" {
+declare module 'vue-router' {
   interface RouteMeta {
     layout?: AppLayoutsEnum;
     layoutComponent?: VueElement;
@@ -9,8 +9,10 @@ declare module "vue-router" {
 }
 
 export enum RouteNamesEnum {
-  home = "home",
-  groups = "groups",
-  subjects = "subjects",
-  teachers = "teachers",
+  home = 'home',
+  groups = 'groups',
+  subjects = 'subjects',
+  teachers = 'teachers',
+  schedules = 'schedules',
+  semesters = 'semesters',
 }

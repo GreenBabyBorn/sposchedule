@@ -24,6 +24,11 @@ class Schedule extends Model
         return $this->belongsTo(Group::class);
     }
 
+    public function semester()
+    {
+        return $this->belongsTo(Semester::class);
+    }
+
     public function lessons()
     {
         return $this->hasMany(Lesson::class);
