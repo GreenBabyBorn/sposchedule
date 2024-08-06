@@ -2,13 +2,17 @@
 import { ref } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Select from 'primevue/select';
 import InputText from 'primevue/inputtext';
-import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
 import { useDateFormat } from '@vueuse/core'
 import { useToast } from 'primevue/usetoast';
+import Chip from 'primevue/chip';
+import MultiSelect from 'primevue/multiselect';
 
-import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup } from '../queries/groups'
+
+import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup, useDestroySemesterForGroup, useStoreSemesterForGroup } from '../queries/groups'
+import { useSemestersQuery } from '@/queries/semesters';
 
 const { data: groups } = useGroupsQuery()
 
@@ -39,9 +43,45 @@ const courses = [
 ]
 
 const { mutateAsync: updateGroup, isPending: isUpdated } = useUpdateGroup()
+const { mutateAsync: storeSemesterForGroup } = useStoreSemesterForGroup()
+const { mutateAsync: destroySemesterForGroup } = useDestroySemesterForGroup()
+
 
 const onRowEditSave = async (event) => {
     let { newData, index } = event;
+    let deletedSubjects = groups.value[index].semesters.filter(obj1 =>
+        !newData.semesters.some(obj2 => obj2.id === obj1.id)
+    );
+    let newSubjects = newData.semesters.filter(obj2 =>
+        !groups.value[index].semesters.some(obj1 => obj1.id === obj2.id)
+    );
+    if (deletedSubjects.length) {
+        for (let i = 0; i < deletedSubjects.length; i++) {
+
+            try {
+                await destroySemesterForGroup({ id: groups.value[index].id, semester_id: deletedSubjects[i].id })
+            }
+            catch (e) {
+                toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+                return
+            }
+        }
+        // queryClient.invalidateQueries({ queryKey: ['teachers'] })
+    }
+
+    // console.log(deletedSubjects, newSubjects)
+    if (newSubjects.length) {
+        for (let i = 0; i < newSubjects.length; i++) {
+            try {
+                await storeSemesterForGroup({ id: groups.value[index].id, semester_id: newSubjects[i].id })
+            }
+            catch (e) {
+                toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+                return
+            }
+        }
+        // queryClient.invalidateQueries({ queryKey: ['teachers'] })
+    }
 
     try {
         await updateGroup({
@@ -52,6 +92,17 @@ const onRowEditSave = async (event) => {
         toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
         return
     }
+    // let { newData, index } = event;
+
+    // try {
+    //     await updateGroup({
+    //         id: newData.id, body: newData
+    //     })
+    // }
+    // catch (e) {
+    //     toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+    //     return
+    // }
 };
 
 
@@ -72,7 +123,8 @@ const addGroup = async () => {
             {
                 specialization: newGroupName.value.split('-')[0],
                 course: newGroupName.value.split('-')[1][0],
-                index: newGroupName.value.split('-')[1].slice(1)
+                index: newGroupName.value.split('-')[1].slice(1),
+                semesters: selectedSemesters.value,
             }
         )
     }
@@ -83,6 +135,7 @@ const addGroup = async () => {
 
     newGroupError.value = false
     newGroupName.value = ''
+    selectedSemesters.value = []
 }
 const { mutateAsync: destroySubject, isPending: isDestroyed } = useDestroyGroup()
 
@@ -101,16 +154,23 @@ const deleteGroups = async () => {
     selectedGroups.value = []
 }
 
+
+const { data: semesters } = useSemestersQuery()
+
+const selectedSemesters = ref([])
 </script>
 
 <template>
     <div class="flex flex-col gap-4">
         <div class="flex flex-wrap justify-between items-baseline">
             <h1 class="text-2xl">Группы</h1>
+
         </div>
         <div class="">
             <form class="flex items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <InputText :invalid="newGroupError" placeholder="Пример: ИС-401" v-model="newGroupName"></InputText>
+                <MultiSelect v-model="selectedSemesters" display="chip" :options="semesters" optionLabel="name" filter
+                    placeholder="Выбрать семестры" :maxSelectedLabels="3" class="" />
                 <Button type="submit" @click.prevent="addGroup" :disabled="!newGroupName">Добавить группу</Button>
             </form>
         </div>
@@ -137,11 +197,23 @@ const deleteGroups = async () => {
                 </Column>
                 <Column field="course" header="Курс" style="width: 10%">
                     <template #editor="{ data, field }">
-                        <Dropdown v-model="data[field]" :options="courses" optionLabel="label" optionValue="value">
-                        </Dropdown>
+                        <Select v-model="data[field]" :options="courses" optionLabel="label" optionValue="value">
+                        </Select>
                     </template>
                 </Column>
+                <Column field="semesters" header="Семестры" style="width: 10%">
+                    <template #body="slotProps">
+                        <div class="flex gap-2 flex-wrap">
+                            <Chip v-for="semester in slotProps.data.semesters" :label="semester.name" />
+                        </div>
+                    </template>
+                    <template #editor="{ data, field }">
 
+                        <MultiSelect v-model="data.semesters" display="chip" :options="semesters" optionLabel="name"
+                            filter placeholder="Выберите семестры" :maxSelectedLabels="3" class="w-48" />
+
+                    </template>
+                </Column>
                 <Column field="updated_at" header="Дата изменения" style="width: 20%">
                     <template #body="slotProps">
                         {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}

@@ -78,6 +78,9 @@ const deleteSemesters = async () => {
 }
 
 
+const minDate = ref(new Date());
+
+
 
 </script>
 
@@ -91,8 +94,8 @@ const deleteSemesters = async () => {
                 <div class="">
                     <label for="years" class=" block mb-1">Учебный год</label>
                     <!-- <InputText id="years" v-model="inputSemester.years" placeholder="2023/2024"></InputText> -->
-                    <DatePicker view="year" input-id="dates" date-format="yy" v-model="years" selectionMode="range"
-                        :manualInput="false" />
+                    <DatePicker :min-date="minDate" view="year" input-id="dates" date-format="yy" v-model="years"
+                        selectionMode="range" :manualInput="false" />
                 </div>
                 <div class="flex-auto">
                     <label for="semester" class=" block mb-1">Номер семестра</label>

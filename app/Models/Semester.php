@@ -15,4 +15,9 @@ class Semester extends Model
         'start',
         'end',
     ];
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class);
+    }
 }

@@ -50,18 +50,18 @@ class UpdateGroupRequest extends FormRequest
     //     ]);
     // }
 
-    protected function getValidatorInstance()
-    {
+    // protected function getValidatorInstance()
+    // {
         
-        $validator = parent::getValidatorInstance();
+        // $validator = parent::getValidatorInstance();
 
-        $validator->after(function ($validator) {
-            $name = $this->safe()->specialization . "-" . $this->safe()->course . $this->safe()->index;
-            if (Group::where('name', $name)->exists()) {
-                $validator->errors()->add('name', 'Группа с таким именем уже существует.');
-            }
-        });
+        // $validator->after(function ($validator) {
+        //     $name = $this->safe()->specialization . "-" . $this->safe()->course . $this->safe()->index;
+        //     if (Group::where('name', $name)->exists()) {
+        //         $validator->errors()->add('name', 'Группа с таким именем уже существует.');
+        //     }
+        // });
 
-        return $validator;
-    }
+        // return $validator;
+    // }
 }

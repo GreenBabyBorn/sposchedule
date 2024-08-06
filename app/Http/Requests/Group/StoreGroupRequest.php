@@ -26,6 +26,8 @@ class StoreGroupRequest extends FormRequest
             'course' => 'required|integer',
             'index' => 'required|string|max:255',
             'specialization' => 'required|string|max:255',
+            'semesters' => 'required|array',
+            'semesters.*.id' => 'required|integer|exists:semesters,id',
         ];
     }
 
@@ -45,6 +47,9 @@ class StoreGroupRequest extends FormRequest
             'specialization.required' => 'Поле "специальность" обязательно для заполнения.',
             'specialization.string' => 'Поле "специальность" должно быть строкой.',
             'specialization.max' => 'Поле "специальность" не должно превышать 255 символов.',
+            'semesters.required' => 'Необходимо указать хотя бы один семестр.',
+            'semesters.*.id.required' => 'ID семестра обязателен для заполнения.',
+            'semesters.*.id.exists' => 'Указанный семестр не существует.'
         ];
     }
 

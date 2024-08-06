@@ -8,6 +8,8 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Support\Facades\Route;
 
+Route::post('/groups/{group}/semesters', [GroupController::class, 'attachSemester'])->where(['semester' => '[0-9]+']);
+Route::delete('/groups/{group}/semesters', [GroupController::class, 'detachSemester'])->where(['semester' => '[0-9]+']);
 Route::apiResource('groups', GroupController::class)->where(['group' => '[0-9]+']);
 
 Route::post('/lessons/{lesson}/teachers', [LessonController::class, 'attachTeacher'])->where(['lesson' => '[0-9]+']);
@@ -15,6 +17,7 @@ Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTea
 Route::apiResource('lessons', LessonController::class)->where(['lesson' => '[0-9]+']);
 
 Route::apiResource('schedules', ScheduleController::class);
+
 
 Route::apiResource('subjects', SubjectController::class)->where(['subject' => '[0-9]+']);
 

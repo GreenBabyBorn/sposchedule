@@ -13,7 +13,8 @@ const options = ref(['Основное', 'Изменения']);
 
 
 
-const selectedMainGroup = ref();
+const selectedMainGroup = ref([]);
+const selectedMainSemester = ref([]);
 const { data: groups } = useGroupsQuery()
 const { data: semesters } = useSemestersQuery()
 </script>
@@ -25,11 +26,12 @@ const { data: semesters } = useSemestersQuery()
         </div>
         <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex gap-2 items-center">
+
                 <SelectButton v-model="value" :options="options" aria-labelledby="basic" />
                 <Select v-model="selectedMainGroup" :options="groups" optionLabel="name" placeholder="Группа"
                     class="w-full md:w-[10rem]" />
-                <Select v-model="selectedMainGroup" :options="semesters" optionLabel="name" placeholder="Семестр"
-                    class="w-full md:w-[10rem]" />
+                <Select v-model="selectedMainSemester" :options="selectedMainGroup.semesters" optionLabel="name"
+                    placeholder="Семестр" class="w-full md:w-[10rem]" />
 
             </div>
 
