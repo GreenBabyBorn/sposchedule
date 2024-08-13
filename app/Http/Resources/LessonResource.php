@@ -22,6 +22,7 @@ class LessonResource extends JsonResource
             'cabinet' => $this->cabinet,
             'subject' => new SubjectResource($this->subject),
             'teachers' => TeacherResource::collection($this->teachers),
+            'building' => $this->building,
         ];
     }
 }

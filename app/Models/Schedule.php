@@ -11,6 +11,7 @@ class Schedule extends Model
 
     protected $fillable = [
         'group_id',
+        'semester_id',
         'date',
         'type',
         'week_type',

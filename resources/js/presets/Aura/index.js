@@ -12,6 +12,7 @@ import inputgroupaddon from './inputgroupaddon';
 import inputmask from './inputmask';
 import inputnumber from './inputnumber';
 import inputtext from './inputtext';
+import knob from './knob';
 import listbox from './listbox';
 import multiselect from './multiselect';
 import password from './password';
@@ -65,6 +66,9 @@ import tabmenu from './tabmenu';
 import tieredmenu from './tieredmenu';
 import message from './message';
 import toast from './toast';
+import carousel from './carousel';
+import galleria from './galleria';
+import image from './image';
 import avatar from './avatar';
 import badge from './badge';
 import blockui from './blockui';
@@ -98,6 +102,7 @@ export default {
     inputmask,
     inputnumber,
     inputtext,
+    knob,
     listbox,
     multiselect,
     password,
@@ -150,6 +155,9 @@ export default {
     tieredmenu,
     message,
     toast,
+    carousel,
+    galleria,
+    image,
     avatar,
     badge,
     blockui,

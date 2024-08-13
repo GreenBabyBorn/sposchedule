@@ -5,6 +5,7 @@ import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import { useDateFormat } from '@vueuse/core'
+import InputNumber from 'primevue/inputnumber';
 import { useToast } from 'primevue/usetoast';
 import { useSubjectsQuery, useDestroySubject, useStoreSubject, useUpdateSubject } from '../queries/subjects'
 
@@ -60,11 +61,11 @@ const addSubject = async () => {
     newSubjectError.value = false
     newSubjectName.value = ''
 }
-
 </script>
 
 <template>
     <div class="flex flex-col gap-4">
+
         <div class="flex flex-wrap justify-between items-baseline">
             <h1 class="text-2xl">Предметы</h1>
         </div>

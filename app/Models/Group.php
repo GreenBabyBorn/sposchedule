@@ -17,6 +17,11 @@ class Group extends Model
         'name',
     ];
 
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
     public function semesters()
     {
         return $this->belongsToMany(Semester::class);

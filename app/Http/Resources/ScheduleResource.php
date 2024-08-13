@@ -21,6 +21,7 @@ class ScheduleResource extends JsonResource
             'week_type' => $this->week_type,
             'week_day' => $this->week_day,
             'view_mode' => $this->view_mode,
+            'semester' => new SemesterResource($this->semester),
             'message' => $this->when($this->message !== null, $this->message),
             'group' => new GroupResource($this->group),
             'lessons' => LessonResource::collection($this->lessons),

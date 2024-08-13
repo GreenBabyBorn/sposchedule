@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -17,7 +16,7 @@ return new class extends Migration
             $table->foreignId('schedule_id');
             $table->string('cabinet');
             $table->integer('index')->min(0)->max(10); // Номер пары
-            $table->integer('building')->min(1); // Номер корпуса
+            $table->string('building')->default('1'); // Номер корпуса
             $table->timestamps();
         });
     }

@@ -1,136 +1,112 @@
 <script setup lang="ts">
+import InputText from 'primevue/inputtext';
+import MultiSelect from 'primevue/multiselect';
+import InputNumber from 'primevue/inputnumber';
+import Select from 'primevue/select';
+import { useSubjectsQuery } from '@/queries/subjects';
+import { useTeachersQuery } from '@/queries/teachers';
+import { useUpdateSchedule } from '@/queries/schedules';
+import { useToast } from 'primevue/usetoast';
+import { toRef } from 'vue';
+
+
+
+const toast = useToast();
+const props = defineProps({
+
+    weekDay: { type: String, required: true },
+    // lessons: { type: Array, required: true },
+    item: { required: true },
+})
+
+const items = toRef(() => props.item)
+
+const { data: subjects } = useSubjectsQuery()
+const { data: teachers } = useTeachersQuery()
+
+const { mutateAsync: updateSchedule, isPending: isUpdated } = useUpdateSchedule()
+async function updateCabinet(item) {
+    try {
+        console.log(item.building)
+        await updateSchedule({
+            id: item.id,
+            body: {
+                building: item.building,
+                cabinet: item.cabinet,
+                subject_id: item.subject.id,
+                schedule_id: item.schedule_id,
+                index: item.index,
+            }
+        })
+    }
+    catch (e) {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+        return
+    }
+}
 
 </script>
 
 <template>
-    <div
-        class="flex flex-col rounded-md border border-zinc-200 bg-white dark:border-surface-700 dark:text-white/80 dark:bg-surface-900">
-        <div class="flex items-center justify-between px-2 py-1">
-            <div class="text-sm font-bold text-zinc-700 dark:text-zinc-300">ТЕСТ-409</div>
-            <div><button
-                    class="flex h-8 w-8 items-center justify-center rounded-full transition-colors duration-100 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-700 dark:hover:text-zinc-50 text-color"><i
-                        class="pi pi-ellipsis-v" style="font-size: 1rem"></i></button></div>
-        </div>
-        <div class="shrink-0 border-t border-zinc-200 dark:border-surface-700">
-            <table class="w-full">
-                <tbody>
-                    <tr class="border-b border-zinc-200 text-zinc-900 dark:border-surface-700 dark:text-zinc-200">
-                        <th
-                            class="w-7 border-r border-zinc-200 px-1 py-0.5 text-sm font-semibold dark:border-surface-700">
-                            №
-                        </th>
-                        <th
-                            class="border-r border-zinc-200 px-1 py-0.5 text-left text-sm font-semibold dark:border-surface-700">
-                            Предмет</th>
-                        <th title="Кабинет" class="w-1/6 px-1 py-0.5 text-left text-sm font-semibold">Каб</th>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            0</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">-------------</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            1</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">-------------</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            2</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">-------------</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            3</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">-------------</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            4</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">-------------</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            5</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">-------------</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            6</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">-------------</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                    <tr class="border-b border-zinc-200 last:border-b-0 dark:border-surface-700">
-                        <td
-                            class="border-r border-zinc-200 px-1 py-0.5 text-center text-sm text-color dark:border-surface-700">
-                            7</td>
-                        <td class="border-r border-zinc-200 text-zinc-700 dark:border-surface-700 dark:text-zinc-300">
-                            <div><input class="w-full bg-transparent px-1 py-0.5 text-sm" hidden="" type="text" value=""
-                                    name="subject"><button
-                                    class="w-full px-1 py-0.5 text-left text-sm">__________</button></div>
-                        </td>
-                        <td class="text-sm"><input
-                                class="w-full bg-transparent px-1 py-0.5 text-sm text-zinc-700 dark:text-zinc-300"
-                                type="text" value="" name="cabinet"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    <div class="">
+        <table class="min-w-full border-collapse border border-surface-800">
+            <caption class="text-2xl font-medium text-left mb-2">{{ props.weekDay }}</caption>
+            <thead>
+                <tr>
+                    <th class="border border-surface-800 p-2 font-medium">№</th>
+                    <th class="max-w-min border border-surface-800 p-2 font-medium">Предметы ЧИСЛ|ЗНАМ</th>
+                    <th class="max-w-min border border-surface-800 p-2 font-medium">Преподаватель</th>
+                    <th class="border border-surface-800 p-2 font-medium">Корпус</th>
+                    <th class="border border-surface-800 p-2 font-medium">Кабинет</th>
+                </tr>
+            </thead>
 
+            <tbody>
+                <template v-for="item in items as any">
+                    <tr class="border-t border-surface-800">
+                        <td class="w-2 border border-surface-800 p-2 text-center" rowspan="2">{{ item.index }}</td>
+                        <td class="border-surface-800 p-2"><Select @change="updateCabinet(item['ЧИСЛ'])"
+                                v-model="item['ЧИСЛ'].subject" class="w-full" :options="subjects"
+                                optionLabel="name"></Select></td>
+                        <td class=" border-surface-800 p-2">
+                            <MultiSelect @change="updateCabinet(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].teachers"
+                                class="w-full" :options="teachers" optionLabel="name"></MultiSelect>
+                        </td>
+                        <td class="w-4 border-surface-800 p-2">
+                            <InputText @change="updateCabinet(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].building" />
+                            <!-- <InputNumber v-model="item['ЧИСЛ'].building" @blur="updateCabinet(item['ЧИСЛ'])" /> -->
+                        </td>
+                        <td class="w-4 border-surface-800 p-2">
+                            <InputText @change="updateCabinet(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].cabinet" />
+                        </td>
+                    </tr>
+                    <tr class="">
+                        <td class=" border-surface-800 p-2"><Select @change="updateCabinet(item['ЗНАМ'])"
+                                v-model="item['ЗНАМ'].subject" class="w-full" :options="subjects"
+                                optionLabel="name"></Select></td>
+                        <td class=" border-surface-800 p-2">
+                            <MultiSelect @change="updateCabinet(item['ЗНАМ'])" v-model="item['ЗНАМ'].teachers"
+                                class="w-full" :options="teachers" optionLabel="name"></MultiSelect>
+                        </td>
+                        <td class=" border-surface-800 p-2">
+                            <InputText @change="updateCabinet(item['ЗНАМ'])" v-model="item['ЗНАМ'].building" />
+                            <!-- <InputNumber @update:modelValue="updateCabinet(item['ЗНАМ'])"
+                                v-model="item['ЗНАМ'].building" inputId="minmax" :min="0" fluid /> -->
+                        </td>
+                        <td class=" border-surface-800 p-2">
+                            <InputText @change="updateCabinet(item['ЗНАМ'])" v-model="item['ЗНАМ'].cabinet" />
+                        </td>
+                    </tr>
+                </template>
+
+
+
+
+
+
+            </tbody>
+
+        </table>
+
+    </div>
 </template>

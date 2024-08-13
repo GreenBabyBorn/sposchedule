@@ -51,4 +51,6 @@ class ScheduleController extends Controller
         $schedule->delete();
         return response()->noContent();
     }
+
+
 }

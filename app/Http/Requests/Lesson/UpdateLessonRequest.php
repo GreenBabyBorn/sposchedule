@@ -23,19 +23,19 @@ class UpdateLessonRequest extends FormRequest
     public function rules()
     {
         return [
-            'subject_id' => 'required|exists:subjects,id',
-            'schedule_id' => 'required|exists:schedules,id',
-            'cabinet' => 'required|string|max:255',
-            'index' => [
-                'required',
-                'integer',
-                'min:0',
-                'max:10',
-                Rule::unique('lessons')->where(function ($query) {
-                    return $query->where('schedule_id', $this->safe()->input('schedule_id'));
-                })
-            ],
-            'building' => 'required|integer|min:1',
+            // 'subject_id' => 'required|exists:subjects,id',
+            // 'schedule_id' => 'required|exists:schedules,id',
+            // 'cabinet' => 'required|string|max:255',
+            // 'index' => [
+            //     'required',
+            //     'integer',
+            //     'min:0',
+            //     'max:10',
+            //     Rule::unique('lessons')->where(function ($query) {
+            //         return $query->where('schedule_id', $this->safe()->input('schedule_id'));
+            //     })
+            // ],
+            // 'building' => 'required|integer|min:1',
         ];
     }
 

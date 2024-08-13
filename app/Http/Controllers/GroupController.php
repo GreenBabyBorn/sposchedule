@@ -8,7 +8,10 @@ use App\Http\Requests\Group\UpdateGroupRequest;
 use App\Http\Requests\Group\AttachSemesterRequest;
 use App\Http\Requests\Group\DetachSemesterRequest;
 use App\Http\Resources\GroupResource;
+use App\Http\Resources\LessonResource;
+use App\Http\Resources\ScheduleResource;
 use App\Models\Group;
+use App\Models\Schedule;
 use App\Models\Semester;
 
 class GroupController extends Controller
@@ -85,5 +88,74 @@ class GroupController extends Controller
         $semester = Semester::findOrFail($request->semester_id);
         $group->semesters()->detach($semester);
         return response()->json(['message' => 'Семестр отвязан от группы.', "semester" => $semester ]);
+    }
+
+    public function scheduleMain(Group $group, Semester $semester)
+    {
+        // Получаем расписания для данной группы с типом 'main'
+        $schedules = Schedule::where('group_id', $group->id)
+        ->where('semester_id', $semester->id)
+        ->where('type', 'main')
+        ->with('lessons') // Загрузить уроки вместе с расписанием
+        ->get()
+        ->groupBy('week_day');
+
+
+        // Инициализируем пустой массив для ответа
+        $response = [
+        'ПН' => [],
+        'ВТ' => [],
+        'СР' => [],
+        'ЧТ' => [],
+        'ПТ' => [],
+        'СБ' => [],
+        'ВС' => [],
+        ];
+        // Заполняем ответ расписаниями по дням недели
+
+        // Возвращаем ответ в формате JSON
+        foreach ($schedules as $weekDay => $scheduleGroup) {
+            // Подготавливаем массив для дня недели
+            $dayLessons = [];
+
+            // Сортируем расписание по времени начала урока
+            foreach ($scheduleGroup as $schedule) {
+                foreach ($schedule->lessons as $lesson) {
+                    $index = $lesson->index; // Поле "index", указывающее номер пары
+
+                    if (!isset($dayLessons[$index])) {
+                        $dayLessons[$index] = [
+                            'index' => $index,
+                            'ЧИСЛ' => new \stdClass(),
+                            'ЗНАМ' => new \stdClass(),
+                        ];
+                    }
+
+                    if ($schedule->week_type === 'ЧИСЛ') {
+                        $dayLessons[$index]['ЧИСЛ'] = new LessonResource($lesson);
+                    } elseif ($schedule->week_type === 'ЗНАМ') {
+                        $dayLessons[$index]['ЗНАМ'] = new LessonResource($lesson);
+                    }
+                }
+            }
+            ksort($dayLessons);
+            // Преобразуем $dayLessons в плоский массив и добавляем его в ответ
+            $response[$weekDay] = array_values($dayLessons);
+        }
+
+
+        // $schedules = $group->schedules()->get()
+        //                      ->groupBy('week_day');
+        // $response = [];
+        // foreach ($schedules as $weekDay => $scheduleGroup) {
+        //     $response[$weekDay] = [
+        //         'ЧИСЛ' =>  ScheduleResource::collection($scheduleGroup->where('week_type', 'ЧИСЛ')->values()),
+        //         'ЗНАМ' => ScheduleResource::collection($scheduleGroup->where('week_type', 'ЗНАМ')->values()),
+        //     ];
+        // }
+
+
+        return response()->json($response);
+
     }
 }

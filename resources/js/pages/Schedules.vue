@@ -4,19 +4,29 @@ import SelectButton from 'primevue/selectbutton';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
-import { reactive, ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useGroupsQuery } from '@/queries/groups';
-import { useSemestersQuery, useStoreSemester } from '@/queries/semesters';
+import { useMainSchedulesQuery } from '@/queries/schedules';
+import { useScheduleStore } from '@/stores/schedule'
+import { storeToRefs } from 'pinia';
 
 const value = ref('Основное');
 const options = ref(['Основное', 'Изменения']);
 
-
-
-const selectedMainGroup = ref([]);
-const selectedMainSemester = ref([]);
+const selectedMainGroup: any = ref(null);
+const selectedMainSemester: any = ref(null);
 const { data: groups } = useGroupsQuery()
-const { data: semesters } = useSemestersQuery()
+const { data: mainSchedules } = useMainSchedulesQuery(selectedMainGroup, selectedMainSemester)
+
+const scheduleStore = useScheduleStore()
+const { schedules } = storeToRefs(scheduleStore)
+const { setSchedules } = scheduleStore
+
+watch(mainSchedules, (newData) => {
+    if (newData) {
+        setSchedules(newData)
+    }
+})
 </script>
 
 <template>
@@ -30,77 +40,17 @@ const { data: semesters } = useSemestersQuery()
                 <SelectButton v-model="value" :options="options" aria-labelledby="basic" />
                 <Select v-model="selectedMainGroup" :options="groups" optionLabel="name" placeholder="Группа"
                     class="w-full md:w-[10rem]" />
-                <Select v-model="selectedMainSemester" :options="selectedMainGroup.semesters" optionLabel="name"
+                <Select v-model="selectedMainSemester" :options="selectedMainGroup?.semesters" optionLabel="name"
                     placeholder="Семестр" class="w-full md:w-[10rem]" />
 
             </div>
 
             <Button>Сохранить</Button>
         </div>
-        <div class="">
-
-
-
-            <!-- <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-                <ScheduleItem></ScheduleItem>
-
-            </div> -->
-            <!-- <table class="table2 mqtable3">
-                <tbody>
-                    <tr>
-                        <th></th>
-                        <th>ИС-301</th>
-
-                    </tr>
-                    <tr>
-                        <th style="writing-mode: sideways-lr;">Понедельник</th>
-                        <td>
-                            <ScheduleItem></ScheduleItem>
-                        </td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <th>Понедельник</th>
-                    </tr>
-                    <tr>
-                        <th>Вторник</th>
-                        <td>qwe</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <th>Вторник</th>
-                    </tr>
-                    <tr>
-                        <th>Среда</th>
-                        <td>qwe</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <th>Среда</th>
-                    </tr>
-                    <tr>
-                        <th>Четверг</th>
-                        <td>qwe</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <th>Четверг</th>
-                    </tr>
-                    <tr>
-                        <th>Пятница</th>
-                        <td>qwe</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <th>Пятница</th>
-                    </tr>
-                </tbody>
-            </table> -->
+        <div class="flex flex-col gap-6">
+            <ScheduleItem v-for="(item, index) in schedules" :item="item" :lessons="item.lessons"
+                :week-day="index.toString()">
+            </ScheduleItem>
         </div>
     </div>
 

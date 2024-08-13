@@ -25,7 +25,19 @@ class StoreScheduleRequest extends FormRequest
     public function rules()
     {
         return [
-            'group_id' => 'required|exists:groups,id',
+            'group_id' => ['required', 'exists:groups,id', function ($attribute, $value, $fail) {
+                if ($this->type === 'main') {
+                    $exists = \App\Models\Schedule::where('group_id', $this->group_id)
+                        ->where('type', $this->type)
+                        ->where('week_type', $this->week_type)
+                        ->where('week_day', $this->week_day)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('Для данной группы уже существует расписание с таким типом, типом недели и днем недели.');
+                    }
+                }
+            }, ],
             'date' => [
                 'nullable',
                 'date',
@@ -60,23 +72,23 @@ class StoreScheduleRequest extends FormRequest
             if(!$week_type) {
                 return;
             }
-            
+
             // День отсчета
-            $currentDate = Carbon::parse('2024-09-01');
+            // $currentDate = Carbon::parse('2024-09-01');
 
-            $daysSinceStart = $currentDate->diffInDays($date);
-            $weekNumber = intdiv($daysSinceStart, 7) + 1;
-            $isOddWeek = $weekNumber % 2 !== 0;
+            // $daysSinceStart = $currentDate->diffInDays($date);
+            // $weekNumber = intdiv($daysSinceStart, 7) + 1;
+            // $isOddWeek = $weekNumber % 2 !== 0;
 
-            if (!$isOddWeek && $week_type === 'ЗНАМ') {
-                return;
-            }
+            // if (!$isOddWeek && $week_type === 'ЗНАМ') {
+            //     return;
+            // }
 
-            if ($isOddWeek && $week_type === 'ЧИСЛ') {
-                return;
-            }
+            // if ($isOddWeek && $week_type === 'ЧИСЛ') {
+            //     return;
+            // }
 
-            $validator->errors()->add('week_type', 'Неверный тип недели для указанной даты.');
+            // $validator->errors()->add('week_type', 'Неверный тип недели для указанной даты.');
         });
     }
 
