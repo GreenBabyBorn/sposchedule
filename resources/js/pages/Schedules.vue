@@ -48,8 +48,8 @@ watch(mainSchedules, (newData) => {
             <Button>Сохранить</Button>
         </div>
         <div class="flex flex-col gap-6">
-            <ScheduleItem v-for="(item, index) in schedules" :item="item" :lessons="item.lessons"
-                :week-day="index.toString()">
+            <ScheduleItem :group="selectedMainGroup" :semester="selectedMainSemester" v-for="(item, index) in schedules"
+                :item="item" :lessons="item.lessons" :week-day="index.toString()">
             </ScheduleItem>
         </div>
     </div>

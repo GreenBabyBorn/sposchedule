@@ -143,18 +143,6 @@ class GroupController extends Controller
             $response[$weekDay] = array_values($dayLessons);
         }
 
-
-        // $schedules = $group->schedules()->get()
-        //                      ->groupBy('week_day');
-        // $response = [];
-        // foreach ($schedules as $weekDay => $scheduleGroup) {
-        //     $response[$weekDay] = [
-        //         'ЧИСЛ' =>  ScheduleResource::collection($scheduleGroup->where('week_type', 'ЧИСЛ')->values()),
-        //         'ЗНАМ' => ScheduleResource::collection($scheduleGroup->where('week_type', 'ЗНАМ')->values()),
-        //     ];
-        // }
-
-
         return response()->json($response);
 
     }

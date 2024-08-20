@@ -25,19 +25,21 @@ class StoreScheduleRequest extends FormRequest
     public function rules()
     {
         return [
-            'group_id' => ['required', 'exists:groups,id', function ($attribute, $value, $fail) {
-                if ($this->type === 'main') {
-                    $exists = \App\Models\Schedule::where('group_id', $this->group_id)
-                        ->where('type', $this->type)
-                        ->where('week_type', $this->week_type)
-                        ->where('week_day', $this->week_day)
-                        ->exists();
+            'group_id' => ['required', 'exists:groups,id', 
+            // function ($attribute, $value, $fail) {
+            //     if ($this->type === 'main') {
+            //         $exists = \App\Models\Schedule::where('group_id', $this->group_id)
+            //             ->where('type', $this->type)
+            //             ->where('week_type', $this->week_type)
+            //             ->where('week_day', $this->week_day)
+            //             ->exists();
 
-                    if ($exists) {
-                        $fail('Для данной группы уже существует расписание с таким типом, типом недели и днем недели.');
-                    }
-                }
-            }, ],
+            //         if ($exists) {
+            //             $fail('Для данной группы уже существует расписание с таким типом, типом недели и днем недели.');
+            //         }
+            //     }
+            // }, 
+        ],
             'date' => [
                 'nullable',
                 'date',

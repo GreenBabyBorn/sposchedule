@@ -19,10 +19,10 @@ export function useMainSchedulesQuery(mainGroup, mainSemester) {
   });
 }
 
-export function useUpdateSchedule() {
+export function useStoreSchedule() {
   const queryClient = useQueryClient();
   let updateSemesterMutation = useMutation({
-    mutationFn: ({ id, body }: any) => axios.patch(`/api/lessons/${id}`, body),
+    mutationFn: ({ body }: any) => axios.post(`/api/schedules`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
     },

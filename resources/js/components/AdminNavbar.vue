@@ -4,7 +4,9 @@
 import Menu from 'primevue/menu';
 
 import { ref } from "vue";
+import { useAppStore } from '@/stores/app';
 
+const { isNavbarActive } = useAppStore();
 
 const items = ref([
     {
@@ -36,16 +38,11 @@ const items = ref([
 </script>
 
 <template>
-    <div class="basis-80 flex-grow-0 lg:min-h-screen bg-surface-200 dark:bg-surface-950">
+    <div :class="{ 'active-navbar': isNavbarActive }"
+        class="transition-transform fixed z-50 w-80 top-20 left-0 basis-80 flex-grow-0 lg:min-h-screen bg-surface-200 dark:bg-surface-950">
         <div class="flex flex-col py-4 px-4">
             <Menu :model="items" class="w-full p-4">
-                <template #start>
-                    <RouterLink to="/">
-                        <div class="p-4">
-                            <span class="font-bold">Система управления расписанием</span>
-                        </div>
-                    </RouterLink>
-                </template>
+
                 <template #item="{ item, props }">
                     <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
                         <a :href="href" v-bind="props.action" @click="navigate">
@@ -63,3 +60,9 @@ const items = ref([
     </div>
 
 </template>
+
+<style>
+.active-navbar {
+    transform: translateX(-100%);
+}
+</style>

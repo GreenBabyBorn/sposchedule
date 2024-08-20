@@ -19,7 +19,6 @@ Route::apiResource('lessons', LessonController::class)->where(['lesson' => '[0-9
 
 Route::apiResource('schedules', ScheduleController::class);
 
-
 Route::apiResource('subjects', SubjectController::class)->where(['subject' => '[0-9]+']);
 
 Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSubject'])->where(['teacher' => '[0-9]+']);

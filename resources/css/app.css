@@ -45,8 +45,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* @layer tailwind-utilities { */
-/* } */
+body {
+  @apply bg-surface-200 dark:bg-surface-950;
+}
 
 /* Primary and Surface Palettes */
 :root {
