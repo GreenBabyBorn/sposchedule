@@ -4,6 +4,7 @@ import axios from 'axios';
 export function useGroupsQuery() {
   return useQuery({
     queryKey: ['groups'],
+
     queryFn: async () => (await axios.get('/api/groups')).data,
   });
 }

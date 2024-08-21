@@ -49,40 +49,101 @@ async function editLesson(item) {
     }
 }
 
-
-const newLesson = reactive({
+let newLesson = reactive({
+    index: null,
     'ЧИСЛ':
     {
         subject: null,
         teachers: [],
         building: null,
         cabinet: null,
-        index: null,
+
     },
     'ЗНАМ': {
         subject: null,
         teachers: [],
         building: null,
         cabinet: null,
-        index: null,
+
     }
 })
 
 const { mutateAsync: storeSchedule, data: newSchedule } = useStoreSchedule()
 const { mutateAsync: storeLesson } = useStoreLesson()
 
-async function addLesson() {
-    console.log(props.item)
-    // if (!newLesson.ЧИСЛ.subject) {
-    //     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Выберите предмет', life: 3000, closable: true });
-    //     return
-    // }
-    // if (!newLesson.ЧИСЛ.teachers.length) {
-    //     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Выберите преподавателя', life: 3000, closable: true });
-    //     return
-    // }
-    try {
-        if (newLesson.ЧИСЛ.subject) {
+async function addNewLesson() {
+    if (newLesson.ЧИСЛ.subject && newLesson.index) {
+        try {
+            await storeSchedule({
+                body: {
+                    // @ts-ignore
+                    group_id: props.group.id,
+                    // @ts-ignore
+                    semester_id: props.semester.id,
+                    type: 'main',
+                    week_type: 'ЧИСЛ',
+                    week_day: props.weekDay,
+                    view_mode: 'table'
+                }
+            })
+        }
+        catch (e) {
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+            return
+        }
+
+        try {
+            await storeLesson({
+                body: {
+                    ...newLesson.ЧИСЛ,
+                    index: newLesson.index,
+                    subject_id: newLesson.ЧИСЛ.subject.id,
+                    schedule_id: newSchedule.value.data.id
+                }
+            })
+        }
+        catch (e) {
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+            return
+        }
+
+    }
+
+    if (newLesson.ЗНАМ.subject && newLesson.index) {
+        try {
+            await storeSchedule({
+                body: {
+                    // @ts-ignore
+                    group_id: props.group.id,
+                    // @ts-ignore
+                    semester_id: props.semester.id,
+                    type: 'main',
+                    week_type: 'ЗНАМ',
+                    week_day: props.weekDay,
+                    view_mode: 'table'
+                }
+            })
+            await storeLesson({
+                body: {
+                    ...newLesson.ЗНАМ,
+                    index: newLesson.index,
+                    subject_id: newLesson.ЗНАМ.subject.id,
+                    schedule_id: newSchedule.value.data.id
+                }
+            })
+        }
+        catch (e) {
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+            return
+        }
+    }
+
+}
+
+async function addLesson(weekType, index, item) {
+    console.log(item)
+    if (weekType == 'ЧИСЛ' && Object.keys(item).length !== 0) {
+        try {
             await storeSchedule({
                 body: {
                     // @ts-ignore
@@ -97,27 +158,63 @@ async function addLesson() {
             })
             await storeLesson({
                 body: {
-                    ...newLesson.ЧИСЛ,
-                    subject_id: newLesson.ЧИСЛ.subject.id,
+                    ...item,
+                    index: index,
+                    subject_id: item.subject.id,
                     schedule_id: newSchedule.value.data.id
                 }
             })
         }
-
+        catch (e) {
+            console.log(e)
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+            return
+        }
     }
-    catch (e) {
 
+    else if (weekType == 'ЗНАМ' && Object.keys(item).length !== 0) {
+        console.log(item)
+        try {
+            await storeSchedule({
+                body: {
+                    // @ts-ignore
+                    group_id: props.group.id,
+                    // @ts-ignore
+                    semester_id: props.semester.id,
+                    type: 'main',
+                    week_type: 'ЗНАМ',
+                    week_day: props.weekDay,
+                    view_mode: 'table'
+                }
+            })
+            await storeLesson({
+                body: {
+                    ...item,
+                    index: index,
+                    subject_id: item.subject.id,
+                    schedule_id: newSchedule.value.data.id
+                }
+            })
+        }
+        catch (e) {
+            console.log(e)
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+            return
+        }
+    }
+    else {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Недозаполненно', life: 3000, closable: true });
     }
 }
 
 const { mutateAsync: destroyLesson } = useDestroyLesson()
-
 async function removeLesson(id) {
     try {
         await destroyLesson({ id: id })
     }
     catch (e) {
-
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+        return
     }
 }
 
@@ -130,7 +227,7 @@ async function removeLesson(id) {
             <thead>
                 <tr>
                     <th class=" border border-surface-800 p-2 font-medium">№</th>
-                    <th class="border border-surface-800 p-2 font-medium">Предметы ЧИСЛ|ЗНАМ</th>
+                    <th class="border border-surface-800 p-2 font-medium">Предметы ЧИСЛ | ЗНАМ</th>
                     <th class="border border-surface-800 p-2 font-medium">Преподаватель</th>
                     <th class=" border border-surface-800 p-2 font-medium">Корпус</th>
                     <th class="border border-surface-800 p-2 font-medium">Кабинет</th>
@@ -143,46 +240,55 @@ async function removeLesson(id) {
                     <tr class="border-t border-surface-800">
                         <td class="border border-surface-800 p-2 text-center" rowspan="2">{{ item.index }}</td>
                         <td class="border-surface-800 p-2"><Select @change="editLesson(item['ЧИСЛ'])"
-                                v-model="item['ЧИСЛ'].subject" class="" :options="subjects" optionLabel="name"></Select>
+                                v-model="item['ЧИСЛ'].subject" class="w-full" :options="subjects"
+                                optionLabel="name"></Select>
                         </td>
                         <td class=" border-surface-800 p-2">
                             <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item['ЧИСЛ'])"
-                                v-model="item['ЧИСЛ'].teachers" class="" :options="teachers" optionLabel="name">
+                                v-model="item['ЧИСЛ'].teachers" class="w-full" :options="teachers" optionLabel="name">
                             </MultiSelect>
                         </td>
-                        <td class=" border-surface-800 p-2">
-                            <InputText @change="editLesson(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].building" />
+                        <td class="text-center border-surface-800 p-2">
+                            <InputText class="max-w-10" @change="editLesson(item['ЧИСЛ'])"
+                                v-model="item['ЧИСЛ'].building" />
 
                         </td>
-                        <td class=" border-surface-800 p-2">
-                            <InputText @change="editLesson(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].cabinet" />
+                        <td class="text-center border-surface-800 p-2">
+                            <InputText class="max-w-10" @change="editLesson(item['ЧИСЛ'])"
+                                v-model="item['ЧИСЛ'].cabinet" />
                         </td>
 
                         <td class="border-surface-800 p-2">
-                            <Button icon="pi pi-plus" v-if="!item['ЧИСЛ'].id"></Button>
+                            <Button @click="addLesson('ЧИСЛ', item.index, item['ЧИСЛ'])" icon="pi pi-plus"
+                                v-if="!item['ЧИСЛ'].id"></Button>
                             <Button @click="removeLesson(item['ЧИСЛ'].id)" icon="pi pi-trash" severity="danger"
                                 v-if="item['ЧИСЛ'].id"></Button>
                         </td>
                     </tr>
                     <tr class="border-t border-surface-800">
                         <td class=" border-surface-800 p-2"><Select @change="editLesson(item['ЗНАМ'])"
-                                v-model="item['ЗНАМ'].subject" class="" :options="subjects" optionLabel="name"></Select>
+                                v-model="item['ЗНАМ'].subject" class="w-full" :options="subjects"
+                                optionLabel="name"></Select>
                         </td>
                         <td class=" border-surface-800 p-2">
                             <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item['ЗНАМ'])"
-                                v-model="item['ЗНАМ'].teachers" :options="teachers" optionLabel="name">
+                                v-model="item['ЗНАМ'].teachers" class="w-full" :options="teachers" optionLabel="name">
                             </MultiSelect>
                         </td>
-                        <td class=" border-surface-800 p-2">
-                            <InputText @change="editLesson(item['ЗНАМ'])" v-model="item['ЗНАМ'].building" />
+                        <td class="text-center border-surface-800 p-2">
+                            <InputText class="max-w-10" @change="editLesson(item['ЗНАМ'])"
+                                v-model="item['ЗНАМ'].building" />
+                        </td>
+
+                        <td class="text-center border-surface-800 p-2">
+                            <InputText class="max-w-10" @change="editLesson(item['ЗНАМ'])"
+                                v-model="item['ЗНАМ'].cabinet" />
                         </td>
 
                         <td class="border-surface-800 p-2">
-                            <InputText @change="editLesson(item['ЗНАМ'])" v-model="item['ЗНАМ'].cabinet" />
-                        </td>
 
-                        <td class="border-surface-800 p-2">
-                            <Button icon="pi pi-plus" v-if="!item['ЗНАМ'].id"></Button>
+                            <Button @click="addLesson('ЗНАМ', item.index, item['ЗНАМ'])" icon="pi pi-plus"
+                                v-if="!item['ЗНАМ'].id"></Button>
                             <Button @click="removeLesson(item['ЗНАМ'].id)" icon="pi pi-trash" severity="danger"
                                 v-if="item['ЗНАМ'].id"></Button>
                         </td>
@@ -190,20 +296,16 @@ async function removeLesson(id) {
 
                 </template>
 
-
-
-
-
                 <tr class="border-t border-surface-800">
                     <td class="border border-surface-800 p-2 text-center " rowspan="2">
-                        <InputText class="max-w-10" v-model="newLesson['ЧИСЛ'].index" />
+                        <InputText class="max-w-10" v-model="newLesson.index" />
                     </td>
-                    <td class="border-surface-800 p-2"><Select v-model="newLesson['ЧИСЛ'].subject" class=""
+                    <td class="border-surface-800 p-2"><Select v-model="newLesson['ЧИСЛ'].subject" class="w-full"
                             :options="subjects" optionLabel="name"></Select>
                     </td>
                     <td class=" border-surface-800 p-2">
-                        <MultiSelect placeholder="Выберите преподавателя" v-model="newLesson['ЧИСЛ'].teachers" class=""
-                            :options="teachers" optionLabel="name">
+                        <MultiSelect placeholder="Выберите преподавателя" v-model="newLesson['ЧИСЛ'].teachers"
+                            class="w-full" :options="teachers" optionLabel="name">
                         </MultiSelect>
                     </td>
                     <td class="text-center border-surface-800 p-2">
@@ -214,18 +316,18 @@ async function removeLesson(id) {
                         <InputText class="max-w-10" v-model="newLesson['ЧИСЛ'].cabinet" />
                     </td>
 
-                    <td class="text-center border-surface-800 p-2" rowspan="2">
-                        <Button @click="addLesson()" icon="pi pi-plus"></Button>
+                    <td class="border-l-2 text-center border-surface-800 p-2" rowspan="2">
+                        <Button @click="addNewLesson()" icon="pi pi-plus"></Button>
 
                     </td>
                 </tr>
                 <tr class="border-t border-surface-800">
-                    <td class=" border-surface-800 p-2"><Select v-model="newLesson['ЗНАМ'].subject" class=""
+                    <td class=" border-surface-800 p-2"><Select v-model="newLesson['ЗНАМ'].subject" class="w-full"
                             :options="subjects" optionLabel="name"></Select>
                     </td>
                     <td class=" border-surface-800 p-2">
                         <MultiSelect placeholder="Выберите преподавателя" v-model="newLesson['ЗНАМ'].teachers"
-                            :options="teachers" optionLabel="name">
+                            :options="teachers" class="w-full" optionLabel="name">
                         </MultiSelect>
                     </td>
                     <td class="text-center border-surface-800 p-2">
@@ -245,72 +347,4 @@ async function removeLesson(id) {
 
     </div>
 
-    <!-- <div class="">
-        <div class="table-container">
-            <div class="table-header">
-                №
-            </div>
-            <div class="table-header">
-                Предмет
-            </div>
-            <div class="table-header">
-                Преподаватели
-            </div>
-            <div class="table-header">
-                Корпус
-            </div>
-            <div class="table-header">
-                Кабинет
-            </div>
-            <div class="table-header">
-                Действия
-            </div>
-            <div class="table-row num">
-                <div class="table-cell">1</div>
-            </div>
-            <div class="table-row">
-                <div class="table-cell">123</div>
-            </div>
-            <div class="table-row">
-                <div class="table-cell">123</div>
-            </div>
-            <div class="table-row">
-                <div class="table-cell">123</div>
-            </div>
-            <div class="table-row">
-                <div class="table-cell">123</div>
-            </div>
-            <div class="table-row">
-                <div class="table-cell">123</div>
-            </div>
-        </div>
-    </div> -->
 </template>
-
-<style>
-.num {
-    grid-row: 1/3;
-}
-
-.table-container {
-    display: grid;
-    grid-template-columns: 2rem 2fr 2fr max-content max-content 1fr;
-    /* 4 колонки одинаковой ширины */
-    gap: 10px;
-    width: 100%;
-    /* max-width: 800px; */
-    margin: 0 auto;
-}
-
-.table-header {
-    text-align: center;
-    padding: 10px;
-    font-weight: bold;
-}
-
-.table-cell {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
-</style>

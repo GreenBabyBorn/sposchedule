@@ -7,7 +7,7 @@ import HomeView from '../pages/Home.vue';
 import GroupsView from '../pages/Groups.vue';
 import SubjectsView from '../pages/Subjects.vue';
 import TeachersView from '../pages/Teachers.vue';
-import SchedulesView from '../pages/Schedules.vue';
+import SchedulesView from '../pages/MainSchedules.vue';
 import SemestersView from '../pages/Semesters.vue';
 
 const router = createRouter({
@@ -24,7 +24,7 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/schedules',
+      path: '/admin/schedules/main',
       name: RouteNamesEnum.schedules,
       component: SchedulesView,
       meta: {
