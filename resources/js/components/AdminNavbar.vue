@@ -11,7 +11,7 @@ const { isNavbarActive } = useAppStore();
 const items = ref([
     {
         label: 'Семестры',
-        icon: 'pi pi-clipboard',
+        icon: 'pi pi-hourglass',
         route: '/admin/semesters'
     },
     {
@@ -20,19 +20,26 @@ const items = ref([
         route: '/admin/groups'
     },
     {
-        label: 'Основное расписание',
-        icon: 'pi pi-clipboard',
-        route: '/admin/schedules/main'
+        label: 'Предметы',
+        icon: 'pi pi-book',
+        route: '/admin/subjects'
     },
     {
         label: 'Преподаватели',
         icon: 'pi pi-user',
         route: '/admin/teachers'
-    }, {
-        label: 'Предметы',
-        icon: 'pi pi-book',
-        route: '/admin/subjects'
     },
+    {
+        label: 'Основное расписание',
+        icon: 'pi pi-calendar-plus',
+        route: '/admin/schedules/main'
+    },
+    {
+        label: 'Расписание',
+        icon: 'pi pi-calendar',
+        route: '/admin/schedules/changes'
+    },
+
 
 ]);
 </script>

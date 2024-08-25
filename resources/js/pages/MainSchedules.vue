@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import ScheduleItem from '../components/MainScheduleItem.vue'
-import Button from 'primevue/button';
 import Select from 'primevue/select';
 import { onMounted, ref, watch } from 'vue'
 import { useGroupsQuery } from '@/queries/groups';
@@ -69,12 +68,12 @@ onMounted(() => {
         </div>
         <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex gap-2 items-center">
-                <Select v-model="selectedMainGroup" :options="groups" optionLabel="name" placeholder="Группа"
+                <Select editable v-model="selectedMainGroup" :options="groups" optionLabel="name" placeholder="Группа"
                     class="w-full md:w-[10rem]" />
                 <Select v-model="selectedMainSemester" :options="selectedMainGroup?.semesters" optionLabel="name"
-                    placeholder="Семестр" class="w-full md:w-[10rem]" />
+                    placeholder="Семестр" class="w-full md:w-[15rem]" />
             </div>
-            <Button>Сохранить</Button>
+
         </div>
         <div class="flex flex-col gap-6">
             <ScheduleItem :group="selectedMainGroup" :semester="selectedMainSemester" v-for="(item, index) in schedules"

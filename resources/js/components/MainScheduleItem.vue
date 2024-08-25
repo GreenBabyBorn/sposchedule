@@ -236,7 +236,7 @@ function addRowAddNewLesson() {
 <template>
     <div class="relative overflow-x-auto">
         <div class="">
-            <table class="schedule-table">
+            <table class="schedule-table dark:bg-surface-900">
                 <caption class="text-2xl font-medium text-surface-200 mb-2">{{ props.weekDay }}</caption>
                 <thead>
                     <tr>
@@ -403,7 +403,7 @@ function addRowAddNewLesson() {
 
 </template>
 
-<style>
+<style scoped>
 .schedule-table {
     width: 100%;
     border-collapse: collapse;

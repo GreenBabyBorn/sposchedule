@@ -7,6 +7,7 @@ import Aura from './presets/Aura';
 import App from './App.vue';
 import ToastService from 'primevue/toastservice';
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
+import { locale } from './locale';
 
 const pinia = createPinia();
 
@@ -17,6 +18,7 @@ createApp(App)
   .use(PrimeVue, {
     unstyled: true,
     pt: Aura,
+    locale,
   })
   .use(router)
   .mount('#app');

@@ -26,4 +26,13 @@ class Group extends Model
     {
         return $this->belongsToMany(Semester::class);
     }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::saving(function ($group) {
+            $group->name = $group->specialization . '-' . $group->course . $group->index;
+        });
+    }
 }

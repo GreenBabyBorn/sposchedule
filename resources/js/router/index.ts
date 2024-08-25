@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter, useRoute } from 'vue-router';
+import { createWebHistory, createRouter } from 'vue-router';
 import { loadLayoutMiddleware } from '@/router/middleware/loadLayout.middleware';
 import { RouteNamesEnum } from '@/router/router.types';
 import { AppLayoutsEnum } from '@/layouts/layouts.types';
@@ -8,6 +8,7 @@ import GroupsView from '../pages/Groups.vue';
 import SubjectsView from '../pages/Subjects.vue';
 import TeachersView from '../pages/Teachers.vue';
 import SchedulesView from '../pages/MainSchedules.vue';
+import SchedulesChanges from '../pages/ChangesSchedules.vue';
 import SemestersView from '../pages/Semesters.vue';
 
 const router = createRouter({
@@ -27,6 +28,15 @@ const router = createRouter({
       path: '/admin/schedules/main',
       name: RouteNamesEnum.schedules,
       component: SchedulesView,
+      meta: {
+        layout: AppLayoutsEnum.admin,
+        title: 'Основное расписание',
+      },
+    },
+    {
+      path: '/admin/schedules/changes',
+      name: RouteNamesEnum.schedulesChanges,
+      component: SchedulesChanges,
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Расписание',
@@ -65,8 +75,8 @@ const router = createRouter({
 router.beforeEach(loadLayoutMiddleware);
 router.beforeEach(to => {
   const { title, description }: any = to.meta;
-  const defaultTitle = 'Расписание';
-  const defaultDescription = 'Расписание';
+  const defaultTitle = 'СУР';
+  const defaultDescription = 'Система управления расписанием';
 
   document.title = title || defaultTitle;
 

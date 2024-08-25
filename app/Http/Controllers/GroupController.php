@@ -13,15 +13,54 @@ use App\Http\Resources\ScheduleResource;
 use App\Models\Group;
 use App\Models\Schedule;
 use App\Models\Semester;
+use Illuminate\Http\Request;
 
 class GroupController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return GroupResource::collection(Group::all());
+        // Начинаем с запроса к модели Group
+        $query = Group::query();
+
+        // Фильтрация по course
+        if ($request->has('course')) {
+            $query->where('course', $request->input('course'));
+        }
+
+        // Фильтрация по index
+        if ($request->has('index')) {
+            $query->where('index', $request->input('index'));
+        }
+
+        // Фильтрация по specialization
+        if ($request->has('specialization')) {
+            $query->where('specialization', $request->input('specialization'));
+        }
+
+        // Фильтрация по name (конкатенация specialization, course и index)
+        if ($request->has('name')) {
+            $name = $request->input('name');
+            $query->where('name', 'LIKE', "%{$name}%");
+        }
+
+        // Сортировка
+        $orderField = $request->input('order_field', 'id'); // Поле для сортировки, по умолчанию id
+        $orderDirection = $request->input('order_direction', 'asc'); // Направление сортировки, по умолчанию asc
+
+        // Проверка на допустимые значения для сортировки
+        if (in_array($orderField, ['id', 'course', 'index', 'specialization', 'name']) &&
+            in_array($orderDirection, ['asc', 'desc'])) {
+            $query->orderBy($orderField, $orderDirection);
+        }
+
+        // Получаем отфильтрованные группы
+        $groups = $query->get();
+
+        // Возвращаем коллекцию через GroupResource
+        return GroupResource::collection($groups);
     }
 
     /**
