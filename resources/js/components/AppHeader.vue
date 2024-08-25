@@ -7,10 +7,10 @@
         <nav>
             <ul class="flex gap-2 flex-wrap ">
                 <li>
-                    <RouterLink to="/">Главная</RouterLink>
+                    <RouterLink class="text-surface-100" to="/">Главная</RouterLink>
                 </li>
                 <li>
-                    <RouterLink to="/admin/schedules/main">Админ</RouterLink>
+                    <RouterLink class="text-surface-100" to="/admin/schedules/main">Админ</RouterLink>
                 </li>
             </ul>
         </nav>

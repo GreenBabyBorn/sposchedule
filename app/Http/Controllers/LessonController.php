@@ -25,6 +25,11 @@ class LessonController extends Controller
     public function store(StoreLessonRequest $request)
     {
         $lesson = Lesson::create($request->all());
+        if ($request->teachers) {
+            $teachersIds = array_column($request->teachers, 'id');
+            $lesson->teachers()->sync($teachersIds);
+        }
+
         return new LessonResource($lesson);
     }
 
@@ -42,6 +47,10 @@ class LessonController extends Controller
     public function update(UpdateLessonRequest $request, Lesson $lesson)
     {
         $lesson->update($request->all());
+        if ($request->has('teachers') && is_array($request->teachers)) {
+            $teachersIds = array_column($request->teachers, 'id');
+            $lesson->teachers()->sync($teachersIds);
+        }
         return new LessonResource($lesson);
     }
 

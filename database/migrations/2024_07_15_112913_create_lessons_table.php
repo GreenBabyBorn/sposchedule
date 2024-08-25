@@ -14,6 +14,7 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('subject_id');
             $table->foreignId('schedule_id');
+            $table->enum('week_type', ['ЗНАМ', 'ЧИСЛ'])->nullable();
             $table->string('cabinet');
             $table->integer('index')->min(0)->max(10); // Номер пары
             $table->string('building')->default('1'); // Номер корпуса

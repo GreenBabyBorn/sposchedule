@@ -18,7 +18,7 @@ class ScheduleResource extends JsonResource
             'id' => $this->id,
             'date' => $this->date,
             'type' => $this->type,
-            'week_type' => $this->week_type,
+            // 'week_type' => $this->week_type,
             'week_day' => $this->week_day,
             'view_mode' => $this->view_mode,
             'semester' => new SemesterResource($this->semester),

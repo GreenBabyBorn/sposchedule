@@ -1,4 +1,4 @@
-import { createWebHistory, createRouter } from 'vue-router';
+import { createWebHistory, createRouter, useRoute } from 'vue-router';
 import { loadLayoutMiddleware } from '@/router/middleware/loadLayout.middleware';
 import { RouteNamesEnum } from '@/router/router.types';
 import { AppLayoutsEnum } from '@/layouts/layouts.types';

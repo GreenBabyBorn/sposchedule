@@ -24,16 +24,17 @@ class StoreLessonRequest extends FormRequest
     {
         return [
             'subject_id' => 'required|exists:subjects,id',
-            'schedule_id' => 'required|exists:schedules,id',    
+            'schedule_id' => 'required|exists:schedules,id',
             'cabinet' => 'required|string|max:255',
+             'week_type' => [Rule::in(['ЧИСЛ', 'ЗНАМ', null])],
             'index' => [
                 'required',
                 'integer',
                 'min:0',
                 'max:10',
-                Rule::unique('lessons')->where(function ($query) {
-                    return $query->where('schedule_id', $this->safe()->input('schedule_id'));
-                })
+                // Rule::unique('lessons')->where(function ($query) {
+                //     return $query->where('schedule_id', $this->safe()->input('schedule_id'));
+                // })
             ],
             'building' => 'required|integer|min:1',
         ];

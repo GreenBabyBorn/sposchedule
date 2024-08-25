@@ -52,7 +52,7 @@ class StoreScheduleRequest extends FormRequest
                 'required',
                 Rule::in(['main', 'changes']),
             ],
-            'week_type' => ['required_if:type,main', Rule::in(['ЧИСЛ', 'ЗНАМ'])],
+            // 'week_type' => ['required_if:type,main', Rule::in(['ЧИСЛ', 'ЗНАМ'])],
             'week_day' => [
                 'required_if:type,main',
                 Rule::in(['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']),

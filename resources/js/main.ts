@@ -11,9 +11,9 @@ import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
 const pinia = createPinia();
 
 createApp(App)
+  .use(pinia)
   .use(VueQueryPlugin)
   .use(ToastService)
-  .use(pinia)
   .use(PrimeVue, {
     unstyled: true,
     pt: Aura,

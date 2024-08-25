@@ -20,9 +20,9 @@ const items = ref([
         route: '/admin/groups'
     },
     {
-        label: 'Расписание',
+        label: 'Основное расписание',
         icon: 'pi pi-clipboard',
-        route: '/admin/schedules'
+        route: '/admin/schedules/main'
     },
     {
         label: 'Преподаватели',

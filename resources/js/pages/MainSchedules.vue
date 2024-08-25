@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ScheduleItem from '../components/ScheduleItem.vue'
+import ScheduleItem from '../components/MainScheduleItem.vue'
 import Button from 'primevue/button';
 import Select from 'primevue/select';
 import { onMounted, ref, watch } from 'vue'
@@ -11,16 +11,32 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 
 const route = useRoute()
-const queryParams = ref(route.query);
 
-const selectedMainGroup: any = ref(null);
-const selectedMainSemester: any = ref(null);
+
+const scheduleStore = useScheduleStore()
+const { schedules, selectedMainGroup, selectedMainSemester, queryParams } = storeToRefs(scheduleStore)
+const { setSchedules, } = scheduleStore
+
 const { data: groups, isFetched, } = useGroupsQuery()
 const { data: mainSchedules } = useMainSchedulesQuery(selectedMainGroup, selectedMainSemester)
 
-const scheduleStore = useScheduleStore()
-const { schedules } = storeToRefs(scheduleStore)
-const { setSchedules } = scheduleStore
+const updateQueryParams = () => {
+    router.replace({
+        query: {
+            ...route.query,
+            group: selectedMainGroup.value?.id || null,
+            semester: selectedMainSemester.value?.id || null,
+        },
+    });
+};
+
+watch(
+    [selectedMainGroup, selectedMainSemester],
+    () => {
+        updateQueryParams();
+    },
+    { deep: true }
+);
 
 watch(mainSchedules, (newData) => {
     if (newData) {
@@ -28,36 +44,20 @@ watch(mainSchedules, (newData) => {
     }
 })
 
-// Функция для обновления query параметров
-const updateQueryParams = () => {
-    router.replace({
-        query: {
-            ...route.query, // Сохраняем другие query параметры, если они есть
-            group: selectedMainGroup.value?.id || null,
-            semester: selectedMainSemester.value?.id || null,
-        },
-    });
-};
 
-// Watch для изменения группы и семестра
-watch([selectedMainGroup, selectedMainSemester], () => {
-    updateQueryParams();
-}, { deep: true });
-
-// Обрабатываем монтирование компонента
 onMounted(() => {
-    // Ждем, пока данные по группам будут загружены
+    updateQueryParams()
     watch(isFetched, (isFetchedVal) => {
         if (isFetchedVal && queryParams.value.group && queryParams.value.semester) {
             // Находим группу, которая соответствует query параметру
             const queryGroup = groups.value?.find((group: any) => group.id == queryParams.value.group);
             if (queryGroup) {
-                // Устанавливаем выбранную группу
                 selectedMainGroup.value = queryGroup;
                 selectedMainSemester.value = queryGroup.semesters.find(semester => semester.id == queryParams.value.semester)
             }
         }
     }, { immediate: true });
+
 });
 
 </script>
@@ -82,8 +82,4 @@ onMounted(() => {
             </ScheduleItem>
         </div>
     </div>
-
-
-
-
 </template>

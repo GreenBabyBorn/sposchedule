@@ -126,15 +126,26 @@ class GroupController extends Controller
                     if (!isset($dayLessons[$index])) {
                         $dayLessons[$index] = [
                             'index' => $index,
-                            'ЧИСЛ' => new \stdClass(),
-                            'ЗНАМ' => new \stdClass(),
+                            'schedule_id' => $schedule->id,
+                            // 'ЧИСЛ' => new \stdClass() ,
+                            // 'ЗНАМ' => new \stdClass() ,
                         ];
                     }
-
-                    if ($schedule->week_type === 'ЧИСЛ') {
+                    if ($lesson->week_type === 'ЧИСЛ' && !empty($lesson)) {
                         $dayLessons[$index]['ЧИСЛ'] = new LessonResource($lesson);
-                    } elseif ($schedule->week_type === 'ЗНАМ') {
+                        if (empty($dayLessons[$index]['ЗНАМ'])) {
+                            $dayLessons[$index]['ЗНАМ'] = new \stdClass();
+                        }
+                    } if ($lesson->week_type === 'ЗНАМ' && !empty($lesson)) {
                         $dayLessons[$index]['ЗНАМ'] = new LessonResource($lesson);
+                        if (empty($dayLessons[$index]['ЧИСЛ'])) {
+                            $dayLessons[$index]['ЧИСЛ'] = new \stdClass();
+                        }
+                        // $dayLessons[$index]['ЧИСЛ'] = new \stdClass();
+                    }
+                    if($lesson->week_type === null) {
+                        $dayLessons[$index]['lesson'] = new LessonResource($lesson);
+
                     }
                 }
             }
