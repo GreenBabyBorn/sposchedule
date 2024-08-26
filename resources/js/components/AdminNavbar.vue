@@ -1,8 +1,5 @@
 <script setup lang="ts">
-
-// import PanelMenu from 'primevue/panelmenu';
 import Menu from 'primevue/menu';
-
 import { ref } from "vue";
 import { useAppStore } from '@/stores/app';
 

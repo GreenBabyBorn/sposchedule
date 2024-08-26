@@ -80,5 +80,13 @@ onMounted(() => {
                 :item="item" :lessons="item.lessons" :week-day="index.toString()">
             </ScheduleItem>
         </div>
+        <div v-if="!schedules" class="">
+            <p class="text-lg">
+                Здесь заполняется Основное расписание, которое в дальнейшем можно будет использовать при заполнении
+                изменений. Оно заполняется один раз.
+            </p>
+            <p class="text-lg">Чтобы начать, выберите сначала <b>группу</b> и <b>семестр</b>.</p>
+        </div>
+
     </div>
 </template>

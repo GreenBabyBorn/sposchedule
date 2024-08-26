@@ -10,11 +10,21 @@ import TeachersView from '../pages/Teachers.vue';
 import SchedulesView from '../pages/MainSchedules.vue';
 import SchedulesChanges from '../pages/ChangesSchedules.vue';
 import SemestersView from '../pages/Semesters.vue';
+import UserView from '../pages/User.vue';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', component: HomeView },
+    {
+      path: '/admin/user',
+      name: RouteNamesEnum.user,
+      component: UserView,
+      meta: {
+        layout: AppLayoutsEnum.admin,
+        title: 'Пользователь',
+      },
+    },
     {
       path: '/admin/groups',
       name: RouteNamesEnum.groups,

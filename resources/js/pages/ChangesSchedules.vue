@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import Select from 'primevue/select';
+import { useGroupsQuery } from '@/queries/groups';
 import DatePicker from 'primevue/datepicker';
 import { ref } from "vue";
 
 const date = ref();
 
+const { data: groups, isFetched, } = useGroupsQuery()
+const selectedChangesGroup = ref()
 </script>
 
 <template>
@@ -13,6 +17,8 @@ const date = ref();
         </div>
         <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex gap-2 items-center">
+
+
                 <DatePicker v-model="date" />
             </div>
 
