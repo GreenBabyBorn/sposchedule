@@ -18,7 +18,12 @@ export function useStoreLesson() {
   let updateSemesterMutation = useMutation({
     mutationFn: ({ body }: any) => axios.post(`/api/lessons`, body),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+      queryClient.invalidateQueries({
+        queryKey: ['scheduleMain'],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['scheduleChanges'],
+      });
     },
   });
   return updateSemesterMutation;
@@ -30,6 +35,7 @@ export function useDestroyLesson() {
     mutationFn: ({ id }: any) => axios.delete(`/api/lessons/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
     },
   });
   return destroySemesterMutation;

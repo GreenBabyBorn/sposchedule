@@ -6,6 +6,7 @@ use App\Http\Requests\Lesson\StoreLessonRequest;
 use App\Http\Requests\Lesson\UpdateLessonRequest;
 use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
+use App\Models\Schedule;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 
@@ -59,8 +60,21 @@ class LessonController extends Controller
      */
     public function destroy(Lesson $lesson)
     {
+        $schedule_id_of_lesson = $lesson->schedule_id;
         $lesson->delete();
+
+        // Используйте метод find() для поиска расписания по ID
+        $schedule = Schedule::find($schedule_id_of_lesson);
+
+        // Проверяем, существует ли расписание
+        if ($schedule) {
+            // Используйте метод count() для подсчета уроков, связанных с расписанием
+            if ($schedule->lessons()->count() === 0) {
+                $schedule->delete();
+            }
+        }
         return response()->noContent();
+        // return empty($schedule->lessons);
     }
 
     public function attachTeacher(Request $request, Lesson $lesson)

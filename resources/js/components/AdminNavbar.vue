@@ -48,12 +48,12 @@ const items = ref([
             <Menu :model="items" class="w-full p-4">
 
                 <template #item="{ item, props }">
-                    <router-link v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
+                    <RouterLink v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
                         <a :href="href" v-bind="props.action" @click="navigate">
                             <span :class="item.icon" />
                             <span class="ml-2">{{ item.label }}</span>
                         </a>
-                    </router-link>
+                    </RouterLink>
                     <a v-else :href="item.url" :target="item.target" v-bind="props.action">
                         <span :class="item.icon" />
                         <span class="ml-2">{{ item.label }}</span>

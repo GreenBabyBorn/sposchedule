@@ -289,29 +289,29 @@ function addRowAddNewLesson() {
                             </td>
                             <td>
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">
-                                    <InputText class="w-full" @change="editLesson(item['ЧИСЛ'])"
+                                    <InputText class="w-full text-center" @change="editLesson(item['ЧИСЛ'])"
                                         v-model="item['ЧИСЛ'].building" />
                                 </div>
                                 <div class="table-subrow" v-if="item.lesson">
-                                    <InputText class="w-full" @change="editLesson(item.lesson)"
+                                    <InputText class="w-full text-center" @change="editLesson(item.lesson)"
                                         v-model="item.lesson.building" />
                                 </div>
                                 <div class="table-subrow" v-if="item['ЗНАМ']">
-                                    <InputText class="w-full" @change="editLesson(item['ЗНАМ'])"
+                                    <InputText class="w-full text-center" @change="editLesson(item['ЗНАМ'])"
                                         v-model="item['ЗНАМ'].building" />
                                 </div>
                             </td>
                             <td>
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">
-                                    <InputText class="w-full" @change="editLesson(item['ЧИСЛ'])"
+                                    <InputText class="w-full text-center" @change="editLesson(item['ЧИСЛ'])"
                                         v-model="item['ЧИСЛ'].cabinet" />
                                 </div>
                                 <div class="table-subrow" v-if="item.lesson">
-                                    <InputText class="w-full" @change="editLesson(item.lesson)"
+                                    <InputText class="w-full text-center" @change="editLesson(item.lesson)"
                                         v-model="item.lesson.cabinet" />
                                 </div>
                                 <div class="table-subrow" v-if="item['ЗНАМ']">
-                                    <InputText class="w-full" @change="editLesson(item['ЗНАМ'])"
+                                    <InputText class="w-full text-center" @change="editLesson(item['ЗНАМ'])"
                                         v-model="item['ЗНАМ'].cabinet" />
                                 </div>
                             </td>
@@ -348,7 +348,7 @@ function addRowAddNewLesson() {
                     </template>
                     <tr>
                         <td>
-                            <InputText class="min-w-10 w-full" v-model="newLesson.index" />
+                            <InputText size="small" class="min-w-10 w-full text-center" v-model="newLesson.index" />
                         </td>
                         <td>
                             <div class="table-subrow"><Select editable v-model="newLesson['ЧИСЛ'].subject"
@@ -371,18 +371,22 @@ function addRowAddNewLesson() {
                         </td>
                         <td>
                             <div class="table-subrow">
-                                <InputText class="w-full" v-model="newLesson['ЧИСЛ'].building" />
+                                <InputText size="small" class="w-full text-center"
+                                    v-model="newLesson['ЧИСЛ'].building" />
                             </div>
                             <div v-if="newLesson['ЗНАМ']" class="table-subrow">
-                                <InputText class="w-full" v-model="newLesson['ЗНАМ'].building" />
+                                <InputText size="small" class="w-full text-center"
+                                    v-model="newLesson['ЗНАМ'].building" />
                             </div>
                         </td>
                         <td>
                             <div class="table-subrow">
-                                <InputText class="w-full" v-model="newLesson['ЧИСЛ'].cabinet" />
+                                <InputText size="small" class="w-full text-center"
+                                    v-model="newLesson['ЧИСЛ'].cabinet" />
                             </div>
                             <div v-if="newLesson['ЗНАМ']" class="table-subrow">
-                                <InputText class="w-full" v-model="newLesson['ЗНАМ'].cabinet" />
+                                <InputText size="small" class="w-full text-center"
+                                    v-model="newLesson['ЗНАМ'].cabinet" />
                             </div>
                         </td>
                         <td>
@@ -408,13 +412,14 @@ function addRowAddNewLesson() {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
+    font-size: 0.8rem;
     /* Чтобы все столбцы имели фиксированную ширину */
 }
 
 .schedule-table th,
 .schedule-table td {
     border: 1px solid var(--p-surface-600);
-    padding: 10px;
+    /* padding: 10px; */
     text-align: center;
 }
 

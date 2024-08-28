@@ -18,13 +18,45 @@ export function useMainSchedulesQuery(mainGroup, mainSemester) {
       ).data,
   });
 }
-
 export function useStoreSchedule() {
   const queryClient = useQueryClient();
   let updateSemesterMutation = useMutation({
     mutationFn: ({ body }: any) => axios.post(`/api/schedules`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+    },
+  });
+  return updateSemesterMutation;
+}
+
+export function useChangesSchedulesQuery(date) {
+  const enabled = computed(() => Boolean(date.value));
+
+  return useQuery({
+    enabled: enabled,
+    queryKey: ['scheduleChanges', date],
+    queryFn: async () =>
+      (await axios.get(`/api/schedules/changes?date=${date.value}`)).data,
+  });
+}
+
+export function useStoreScheduleChange() {
+  const queryClient = useQueryClient();
+  let updateSemesterMutation = useMutation({
+    mutationFn: ({ body }: any) => axios.post(`/api/schedules`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+    },
+  });
+  return updateSemesterMutation;
+}
+export function useFromMainToChangesSchedule() {
+  const queryClient = useQueryClient();
+  let updateSemesterMutation = useMutation({
+    mutationFn: ({ id, body }: any) =>
+      axios.patch(`/api/schedules/${id}/changes`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
     },
   });
   return updateSemesterMutation;
