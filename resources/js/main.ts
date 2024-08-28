@@ -8,6 +8,14 @@ import App from './App.vue';
 import ToastService from 'primevue/toastservice';
 import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
 import { locale } from './locale';
+import '@tanstack/vue-query';
+import type { AxiosError } from 'axios';
+
+declare module '@tanstack/vue-query' {
+  interface Register {
+    defaultError: AxiosError;
+  }
+}
 
 const pinia = createPinia();
 

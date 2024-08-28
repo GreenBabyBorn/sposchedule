@@ -2,7 +2,6 @@
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import MultiSelect from 'primevue/multiselect';
-import InputNumber from 'primevue/inputnumber';
 import Select from 'primevue/select';
 import { useSubjectsQuery } from '@/queries/subjects';
 import { useTeachersQuery } from '@/queries/teachers';
@@ -10,226 +9,177 @@ import { useStoreSchedule } from '@/queries/schedules';
 import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/lessons';
 import { useToast } from 'primevue/usetoast';
 import { reactive, ref, toRef } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useScheduleStore } from '@/stores/schedule';
-
 
 const toast = useToast();
+
 const props = defineProps({
     weekDay: { type: String, required: true },
-    group: { required: true },
-    semester: { required: true },
-    item: { required: true },
-})
+    group: { required: true, type: Object },
+    semester: { required: true, type: Object },
+    item: { required: true, type: [Object] },
+});
 
-const items: any = toRef<any>(() => props.item)
+// Применение toRef для индивидуальных props
+const group = toRef(props, 'group');
+const semester = toRef(props, 'semester');
+const weekDay = toRef(props, 'weekDay');
+const items = toRef(props, 'item');
 
-const { data: subjects } = useSubjectsQuery()
-const { data: teachers } = useTeachersQuery()
+const { data: subjects } = useSubjectsQuery();
+const { data: teachers } = useTeachersQuery();
 
-const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson()
+const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson();
 async function editLesson(item) {
-    if (!item.id) return
+    if (!item.id) return;
 
     try {
         await updateLesson({
             id: item.id,
             body: {
-                ...item
-            }
-        })
+                ...item,
+            },
+        });
+    } catch (e) {
+        showError(e);
     }
-    catch (e) {
-        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-        return
-    }
+}
+
+const addRowAddNewLessonState = ref(false);
+
+function addRowAddNewLesson() {
+    addRowAddNewLessonState.value = !addRowAddNewLessonState.value;
+    newLesson.ЗНАМ = addRowAddNewLessonState.value
+        ? {
+            subject: null,
+            teachers: [],
+            building: null,
+            cabinet: null,
+        }
+        : null;
 }
 
 type LessonWithWeekTypes = {
-    index: number,
-    'ЧИСЛ': {
-        subject: any | null,
-        teachers: [] | null,
-        building: string | null,
-        cabinet: string | null,
-
-    },
-    'ЗНАМ'?: {
-        subject: any | null,
-        teachers: [] | null,
-        building: string | null,
-        cabinet: string | null,
-    },
-}
+    index: number;
+    ЧИСЛ: {
+        subject: any | null;
+        teachers: [] | null;
+        building: string | null;
+        cabinet: string | null;
+    };
+    ЗНАМ?: {
+        subject: any | null;
+        teachers: [] | null;
+        building: string | null;
+        cabinet: string | null;
+    };
+};
 
 let newLesson = reactive<LessonWithWeekTypes>({
     index: null,
-    'ЧИСЛ':
-    {
+    ЧИСЛ: {
         subject: null,
         teachers: [],
         building: null,
         cabinet: null,
-
     },
-})
+});
 
-const { mutateAsync: storeSchedule, data: newSchedule } = useStoreSchedule()
-const { mutateAsync: storeLesson } = useStoreLesson()
+const { mutateAsync: storeSchedule, data: newSchedule } = useStoreSchedule();
+const { mutateAsync: storeLesson } = useStoreLesson();
+const { mutateAsync: destroyLesson } = useDestroyLesson();
 
-async function addNewLesson() {
-    // @ts-ignore
-    const loadedSchedule = props.item.find(item => item.schedule_id)
+async function addOrUpdateSchedule() {
+    const loadedSchedule = items.value.find((item) => item.schedule_id);
 
     if (!loadedSchedule?.schedule_id) {
         try {
             await storeSchedule({
                 body: {
-                    // @ts-ignore
-                    group_id: props.group.id,
-                    // @ts-ignore
-                    semester_id: props.semester.id,
+                    group_id: group.value.id,
+                    semester_id: semester.value.id,
                     type: 'main',
-                    week_day: props.weekDay,
-                    view_mode: 'table'
-                }
-            })
-        }
-        catch (e) {
-            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-            return
+                    week_day: weekDay.value,
+                    view_mode: 'table',
+                },
+            });
+        } catch (e) {
+            showError(e);
+            return;
         }
     }
-    // console.log(newLesson['ЧИСЛ']?.teachers, newLesson['ЗНАМ']?.teachers)
+
+    return loadedSchedule?.schedule_id || newSchedule.value.data.id;
+}
+
+async function addNewLesson() {
+    const schedule_id = await addOrUpdateSchedule();
+    if (!schedule_id) return;
+
+    // Создаем первый урок 'ЧИСЛ'
+    if (addRowAddNewLessonState.value) {
+
+        await createLesson('ЧИСЛ', schedule_id);
+    }
+    else {
+        await createLesson('', schedule_id);
+    }
+
+    // Если 'ЗНАМ' также добавляется
+    if (addRowAddNewLessonState.value && newLesson.ЗНАМ?.subject && newLesson.index) {
+        await createLesson('ЗНАМ', schedule_id);
+    }
+}
+
+async function createLesson(weekType, schedule_id) {
+    const lessonData = weekType === 'ЧИСЛ' || weekType === '' ? newLesson['ЧИСЛ'] : newLesson['ЗНАМ'];
+    if (!lessonData || Object.keys(lessonData).length === 0) {
+        showToast('Ошибка', 'Недозаполненно');
+        return;
+    }
+
     try {
         await storeLesson({
             body: {
-                ...newLesson['ЧИСЛ'],
-                teachers: newLesson['ЧИСЛ'].teachers,
-                week_type: addRowAddNewLessonState.value ? 'ЧИСЛ' : null,
+                ...lessonData,
+                teachers: lessonData.teachers,
+                week_type: weekType,
                 index: newLesson.index,
-                subject_id: newLesson['ЧИСЛ'].subject?.id,
-                schedule_id: loadedSchedule?.schedule_id ? loadedSchedule?.schedule_id : newSchedule.value.data.id
-            }
-        })
-    }
-    catch (e) {
-        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-        return
-    }
-    if (addRowAddNewLessonState.value && newLesson?.['ЗНАМ']?.subject && newLesson.index) {
-        try {
-            await storeLesson({
-                body: {
-                    ...newLesson['ЗНАМ'],
-                    teachers: newLesson['ЗНАМ'].teachers,
-                    week_type: 'ЗНАМ',
-                    index: newLesson.index,
-                    subject_id: newLesson['ЗНАМ'].subject?.id,
-                    schedule_id: loadedSchedule?.schedule_id ? loadedSchedule?.schedule_id : newSchedule.value.data.id
-                }
-            })
-        }
-        catch (e) {
-            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-            return
-        }
+                subject_id: lessonData.subject?.id,
+                schedule_id: schedule_id,
+            },
+        });
+    } catch (e) {
+        showError(e);
     }
 }
 
-async function addLesson(weekType, index, schedule_id, item) {
-    console.log(item)
-    if (weekType == 'ЧИСЛ' && Object.keys(item).length !== 0) {
-        try {
-            // await storeSchedule({
-            //     body: {
-            //         // @ts-ignore
-            //         group_id: props.group.id,
-            //         // @ts-ignore
-            //         semester_id: props.semester.id,
-            //         type: 'main',
-            //         // week_type: 'ЧИСЛ',
-            //         week_day: props.weekDay,
-            //         view_mode: 'table'
-            //     }
-            // })
-            await storeLesson({
-                body: {
-                    ...item,
-                    index: index,
-                    week_type: 'ЧИСЛ',
-                    subject_id: item.subject.id,
-                    schedule_id: schedule_id
-                }
-            })
-        }
-        catch (e) {
-            console.log(e)
-            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-            return
-        }
-    }
-
-    else if (weekType == 'ЗНАМ' && Object.keys(item).length !== 0) {
-        console.log(item)
-        try {
-            // await storeSchedule({
-            //     body: {
-            //         // @ts-ignore
-            //         group_id: props.group.id,
-            //         // @ts-ignore
-            //         semester_id: props.semester.id,
-            //         type: 'main',
-            //         // week_type: 'ЗНАМ',
-            //         week_day: props.weekDay,
-            //         view_mode: 'table'
-            //     }
-            // })
-            await storeLesson({
-                body: {
-                    ...item,
-                    index: index,
-                    week_type: 'ЗНАМ',
-                    subject_id: item.subject.id,
-                    schedule_id: schedule_id
-                }
-            })
-        }
-        catch (e) {
-            console.log(e)
-            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-            return
-        }
-    }
-    else {
-        toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Недозаполненно', life: 3000, closable: true });
-    }
-}
-
-const { mutateAsync: destroyLesson } = useDestroyLesson()
 async function removeLesson(id) {
     try {
-        await destroyLesson({ id: id })
-    }
-    catch (e) {
-        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-        return
+        await destroyLesson({ id });
+    } catch (e) {
+        showError(e);
     }
 }
 
-
-const addRowAddNewLessonState = ref(false)
-
-function addRowAddNewLesson() {
-    addRowAddNewLessonState.value = !addRowAddNewLessonState.value
-    newLesson.ЗНАМ = addRowAddNewLessonState.value ? {
-        subject: null,
-        teachers: [],
-        building: null,
-        cabinet: null,
-    } : null
+function showError(e) {
+    toast.add({
+        severity: 'error',
+        summary: 'Ошибка',
+        detail: e?.response?.data.message || 'Произошла ошибка',
+        life: 3000,
+        closable: true,
+    });
 }
 
+function showToast(summary, detail) {
+    toast.add({
+        severity: 'error',
+        summary: summary,
+        detail: detail,
+        life: 3000,
+        closable: true,
+    });
+}
 
 </script>
 
@@ -326,8 +276,8 @@ function addRowAddNewLesson() {
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">
                                     <Button text
                                         :disabled="!item['ЧИСЛ'].cabinet || !item['ЧИСЛ'].building || !item['ЧИСЛ'].subject"
-                                        @click="addLesson('ЧИСЛ', item.index, item.schedule_id, item['ЧИСЛ'])"
-                                        icon="pi pi-check" v-if="!item['ЧИСЛ'].id"></Button>
+                                        @click="createLesson('ЧИСЛ', item.schedule_id)" icon="pi pi-check"
+                                        v-if="!item['ЧИСЛ'].id"></Button>
 
                                     <Button text @click="removeLesson(item['ЧИСЛ'].id)" icon="pi pi-trash"
                                         severity="danger" v-if="item['ЧИСЛ'].id"></Button>
@@ -336,8 +286,8 @@ function addRowAddNewLesson() {
                                 <div class="table-subrow" v-if="item['ЗНАМ']">
                                     <Button text
                                         :disabled="!item['ЗНАМ'].cabinet || !item['ЗНАМ'].building || !item['ЗНАМ'].subject"
-                                        @click="addLesson('ЗНАМ', item.index, item.schedule_id, item['ЗНАМ'])"
-                                        icon="pi pi-check" v-if="!item['ЗНАМ'].id"></Button>
+                                        @click="createLesson('ЗНАМ', item.schedule_id)" icon="pi pi-check"
+                                        v-if="!item['ЗНАМ'].id"></Button>
 
                                     <Button text @click="removeLesson(item['ЗНАМ'].id)" icon="pi pi-trash"
                                         severity="danger" v-if="item['ЗНАМ'].id"></Button>

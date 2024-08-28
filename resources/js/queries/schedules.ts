@@ -29,14 +29,19 @@ export function useStoreSchedule() {
   return updateSemesterMutation;
 }
 
-export function useChangesSchedulesQuery(date) {
+export function useChangesSchedulesQuery(date, course) {
   const enabled = computed(() => Boolean(date.value));
 
   return useQuery({
     enabled: enabled,
-    queryKey: ['scheduleChanges', date],
+    queryKey: ['scheduleChanges', date, course],
+    retry: 0,
     queryFn: async () =>
-      (await axios.get(`/api/schedules/changes?date=${date.value}`)).data,
+      (
+        await axios.get(
+          `/api/schedules/changes?date=${date.value}&course=${course.value || ''}`
+        )
+      ).data,
   });
 }
 
@@ -60,4 +65,11 @@ export function useFromMainToChangesSchedule() {
     },
   });
   return updateSemesterMutation;
+}
+
+export function useCoursesQuery() {
+  return useQuery({
+    queryKey: ['courses'],
+    queryFn: async () => (await axios.get(`/api/groups/courses`)).data,
+  });
 }

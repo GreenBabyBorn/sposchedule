@@ -1,4 +1,3 @@
-import router from '@/router';
 import { defineStore } from 'pinia';
 import { ref, toRaw, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -13,6 +12,7 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
   const schedulesChanges = ref();
 
   const date = ref(null);
+  const course = ref(null);
 
   function setSchedules(scheduless) {
     schedules.value = toRaw(scheduless ?? []);
@@ -30,5 +30,6 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
     schedulesChanges,
     setSchedulesChanges,
     date,
+    course,
   };
 });

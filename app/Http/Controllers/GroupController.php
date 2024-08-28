@@ -129,6 +129,12 @@ class GroupController extends Controller
         return response()->json(['message' => 'Семестр отвязан от группы.', "semester" => $semester ]);
     }
 
+    public function getCourses()
+    {
+        $courses = Group::select('course')->get();
+        return $courses;
+    }
+
     public function scheduleMain(Group $group, Semester $semester)
     {
         // Получаем расписания для данной группы с типом 'main'

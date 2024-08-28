@@ -2,7 +2,6 @@
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
 import MultiSelect from 'primevue/multiselect';
-import InputNumber from 'primevue/inputnumber';
 import Select from 'primevue/select';
 import { useSubjectsQuery } from '@/queries/subjects';
 import { useTeachersQuery } from '@/queries/teachers';
@@ -10,13 +9,12 @@ import { useFromMainToChangesSchedule, useStoreSchedule, useStoreScheduleChange 
 import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/lessons';
 import { useToast } from 'primevue/usetoast';
 import { reactive, ref, toRef } from 'vue';
-import { storeToRefs } from 'pinia';
-import { useScheduleStore } from '@/stores/schedule';
 
 const toast = useToast();
 const props = defineProps({
     group: { required: true, type: Object },
     date: { required: false },
+    week_type: { required: false },
     type: { required: true },
     semester: { required: false, type: Object },
     lessons: { required: true },
@@ -30,7 +28,7 @@ const { data: teachers } = useTeachersQuery()
 const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson()
 
 
-const { mutateAsync: fromMainToChangesSchedule, data: newChannges } = useFromMainToChangesSchedule()
+const { mutateAsync: fromMainToChangesSchedule, data: newChanges } = useFromMainToChangesSchedule()
 async function editLesson(item) {
     if (!item.id) return
 
@@ -46,17 +44,14 @@ async function editLesson(item) {
             toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
             return
         }
-        console.log(item)
-        console.log(newChannges.value.data.lessons.find(x => x.index === item.index))
-        // item = newChannges.value.data.lessons.find(x => x.index === item.index)
     }
     try {
         await updateLesson({
-            id: props.type === 'main' ? newChannges.value.data.lessons.find(x => x.index === item.index).id : item.id,
+            id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).id : item.id,
             body: {
                 ...item,
-                id: props.type === 'main' ? newChannges.value.data.lessons.find(x => x.index === item.index).id : item.id,
-                schedule_id: props.type === 'main' ? newChannges.value.data.lessons.find(x => x.index === item.index).schedule_id : item.schedule_id,
+                id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).id : item.id,
+                schedule_id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).schedule_id : item.schedule_id,
             }
         })
     }
@@ -85,10 +80,31 @@ const { mutateAsync: storeSchedule, data: newSchedule } = useStoreScheduleChange
 const { mutateAsync: storeLesson } = useStoreLesson()
 
 async function addNewLesson() {
+    const loadedSchedule = props.schedule?.id;
 
-    const loadedSchedule = props.schedule?.id
-    if (!loadedSchedule || props.schedule.type === 'main') {
+    // Если тип расписания 'main', конвертируем его в изменения
+    if (props.schedule.type === 'main') {
+        try {
+            await fromMainToChangesSchedule({
+                id: props.schedule.id,
+                body: {
+                    date: props.date,
+                },
+            });
+        } catch (e) {
+            toast.add({
+                severity: 'error',
+                summary: 'Ошибка',
+                detail: e?.response?.data?.message || 'Не удалось конвертировать основное расписание в изменения.',
+                life: 3000,
+                closable: true,
+            });
+            return;
+        }
+    }
 
+    // Если расписание не загружено и тип 'changes', создаем новое расписание
+    if (!loadedSchedule) {
         try {
             await storeSchedule({
                 body: {
@@ -97,14 +113,30 @@ async function addNewLesson() {
                     type: 'changes',
                     view_mode: 'table',
                     date: props.date,
-                }
-            })
-        }
-        catch (e) {
-            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response?.data.message, life: 3000, closable: true });
-            return
+                },
+            });
+        } catch (e) {
+            toast.add({
+                severity: 'error',
+                summary: 'Ошибка',
+                detail: e?.response?.data?.message || 'Не удалось сохранить расписание.',
+                life: 3000,
+                closable: true,
+            });
+            return;
         }
     }
+
+    // Определяем правильный ID для использования в storeLesson
+    let scheduleId;
+    if (loadedSchedule && props.schedule.type !== 'main') {
+        scheduleId = loadedSchedule;
+    } else if (props.schedule.type === 'main') {
+        scheduleId = newChanges.value?.data?.id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
+    } else {
+        scheduleId = newSchedule.value?.data?.id; // Тоже необходимо проверить наличие значения
+    }
+    console.log(scheduleId, newSchedule.value)
     try {
         await storeLesson({
             body: {
@@ -112,15 +144,21 @@ async function addNewLesson() {
                 teachers: newLesson.teachers,
                 index: newLesson.index,
                 subject_id: newLesson.subject?.id,
-                schedule_id: loadedSchedule && props.schedule.type !== 'main' ? loadedSchedule : newSchedule.value.data.id
-            }
-        })
-    }
-    catch (e) {
-        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-        return
+                schedule_id: scheduleId,
+            },
+        });
+    } catch (e) {
+        toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail: e?.response?.data?.message || 'Не удалось сохранить урок.',
+            life: 3000,
+            closable: true,
+        });
+        return;
     }
 }
+
 
 const { mutateAsync: destroyLesson, } = useDestroyLesson()
 async function removeLesson(id) {
@@ -156,6 +194,7 @@ async function removeLesson(id) {
         <div class="mb-2 flex justify-between items-center"> <span
                 class="text-2xl text-left font-medium text-surface-800 dark:text-white/80">{{
                     props.group.name }}</span>
+            <span>{{ props.week_type }}</span>
             <span :class="{
                 'border border-green-400 ': props.type
                     !== 'main'
@@ -194,12 +233,12 @@ async function removeLesson(id) {
                         <td>
 
 
-                            <div v-if="item.subject" class="table-subrow"><Select @change="editLesson(item)"
+                            <div v-if="item.id" class="table-subrow"><Select @change="editLesson(item)"
                                     v-model="item.subject" class="w-full text-left" :options="subjects"
                                     optionLabel="name"></Select>
 
                             </div>
-                            <div class="table-subrow" v-if="item.teachers">
+                            <div class="table-subrow" v-if="item.id">
                                 <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item)"
                                     v-model="item.teachers" class="w-full" :options="teachers" optionLabel="name">
                                 </MultiSelect>
@@ -209,20 +248,20 @@ async function removeLesson(id) {
 
                         <td>
 
-                            <div class="table-subrow" v-if="item.building">
+                            <div class="table-subrow" v-if="item.id">
                                 <InputText class="w-full" @change="editLesson(item)" v-model="item.building" />
                             </div>
                         </td>
                         <td>
 
-                            <div class="table-subrow" v-if="item.cabinet">
+                            <div class="table-subrow" v-if="item.id">
                                 <InputText class="w-full" @change="editLesson(item)" v-model="item.cabinet" />
                             </div>
                         </td>
                         <td>
 
 
-                            <div class="table-subrow" v-if="item.index">
+                            <div class="table-subrow" v-if="item.id">
                                 <Button text :disabled="!item.cabinet || !item.building || !item.subject"
                                     icon="pi pi-check" v-if="!item.id"></Button>
 

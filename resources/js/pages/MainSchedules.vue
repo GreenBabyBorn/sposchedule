@@ -8,56 +8,76 @@ import { useScheduleStore } from '@/stores/schedule'
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import router from '@/router';
+import { useStorage } from '@vueuse/core';
 
 const route = useRoute()
 
+const scheduleStore = useScheduleStore();
+const { schedules, selectedMainGroup, selectedMainSemester, queryParams } = storeToRefs(scheduleStore);
+const { setSchedules } = scheduleStore;
 
-const scheduleStore = useScheduleStore()
-const { schedules, selectedMainGroup, selectedMainSemester, queryParams } = storeToRefs(scheduleStore)
-const { setSchedules, } = scheduleStore
+// Используем useStorage для сохранения query параметров в localStorage
+const storedParams = useStorage('mainSchedules', { group: '', semester: '' });
 
-const { data: groups, isFetched, } = useGroupsQuery()
-const { data: mainSchedules } = useMainSchedulesQuery(selectedMainGroup, selectedMainSemester)
+// Запросы данных
+const { data: groups, isFetched } = useGroupsQuery();
+const { data: mainSchedules } = useMainSchedulesQuery(selectedMainGroup, selectedMainSemester);
 
+// Обновление query параметров в URL и localStorage
 const updateQueryParams = () => {
-    router.replace({
-        query: {
-            ...route.query,
-            group: selectedMainGroup.value?.id || null,
-            semester: selectedMainSemester.value?.id || null,
-        },
-    });
+    const newQuery = {
+        ...route.query,
+        group: selectedMainGroup.value?.id || null,
+        semester: selectedMainSemester.value?.id || null,
+    };
+
+    router.replace({ query: newQuery });
+
+    // Сохраняем новые параметры в localStorage
+    storedParams.value.group = selectedMainGroup.value?.id || '';
+    storedParams.value.semester = selectedMainSemester.value?.id || '';
 };
 
-watch(
-    [selectedMainGroup, selectedMainSemester],
-    () => {
-        updateQueryParams();
-    },
-    { deep: true }
-);
+// Следим за изменениями выбранной группы и семестра для обновления query параметров
+watch([selectedMainGroup, selectedMainSemester], updateQueryParams, { deep: true });
 
+// Следим за изменениями данных расписания и устанавливаем их в store
 watch(mainSchedules, (newData) => {
     if (newData) {
-        setSchedules(newData)
+        setSchedules(newData);
     }
+});
+
+// Инициализация при монтировании компонента
+onMounted(() => {
+    // Восстанавливаем значения из localStorage при загрузке
+    if (storedParams.value.group) {
+        selectedMainGroup.value = groups.value?.find((group) => group.id == storedParams.value.group) || null;
+    }
+    if (storedParams.value.semester && selectedMainGroup.value) {
+        selectedMainSemester.value = selectedMainGroup.value.semesters.find((semester) => semester.id == storedParams.value.semester) || null;
+    }
+
+    // Синхронизируем параметры в URL с состоянием store
+    updateQueryParams();
+
+    // Следим за тем, когда данные групп будут загружены
+    watch(
+        isFetched,
+        (isFetchedVal) => {
+            if (isFetchedVal && queryParams.value.group && queryParams.value.semester) {
+                // Находим группу, соответствующую query параметрам
+                const queryGroup = groups.value?.find((group) => group.id == queryParams.value.group);
+                if (queryGroup) {
+                    selectedMainGroup.value = queryGroup;
+                    selectedMainSemester.value = queryGroup.semesters.find((semester) => semester.id == queryParams.value.semester);
+                }
+            }
+        },
+        { immediate: true } // Наблюдатель начнет работу сразу
+    );
 })
 
-
-onMounted(() => {
-    updateQueryParams()
-    watch(isFetched, (isFetchedVal) => {
-        if (isFetchedVal && queryParams.value.group && queryParams.value.semester) {
-            // Находим группу, которая соответствует query параметру
-            const queryGroup = groups.value?.find((group: any) => group.id == queryParams.value.group);
-            if (queryGroup) {
-                selectedMainGroup.value = queryGroup;
-                selectedMainSemester.value = queryGroup.semesters.find(semester => semester.id == queryParams.value.semester)
-            }
-        }
-    }, { immediate: true });
-
-});
 
 </script>
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Group;
 use App\Models\Lesson;
+use App\Models\Semester;
 
 class ScheduleController extends Controller
 {
@@ -104,7 +105,10 @@ class ScheduleController extends Controller
 
         // Продолжаем с группами
         $groups = Group::all();
-
+        $course = $request->input('course');
+        if($course) {
+            $groups = Group::all()->where('course', $course);
+        }
         // Получаем все изменения расписания (type = 'changes') для выбранного дня недели
         $changes = Schedule::where('type', 'changes')
             ->where('date', $carbonDate)
@@ -118,8 +122,28 @@ class ScheduleController extends Controller
             })
             ->get();
 
+
+
+        $semester = Semester::all()->where('start', '<=', $carbonDate)->first();
+        if(!$semester) {
+            return response()->json([
+                'error' => 404,
+                'message' => 'Семестра на данную дату не найдено'
+            ], 404);
+        }
+
+        $semesterStart = Carbon::parse($semester->start);
+
+        // Определяем номер недели с начала семестра
+        $weekNumber = $semesterStart->diffInWeeks($date);
+
+        // Если неделя четная - ЧИСЛ, нечетная - ЗНАМ
+        $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
         // Массив для хранения финального расписания
-        $finalSchedules = [];
+        $finalSchedules = [
+            'week_type' => $weekType,
+            'schedules' => [],
+        ];
 
         foreach ($groups as $group) {
             // Получаем изменения для текущей группы и текущего дня недели
@@ -171,7 +195,10 @@ class ScheduleController extends Controller
             }
 
             // Добавляем финальное расписание группы в общий массив
-            array_push($finalSchedules, [
+
+
+
+            array_push($finalSchedules['schedules'], [
 
                 'semester' => $group->semesters->filter(function ($semester) use ($carbonDate) {
                     $start = Carbon::parse($semester->start);
