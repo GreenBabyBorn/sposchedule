@@ -10,12 +10,16 @@ import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
 import { locale } from './locale';
 import '@tanstack/vue-query';
 import type { AxiosError } from 'axios';
+import axios from 'axios';
 
 declare module '@tanstack/vue-query' {
   interface Register {
     defaultError: AxiosError;
   }
 }
+
+axios.defaults.withCredentials = true;
+axios.defaults.withXSRFToken = true;
 
 const pinia = createPinia();
 

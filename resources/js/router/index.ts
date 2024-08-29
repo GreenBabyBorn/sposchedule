@@ -11,11 +11,22 @@ import SchedulesView from '../pages/MainSchedules.vue';
 import SchedulesChanges from '../pages/ChangesSchedules.vue';
 import SemestersView from '../pages/Semesters.vue';
 import UserView from '../pages/User.vue';
+import AuthView from '../pages/Auth.vue';
+import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', component: HomeView },
+    {
+      path: '/admin/login',
+      name: RouteNamesEnum.auth,
+      component: AuthView,
+      meta: {
+        layout: AppLayoutsEnum.default,
+        title: 'Авторизация',
+      },
+    },
     {
       path: '/admin/user',
       name: RouteNamesEnum.user,
@@ -83,9 +94,38 @@ const router = createRouter({
 });
 
 router.beforeEach(loadLayoutMiddleware);
+
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore();
+
+  // Если пользователь уже авторизован и пытается попасть на страницу входа, перенаправляем его на админскую страницу
+  if (to.path === '/admin/login' && authStore.token) {
+    return next('/admin/schedules/changes');
+  }
+
+  // Если пользователь не авторизован и пытается получить доступ к админским страницам, перенаправляем на страницу входа
+  if (to.meta.layout === 'admin' && !authStore.token) {
+    return next('/admin/login');
+  }
+
+  // Если у пользователя есть токен, но данные пользователя еще не загружены, загружаем их
+  if (authStore.token && !authStore.user) {
+    try {
+      await authStore.fetchUser();
+    } catch (error) {
+      // Если произошла ошибка при загрузке данных пользователя, перенаправляем на страницу входа
+      authStore.logout();
+      return next('/admin/login');
+    }
+  }
+
+  // Разрешаем переход на целевой маршрут
+  next();
+});
+
 router.beforeEach(to => {
   const { title, description }: any = to.meta;
-  const defaultTitle = 'СУР';
+  const defaultTitle = 'Пары РКЭ';
   const defaultDescription = 'Система управления расписанием';
 
   document.title = title || defaultTitle;

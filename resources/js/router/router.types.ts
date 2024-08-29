@@ -17,4 +17,5 @@ export enum RouteNamesEnum {
   schedulesChanges = 'schedulesChanges',
   semesters = 'semesters',
   user = 'user',
+  auth = 'auth',
 }

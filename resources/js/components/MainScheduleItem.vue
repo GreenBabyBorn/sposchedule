@@ -187,7 +187,7 @@ function showToast(summary, detail) {
     <div class="relative overflow-x-auto">
         <div class="">
             <table class="schedule-table dark:bg-surface-900">
-                <caption class="text-2xl font-medium text-surface-200 mb-2">{{ props.weekDay }}</caption>
+                <caption class="text-2xl font-medium  mb-2">{{ props.weekDay }}</caption>
                 <thead>
                     <tr>
                         <th>№</th>
@@ -201,7 +201,7 @@ function showToast(summary, detail) {
                 <tbody>
                     <template v-for="item in items">
                         <tr>
-                            <td><span class="text-xl font-medium text-surface-200">
+                            <td><span class="text-xl font-medium ">
                                     {{ item.index }}
                                 </span></td>
                             <td>
