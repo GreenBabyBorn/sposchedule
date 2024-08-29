@@ -66,6 +66,18 @@ export function useFromMainToChangesSchedule() {
   });
   return updateSemesterMutation;
 }
+export function useUpdateSchedule() {
+  const queryClient = useQueryClient();
+  let updateSemesterMutation = useMutation({
+    mutationFn: ({ id, body }: any) =>
+      axios.patch(`/api/schedules/${id}`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+    },
+  });
+  return updateSemesterMutation;
+}
 
 export function useCoursesQuery() {
   return useQuery({

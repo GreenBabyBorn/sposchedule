@@ -36,8 +36,17 @@ export const useAuthStore = defineStore('useAuthStore', () => {
 
   const fetchUser = async () => {
     if (token.value) {
-      const response = await axios.get('/api/user');
-      user.value = response.data;
+      try {
+        const response = await axios.get('/api/user');
+        user.value = response.data;
+      } catch (e) {
+        // if (e.response.status === 401) {
+        console.log(user.value);
+        localStorage.removeItem('token');
+        router.push('/admin/login');
+        return;
+        // }
+      }
     }
   };
 

@@ -21,6 +21,24 @@ declare module '@tanstack/vue-query' {
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
 
+axios.interceptors.response.use(
+  response => {
+    // Если ответ успешен, просто возвращаем его
+    return response;
+  },
+  error => {
+    // Если произошла ошибка, проверяем код статуса
+    if (error.response && error.response.status === 401) {
+      // Если ошибка 401, перенаправляем пользователя на страницу входа
+      localStorage.removeItem('token');
+      router.push('/admin/login');
+    }
+
+    // Возвращаем отклоненное обещание, чтобы остальные обработчики тоже могли обрабатывать ошибку
+    return Promise.reject(error);
+  }
+);
+
 const pinia = createPinia();
 
 createApp(App)

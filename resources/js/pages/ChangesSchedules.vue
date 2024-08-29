@@ -102,7 +102,7 @@ onMounted(() => {
             </span>
             <ChangesScheduleItem v-else class="schedule" v-for="item in schedulesChanges?.schedules" :date="isoDate"
                 :schedule="item.schedule" :semester="item.semester" :type="item.schedule.type" :group="item.group"
-                :lessons="item?.schedule?.lessons" :week_type="item.week_type">
+                :lessons="item?.schedule?.lessons" :week_type="item.week_type" :published="item?.schedule.published">
             </ChangesScheduleItem>
         </div>
     </div>

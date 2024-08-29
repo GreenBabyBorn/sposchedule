@@ -11,7 +11,7 @@ import SchedulesView from '../pages/MainSchedules.vue';
 import SchedulesChanges from '../pages/ChangesSchedules.vue';
 import SemestersView from '../pages/Semesters.vue';
 import UserView from '../pages/User.vue';
-import AuthView from '../pages/Auth.vue';
+import AuthView from '../pages/Login.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
@@ -128,7 +128,7 @@ router.beforeEach(to => {
   const defaultTitle = 'Пары РКЭ';
   const defaultDescription = 'Система управления расписанием';
 
-  document.title = title || defaultTitle;
+  document.title = `${defaultTitle} | ${title}` || defaultTitle;
 
   const descriptionElement = document.querySelector(
     'head meta[name="description"]'

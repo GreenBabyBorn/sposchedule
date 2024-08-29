@@ -123,9 +123,9 @@ const { data: subjects } = useSubjectsQuery()
         </div>
         <div class="">
             <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <InputText :invalid="newTeacherError" placeholder="Имя" v-model="newTeacherFirstName">
-                </InputText>
                 <InputText :invalid="newTeacherError" placeholder="Фамилия" v-model="newTeacherLastName">
+                </InputText>
+                <InputText :invalid="newTeacherError" placeholder="Имя" v-model="newTeacherFirstName">
                 </InputText>
                 <InputText :invalid="newTeacherError" placeholder="Отчество" v-model="newTeacherPatronymic">
                 </InputText>

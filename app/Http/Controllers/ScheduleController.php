@@ -115,7 +115,7 @@ class ScheduleController extends Controller
             ->get();
 
         // Получаем все основные расписания (type = 'main') для выбранного дня недели
-        $mainSchedules = Schedule::where('type', 'main')
+        $mainSchedules = Schedule::where('type', 'main')->where('published', true)
             ->where('week_day', $weekDay)->whereHas('semester', function ($query) use ($carbonDate) {
                 $query->where('start', '<=', $carbonDate)
                     ->where('end', '>=', $carbonDate);
@@ -124,7 +124,7 @@ class ScheduleController extends Controller
 
 
 
-        $semester = Semester::all()->where('start', '<=', $carbonDate)->first();
+        $semester = Semester::all()->where('start', '<=', $carbonDate)->where('end', '>=', $carbonDate)->first();
         if(!$semester) {
             return response()->json([
                 'error' => 404,
@@ -169,6 +169,7 @@ class ScheduleController extends Controller
                         'id' => $mainSchedule->id,
                         'week_day' => $mainSchedule->week_day,
                         'type' => $mainSchedule->type,
+
                         // 'semester' => $mainSchedule->semester,
                         'lessons' => LessonResource::collection(Lesson::where('schedule_id', $mainSchedule->id)->where(function ($query) use ($weekType) {
                             $query->where('week_type', $weekType)
@@ -187,6 +188,7 @@ class ScheduleController extends Controller
                     'id' => $change->id,
                     'week_type' => $change->week_type,
                     'type' => $change->type,
+                    'published' => $change->published,
                     // 'semester' => $change->semester,
                     'lessons' => LessonResource::collection(Lesson::where('schedule_id', $change->id)
                         ->orderBy('index')

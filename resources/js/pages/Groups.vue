@@ -167,7 +167,7 @@ const selectedSemesters = ref([])
 
         </div>
         <div class="">
-            <form class="flex items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
+            <form class="flex flex-wrap  items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <InputText :invalid="newGroupError" placeholder="Пример: ИС-401" v-model="newGroupName"></InputText>
                 <MultiSelect v-model="selectedSemesters" display="chip" :options="semesters" optionLabel="name" filter
                     placeholder="Выбрать семестры" :maxSelectedLabels="3" class="" />

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import InputText from 'primevue/inputtext';
 import Password from 'primevue/password';
 import Button from 'primevue/button';
@@ -27,6 +27,8 @@ watch(credentials, () => {
 
 const error = ref()
 
+const isError = computed(() => Boolean(error.value))
+
 async function auth() {
     try {
         await login(credentials)
@@ -48,13 +50,13 @@ const debouncedAuth = useDebounceFn(auth, 300);
 
         <form @submit.prevent="debouncedAuth()" class="flex flex-col justify-center items-center h-screen gap-4">
             <div class=" flex flex-col gap-4 rounded-lg px-4 py-8 bg-surface-100 dark:bg-surface-900 max-w-72">
-                <h1 class=" text-center  text-2xl mb-4">Авторизация</h1>
-                <InputText :invalid="error" placeholder="Электронная почта" v-model="credentials.email"></InputText>
-                <Password :invalid="error" fluid placeholder="Пароль" v-model="credentials.password" :feedback="false"
+                <h1 class=" text-center dark:text-surface-100 text-2xl mb-4">Авторизация</h1>
+                <InputText :invalid="isError" placeholder="Электронная почта" v-model="credentials.email"></InputText>
+                <Password :invalid="isError" fluid placeholder="Пароль" v-model="credentials.password" :feedback="false"
                     toggleMask>
                 </Password>
                 <Button :disabled="!credentials.email || !credentials.password" type="submit" label="Войти"></Button>
-                <span class="text-red-400 w-full" v-if="error">{{ error?.message }}</span>
+                <span class="text-red-400 w-full" v-if="isError">{{ error?.message }}</span>
             </div>
         </form>
     </div>

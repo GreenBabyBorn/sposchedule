@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout']);
-Route::post('/register', [AuthController::class, 'register']);
+// Route::post('/register', [AuthController::class, 'register']);
 
 // Маршруты, защищенные Sanctum
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::get('/groups/courses', [GroupController::class, 'getCourses']);
     Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);

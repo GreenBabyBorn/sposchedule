@@ -14,10 +14,10 @@ class Schedule extends Model
         'semester_id',
         'date',
         'type',
-        // 'week_type',
         'week_day',
         'view_mode',
         'message',
+        'published'
     ];
 
     public function group()

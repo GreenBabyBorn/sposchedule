@@ -5,10 +5,12 @@ import MultiSelect from 'primevue/multiselect';
 import Select from 'primevue/select';
 import { useSubjectsQuery } from '@/queries/subjects';
 import { useTeachersQuery } from '@/queries/teachers';
-import { useFromMainToChangesSchedule, useStoreSchedule, useStoreScheduleChange } from '@/queries/schedules';
+import { useFromMainToChangesSchedule, useStoreSchedule, useStoreScheduleChange, useUpdateSchedule } from '@/queries/schedules';
 import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/lessons';
 import { useToast } from 'primevue/usetoast';
-import { reactive, ref, toRef } from 'vue';
+import { reactive, ref, toRef, watch } from 'vue';
+import ToggleButton from 'primevue/togglebutton';
+
 
 const toast = useToast();
 const props = defineProps({
@@ -19,8 +21,14 @@ const props = defineProps({
     semester: { required: false, type: Object },
     lessons: { required: true },
     schedule: { required: true, type: Object },
+    published: { required: true, type: Boolean },
 })
 const lessons: any = toRef<any>(() => props.lessons)
+const published = ref(props.published)
+
+watch(() => props.published, (newValue) => {
+    published.value = newValue
+})
 
 const { data: subjects } = useSubjectsQuery()
 const { data: teachers } = useTeachersQuery()
@@ -187,14 +195,35 @@ async function removeLesson(id) {
     }
 
 }
+
+const { mutateAsync: updateChangesSchedule } = useUpdateSchedule()
+async function handlePublished() {
+    try {
+        await updateChangesSchedule({
+            id: props.schedule.id,
+
+            body: {
+                published: published.value,
+            }
+        })
+    }
+    catch (e) {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+        return
+    }
+}
 </script>
 
 <template>
     <div class="schedule-item">
-        <div class="mb-2 flex justify-between items-center"> <span
-                class="text-2xl text-left font-medium text-surface-800 dark:text-white/80">{{
+        <div class="p-2  bg-surface-800  flex flex-wrap  justify-between items-center"> <span
+                class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
                     props.group.name }}</span>
             <span>{{ props.week_type }}</span>
+            <div v-if="props.type !== 'main'" class="">
+                <ToggleButton @change="handlePublished" :disabled="!lessons" v-model="published" class="text-sm" fluid
+                    onLabel="Опубликовано" offLabel="Не опубликовано" />
+            </div>
             <span :class="{
                 'border border-green-400 ': props.type
                     !== 'main'
@@ -299,7 +328,9 @@ async function removeLesson(id) {
                         </div>
                     </td>
                     <td>
-                        <div class="table-subrow"><Button @click="addNewLesson()" text icon="pi pi-plus"></Button>
+                        <div class="table-subrow"><Button
+                                :disabled="!newLesson.building || !newLesson.cabinet || !newLesson.subject"
+                                @click="addNewLesson()" text icon="pi pi-plus"></Button>
                         </div>
                     </td>
                 </tr>
@@ -315,7 +346,7 @@ async function removeLesson(id) {
 
 <style scoped>
 .schedule-item {
-    width: 450px;
+    /* width: 450px; */
 }
 
 .schedule-table {

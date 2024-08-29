@@ -42,7 +42,7 @@ class AuthController extends Controller
         ]);
 
         if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Неверный логин или пароль'], 401);
         }
 
         $user = $request->user();
@@ -50,7 +50,7 @@ class AuthController extends Controller
         $token = $user->createToken('Personal Access Token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Login successful',
+            'message' => 'Добро пожаловать!',
             'token' => $token
         ]);
     }
@@ -61,7 +61,10 @@ class AuthController extends Controller
         $user = $request->user();
 
         // Удаляем все токены, или можно удалить только один
-        $user->tokens()->delete();
+        if($user) {
+
+            $user->tokens()->delete();
+        }
 
         return response()->json(['message' => 'Выход успешный']);
     }

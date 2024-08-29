@@ -3,12 +3,13 @@ import ScheduleItem from '../components/MainScheduleItem.vue'
 import Select from 'primevue/select';
 import { onMounted, ref, watch } from 'vue'
 import { useGroupsQuery } from '@/queries/groups';
-import { useMainSchedulesQuery } from '@/queries/schedules';
+import { useMainSchedulesQuery, useUpdateSchedule } from '@/queries/schedules';
 import { useScheduleStore } from '@/stores/schedule'
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import { useStorage } from '@vueuse/core';
+
 
 const route = useRoute()
 
@@ -87,17 +88,18 @@ onMounted(() => {
             <h1 class="text-2xl">Основное расписание</h1>
         </div>
         <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
-            <div class="flex gap-2 items-center">
+            <div class="flex flex-wrap  gap-2 items-center">
                 <Select editable v-model="selectedMainGroup" :options="groups" optionLabel="name" placeholder="Группа"
                     class="w-full md:w-[10rem]" />
                 <Select v-model="selectedMainSemester" :options="selectedMainGroup?.semesters" optionLabel="name"
                     placeholder="Семестр" class="w-full md:w-[15rem]" />
+
             </div>
 
         </div>
         <div class="flex flex-col gap-6">
             <ScheduleItem :group="selectedMainGroup" :semester="selectedMainSemester" v-for="(item, index) in schedules"
-                :item="item" :lessons="item.lessons" :week-day="index.toString()">
+                :item="item" :lessons="item.lessons" :published="item?.published" :week-day="index.toString()">
             </ScheduleItem>
         </div>
         <div v-if="!schedules" class="">

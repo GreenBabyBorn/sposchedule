@@ -5,10 +5,11 @@ import MultiSelect from 'primevue/multiselect';
 import Select from 'primevue/select';
 import { useSubjectsQuery } from '@/queries/subjects';
 import { useTeachersQuery } from '@/queries/teachers';
-import { useStoreSchedule } from '@/queries/schedules';
+import { useStoreSchedule, useUpdateSchedule } from '@/queries/schedules';
 import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/lessons';
 import { useToast } from 'primevue/usetoast';
-import { reactive, ref, toRef } from 'vue';
+import { reactive, ref, toRef, watch } from 'vue';
+import ToggleButton from 'primevue/togglebutton';
 
 const toast = useToast();
 
@@ -17,6 +18,7 @@ const props = defineProps({
     group: { required: true, type: Object },
     semester: { required: true, type: Object },
     item: { required: true, type: [Object] },
+    published: { required: false, type: Boolean },
 });
 
 // Применение toRef для индивидуальных props
@@ -180,14 +182,41 @@ function showToast(summary, detail) {
         closable: true,
     });
 }
+const published = ref(props.item?.[0]?.published || null)
 
+watch(() => props.published, (newValue) => {
+    published.value = newValue
+})
+
+const { mutateAsync: updateChangesSchedule } = useUpdateSchedule()
+async function handlePublished() {
+    console.log(props.item?.[0])
+    try {
+        await updateChangesSchedule({
+            id: props.item?.[0].schedule_id,
+
+            body: {
+                published: published.value,
+            }
+        })
+    }
+    catch (e) {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+        return
+    }
+}
 </script>
 
 <template>
     <div class="relative overflow-x-auto">
         <div class="">
+            <div class="flex items-center h-full gap-4 mb-2">
+                <span class="text-2xl font-medium  ">{{ props.weekDay }}</span>
+                <ToggleButton @change="handlePublished" :disabled="!props.item.length" v-model="published"
+                    class="text-sm" fluid onLabel="Опубликовано" offLabel="Не опубликовано" />
+            </div>
             <table class="schedule-table dark:bg-surface-900">
-                <caption class="text-2xl font-medium  mb-2">{{ props.weekDay }}</caption>
+                <!-- <caption class="text-2xl font-medium  mb-2">{{ props.weekDay }}</caption> -->
                 <thead>
                     <tr>
                         <th>№</th>

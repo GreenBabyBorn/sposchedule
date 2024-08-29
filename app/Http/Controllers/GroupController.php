@@ -172,6 +172,7 @@ class GroupController extends Controller
                         $dayLessons[$index] = [
                             'index' => $index,
                             'schedule_id' => $schedule->id,
+                            'published' => $schedule->published,
                             // 'ЧИСЛ' => new \stdClass() ,
                             // 'ЗНАМ' => new \stdClass() ,
                         ];

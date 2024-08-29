@@ -3,7 +3,7 @@
 </script>
 
 <template>
-    <header class=" py-4">
+    <header class="dark:text-surface-100 py-4">
         <div class="max-w-screen-xl mx-auto px-4">
 
             <nav>

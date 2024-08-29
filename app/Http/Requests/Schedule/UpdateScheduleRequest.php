@@ -24,7 +24,7 @@ class UpdateScheduleRequest extends FormRequest
     public function rules()
     {
         return [
-            'group_id' => 'required|exists:groups,id',
+            'group_id' => 'exists:groups,id',
             'date' => [
                 'nullable',
                 'date',
@@ -34,7 +34,7 @@ class UpdateScheduleRequest extends FormRequest
                 }),
             ],
             'type' => [
-                'required',
+
                 Rule::in(['main', 'changes']),
             ],
             'week_type' => ['required_if:type,main', Rule::in(['ЧИСЛ', 'ЗНАМ'])],
@@ -43,7 +43,7 @@ class UpdateScheduleRequest extends FormRequest
                 Rule::in(['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']),
             ],
             'view_mode' => [
-                'required',
+
                 Rule::in(['table', 'message']),
             ],
             'message' => 'required_if:view_mode,message|string',
@@ -59,7 +59,7 @@ class UpdateScheduleRequest extends FormRequest
             if(!$week_type) {
                 return;
             }
-            
+
             // День отсчета
             $currentDate = Carbon::parse('2024-09-01');
 

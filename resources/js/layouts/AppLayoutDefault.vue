@@ -7,7 +7,7 @@ import Toast from 'primevue/toast';
 <template>
   <Toast></Toast>
   <TheHeader></TheHeader>
-  <main class="">
+  <main class="dark:text-surface-100">
     <slot />
   </main>
   <TheFooter></TheFooter>

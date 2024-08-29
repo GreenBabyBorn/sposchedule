@@ -25,6 +25,7 @@ class ScheduleResource extends JsonResource
             'message' => $this->when($this->message !== null, $this->message),
             'group' => new GroupResource($this->group),
             'lessons' => LessonResource::collection($this->lessons),
+            'published' => $this->published,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

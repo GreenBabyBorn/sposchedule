@@ -70,7 +70,7 @@ const addSubject = async () => {
             <h1 class="text-2xl">Предметы</h1>
         </div>
         <div class="">
-            <form class="flex items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
+            <form class="flex flex-wrap  items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <InputText :invalid="newSubjectError" placeholder="Пример: Математика" v-model="newSubjectName">
                 </InputText>
                 <Button type="submit" @click.prevent="addSubject" :disabled="!newSubjectName">Добавить предмет</Button>
