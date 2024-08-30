@@ -16,9 +16,7 @@ const { data: teachers } = useTeachersQuery()
 
 const toast = useToast();
 
-const newTeacherFirstName = ref('')
-const newTeacherLastName = ref('')
-const newTeacherPatronymic = ref('')
+const newTeacherName = ref('')
 
 const newTeacherError = ref(false)
 
@@ -96,21 +94,17 @@ const { mutateAsync: storeTeacher, isPending: isStored } = useStoreTeacher()
 const addTeacher = async () => {
     try {
         await storeTeacher({
-            first_name: newTeacherFirstName.value,
-            last_name: newTeacherLastName.value,
-            patronymic: newTeacherPatronymic.value
+            name: newTeacherName.value,
         })
     }
     catch (e) {
         newTeacherError.value = true
         toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-        newTeacherFirstName.value = ''
+        newTeacherName.value = ''
         return
     }
     newTeacherError.value = false
-    newTeacherFirstName.value = ''
-    newTeacherLastName.value = ''
-    newTeacherPatronymic.value = ''
+    newTeacherName.value = ''
 }
 
 const { data: subjects } = useSubjectsQuery()
@@ -123,14 +117,10 @@ const { data: subjects } = useSubjectsQuery()
         </div>
         <div class="">
             <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <InputText :invalid="newTeacherError" placeholder="Фамилия" v-model="newTeacherLastName">
+                <InputText :invalid="newTeacherError" placeholder="ФИО" v-model="newTeacherName">
                 </InputText>
-                <InputText :invalid="newTeacherError" placeholder="Имя" v-model="newTeacherFirstName">
-                </InputText>
-                <InputText :invalid="newTeacherError" placeholder="Отчество" v-model="newTeacherPatronymic">
-                </InputText>
-                <Button type="submit" @click.prevent="addTeacher"
-                    :disabled="!newTeacherFirstName || !newTeacherLastName || !newTeacherPatronymic">Добавить
+
+                <Button type="submit" @click.prevent="addTeacher" :disabled="!newTeacherName">Добавить
                     преподавателя</Button>
             </form>
         </div>
@@ -149,17 +139,7 @@ const { data: subjects } = useSubjectsQuery()
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-                <Column field="last_name" header="Фамилия" style="width: 10%">
-                    <template #editor="{ data, field }">
-                        <InputText class="w-full" v-model="data[field]" />
-                    </template>
-                </Column>
-                <Column field="first_name" header="Имя" style="width: 10%">
-                    <template #editor="{ data, field }">
-                        <InputText class="w-full" v-model="data[field]" />
-                    </template>
-                </Column>
-                <Column field="patronymic" header="Отчество" style="width: 10%">
+                <Column field="name" header="ФИО" style="width: 10%">
                     <template #editor="{ data, field }">
                         <InputText class="w-full" v-model="data[field]" />
                     </template>

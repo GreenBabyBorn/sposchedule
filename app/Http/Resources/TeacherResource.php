@@ -16,10 +16,11 @@ class TeacherResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'patronymic' => $this->patronymic,
-            'name' => $this->last_name . " " . $this->first_name . " " . $this->patronymic,
+            // 'first_name' => $this->first_name,
+            // 'last_name' => $this->last_name,
+            // 'patronymic' => $this->patronymic,
+            // 'name' => $this->last_name . " " . $this->first_name . " " . $this->patronymic,
+            'name' => $this->name,
             'subjects' => SubjectResource::collection($this->subjects),
         ];
     }
