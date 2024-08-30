@@ -6,7 +6,6 @@ services:
             context: .
             dockerfile: Dockerfile
         image: php:8.3
-        container_name: app
         restart: unless-stopped
         tty: true
         environment:
@@ -23,13 +22,11 @@ services:
         build:
             context: .
             dockerfile: node/Dockerfile
-        container_name: node
         volumes:
             - .:/var/www
 
     webserver:
         image: nginx:latest
-        container_name: webserver
         restart: unless-stopped
         tty: true
         ports:
