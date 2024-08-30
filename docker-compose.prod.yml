@@ -33,7 +33,7 @@ services:
         restart: unless-stopped
         tty: true
         ports:
-            - "81:80"
+            - "82:80"
             - "444:443"
         volumes:
             - .:/var/www/
@@ -46,7 +46,7 @@ services:
         image: postgres:13.0
         restart: always
         ports:
-            - 5433:5432
+            - 5434:5432
         environment:
             POSTGRES_PASSWORD: ${DB_PASSWORD}
             POSTGRES_USER: ${DB_USERNAME}
