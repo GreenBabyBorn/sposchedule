@@ -87,7 +87,7 @@ onMounted(() => {
         </div>
         <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex gap-2 items-center">
-                <DatePicker :invalid="isError" v-model="date" />
+                <DatePicker :invalid="isError" dateFormat="dd.mm.yy" v-model="date" />
                 <Select class="basis-1/5" showClear v-model="course" :options="courses" option-label="course"
                     placeholder="Курс"></Select>
 

@@ -95,7 +95,7 @@ const { data: groups } = useGroupsQuery();
             <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <div class="flex flex-wrap gap-2 items-center w-full">
 
-                    <DatePicker id="date" :invalid="isError" v-model="date" />
+                    <DatePicker id="date" :invalid="isError" dateFormat="dd.mm.yy" v-model="date" />
                     <Select :disabled="course" editable showClear v-model="selectedGroup" :options="groups"
                         optionLabel="name" placeholder="Группа" class="w-full md:w-[10rem]" />
                     <Select :disabled="selectedGroup" class="" showClear v-model="course" :options="courses"

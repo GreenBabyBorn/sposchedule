@@ -2,6 +2,7 @@
 import AdminNav from '../components/AdminNavbar.vue'
 import AdminTopbar from '../components/AdminTopbar.vue'
 import Toast from 'primevue/toast';
+import ConfirmDialog from 'primevue/confirmdialog';
 
 import { useAppStore } from '@/stores/app';
 const { isNavbarActive } = useAppStore();
@@ -9,6 +10,7 @@ const { isNavbarActive } = useAppStore();
 
 <template>
   <Toast></Toast>
+  <ConfirmDialog></ConfirmDialog>
   <div class="h-screen">
     <AdminTopbar></AdminTopbar>
     <AdminNav></AdminNav>

@@ -125,9 +125,9 @@ const { data: subjects } = useSubjectsQuery()
             </form>
         </div>
         <div class="">
-            <DataTable :loading="isUpdated || isDestroyed || isStored" v-model:selection="selectedTeachers"
-                v-model:editingRows="editingRows" :value="teachers" editMode="row" dataKey="id"
-                @row-edit-save="onRowEditSave" :pt="{
+            <DataTable paginator :rows="10" :loading="isUpdated || isDestroyed || isStored"
+                v-model:selection="selectedTeachers" v-model:editingRows="editingRows" :value="teachers" editMode="row"
+                dataKey="id" @row-edit-save="onRowEditSave" :pt="{
                     table: { style: 'min-width: 50rem' }
                 }">
                 <template #header>

@@ -6,15 +6,27 @@ use App\Http\Requests\Subject\StoreSubjectRequest;
 use App\Http\Requests\Subject\UpdateSubjectRequest;
 use App\Http\Resources\SubjectResource;
 use App\Models\Subject;
+use Illuminate\Http\Request;
 
 class SubjectController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return SubjectResource::collection(Subject::all());
+        $query = Subject::query();
+        $orderField = $request->input('order_field', 'id'); // Поле для сортировки, по умолчанию id
+        $orderDirection = $request->input('order_direction', 'desc'); // Направление сортировки, по умолчанию
+
+        if (in_array($orderField, ['id', 'name', 'created_at', 'updated_at']) &&
+        in_array($orderDirection, ['asc', 'desc'])) {
+            $query->orderBy($orderField, $orderDirection);
+        }
+
+        // Получаем отфильтрованные группы
+        $subjects = $query->get();
+        return SubjectResource::collection($subjects);
     }
 
     /**

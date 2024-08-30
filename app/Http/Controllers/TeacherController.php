@@ -17,9 +17,20 @@ class TeacherController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        return TeacherResource::collection(Teacher::all());
+        $query = Teacher::query();
+        $orderField = $request->input('order_field', 'id'); // Поле для сортировки, по умолчанию id
+        $orderDirection = $request->input('order_direction', 'desc'); // Направление сортировки, по умолчанию
+
+        if (in_array($orderField, ['id', 'name', 'created_at', 'updated_at']) &&
+        in_array($orderDirection, ['asc', 'desc'])) {
+            $query->orderBy($orderField, $orderDirection);
+        }
+
+        // Получаем отфильтрованные группы
+        $teachers = $query->get();
+        return TeacherResource::collection($teachers);
     }
 
     /**

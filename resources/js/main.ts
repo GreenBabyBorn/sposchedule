@@ -11,6 +11,7 @@ import { locale } from './locale';
 import '@tanstack/vue-query';
 import type { AxiosError } from 'axios';
 import axios from 'axios';
+import ConfirmationService from 'primevue/confirmationservice';
 
 declare module '@tanstack/vue-query' {
   interface Register {
@@ -55,5 +56,6 @@ createApp(App)
     pt: Aura,
     locale,
   })
+  .use(ConfirmationService)
   .use(router)
   .mount('#app');

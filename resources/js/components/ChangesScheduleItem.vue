@@ -216,13 +216,13 @@ async function handlePublished() {
 
 <template>
     <div class="schedule-item">
-        <div class="p-2  dark:bg-surface-800  flex flex-wrap  justify-between items-center"> <span
+        <div class="p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center"> <span
                 class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
                     props.group.name }}</span>
             <span>{{ props.week_type }}</span>
             <div v-if="props.type !== 'main'" class="">
                 <ToggleButton @change="handlePublished" :disabled="!lessons" v-model="published" class="text-sm" fluid
-                    onLabel="Опубликовано" offLabel="Не опубликовано" />
+                    onLabel="Снять с публикации" offLabel="Опубликовать" />
             </div>
             <span :class="{
                 'border border-green-400 ': props.type

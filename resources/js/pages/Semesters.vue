@@ -91,21 +91,22 @@ const minDate = ref(new Date());
         </div>
         <div class="">
             <form class="flex flex-wrap items-end gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <div class="">
+                <div class="basis-1/5">
                     <label for="years" class=" block mb-1">Учебный год</label>
                     <!-- <InputText id="years" v-model="inputSemester.years" placeholder="2023/2024"></InputText> -->
-                    <DatePicker :min-date="minDate" view="year" input-id="dates" date-format="yy" v-model="years"
-                        selectionMode="range" :manualInput="false" />
+                    <DatePicker placeholder="Учебный год" :min-date="minDate" view="year" input-id="dates"
+                        date-format="yy" v-model="years" selectionMode="range" :manualInput="false" />
                 </div>
-                <div class="flex-auto">
-                    <label for="semester" class=" block mb-1">Номер семестра</label>
-                    <InputNumber v-model="indexSemester" inputId="semester" mode="decimal" :min="1" :max="100" fluid>
+                <div class="">
+                    <label for=" semester" class=" block mb-1">Номер семестра</label>
+                    <InputNumber placeholder="Номер семестра" v-model="indexSemester" inputId="semester" mode="decimal"
+                        :min="1" :max="100" fluid>
                     </InputNumber>
                 </div>
                 <div class="">
                     <label for="dates" class="block mb-1">Начало - Конец семестра</label>
-                    <DatePicker input-id="dates" date-format="dd.mm.yy" v-model="dates" selectionMode="range"
-                        :manualInput="false" />
+                    <DatePicker placeholder="Начало - Конец семестра" input-id="dates" date-format="dd.mm.yy"
+                        v-model="dates" selectionMode="range" :manualInput="false" />
                 </div>
 
                 <Button @click.prevent="addSemester">Добавить</Button>

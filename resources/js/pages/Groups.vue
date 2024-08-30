@@ -9,10 +9,12 @@ import { useDateFormat } from '@vueuse/core'
 import { useToast } from 'primevue/usetoast';
 import Chip from 'primevue/chip';
 import MultiSelect from 'primevue/multiselect';
+import { FilterMatchMode } from '@primevue/core/api';
 
 
 import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup, useDestroySemesterForGroup, useStoreSemesterForGroup } from '../queries/groups'
 import { useSemestersQuery } from '@/queries/semesters';
+import { useConfirm } from 'primevue/useconfirm';
 
 const { data: groups } = useGroupsQuery()
 
@@ -137,7 +139,37 @@ const addGroup = async () => {
     newGroupName.value = ''
     selectedSemesters.value = []
 }
+
+
+const confirm = useConfirm();
+
+
 const { mutateAsync: destroySubject, isPending: isDestroyed } = useDestroyGroup()
+
+
+const confirmDelete = () => {
+    confirm.require({
+        message: 'Удаление групп может сломать расписание',
+        header: 'Вы уверены?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Отмена',
+        rejectProps: {
+            label: 'Отмена',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Удалить',
+            severity: 'danger'
+        },
+        accept: async () => {
+            await deleteGroups()
+        },
+        reject: () => {
+
+        }
+    });
+};
 
 const deleteGroups = async () => {
     if (selectedGroups.value.length === 0) return;
@@ -158,6 +190,14 @@ const deleteGroups = async () => {
 const { data: semesters } = useSemestersQuery()
 
 const selectedSemesters = ref([])
+
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+    course: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
+});
 </script>
 
 <template>
@@ -167,7 +207,7 @@ const selectedSemesters = ref([])
 
         </div>
         <div class="">
-            <form class="flex flex-wrap  items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
+            <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <InputText :invalid="newGroupError" placeholder="Пример: ИС-401" v-model="newGroupName"></InputText>
                 <MultiSelect v-model="selectedSemesters" display="chip" :options="semesters" optionLabel="name" filter
                     placeholder="Выбрать семестры" :maxSelectedLabels="3" class="" />
@@ -175,7 +215,8 @@ const selectedSemesters = ref([])
             </form>
         </div>
         <div class="">
-            <DataTable :loading="isUpdated || isDestroyed || isStored" v-model:selection="selectedGroups"
+            <DataTable paginator :rows="10" :globalFilterFields="['name', 'course']" v-model:filters="filters"
+                :loading="isUpdated || isDestroyed || isStored" v-model:selection="selectedGroups"
                 v-model:editingRows="editingRows" :value="groups" editMode="row" dataKey="id"
                 @row-edit-save="onRowEditSave" :pt="{
                     table: { style: 'min-width: 50rem' }
@@ -183,8 +224,8 @@ const selectedSemesters = ref([])
                 <template #header>
                     <div class="flex justify-between">
                         <Button severity="danger" :disabled="!selectedGroups.length || !groups.length" type="button"
-                            icon="pi pi-trash" label="Удалить" outlined @click="deleteGroups" />
-
+                            icon="pi pi-trash" label="Удалить" outlined @click="confirmDelete" />
+                        <InputText v-model="filters['global'].value" placeholder="Поиск" />
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>

@@ -48,7 +48,7 @@ class GroupController extends Controller
 
         // Сортировка
         $orderField = $request->input('order_field', 'id'); // Поле для сортировки, по умолчанию id
-        $orderDirection = $request->input('order_direction', 'asc'); // Направление сортировки, по умолчанию asc
+        $orderDirection = $request->input('order_direction', 'desc'); // Направление сортировки, по умолчанию
 
         // Проверка на допустимые значения для сортировки
         if (in_array($orderField, ['id', 'course', 'index', 'specialization', 'name']) &&
