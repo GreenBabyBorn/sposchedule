@@ -20,7 +20,7 @@ const { course, date, queryParams, schedulesChanges, selectedGroup } = storeToRe
 const { setSchedulesChanges } = scheduleStore;
 
 // Хранение query параметров в localStorage
-const localStorage = useStorage('changesSchedules', { date: '', course: '', group: '' });
+const localStorage = useStorage('publicSchedules', { date: '', course: '', group: '' });
 
 const isoDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'YYYY/MM/DD').value : null;
@@ -49,8 +49,8 @@ const updateQueryParams = () => {
 
     // Обновляем localStorage при изменении query параметров
     if (isoDate.value) localStorage.value.date = isoDate.value;
-    if (selectedCourse.value) localStorage.value.course = selectedCourse.value;
-    // if (selectedGroup.value) localStorage.value.group = selectedGroup.value;
+    localStorage.value.course = selectedCourse.value;
+    localStorage.value.group = selectedGroup.value;
 };
 
 watch(changesSchedules, (newData) => {
@@ -71,6 +71,8 @@ onMounted(() => {
 
     if (localStorage.value.course) {
         course.value = { course: localStorage.value.course };
+    } if (localStorage.value.group) {
+        selectedGroup.value = localStorage.value.group;
     }
 
     // Синхронизация параметров в URL
@@ -94,10 +96,10 @@ const { data: groups } = useGroupsQuery();
                 <div class="flex flex-wrap gap-2 items-center w-full">
 
                     <DatePicker id="date" :invalid="isError" v-model="date" />
-                    <Select editable showClear v-model="selectedGroup" :options="groups" optionLabel="name"
-                        placeholder="Группа" class="w-full md:w-[10rem]" />
-                    <Select class="" showClear v-model="course" :options="courses" option-label="course"
-                        placeholder="Курс"></Select>
+                    <Select :disabled="course" editable showClear v-model="selectedGroup" :options="groups"
+                        optionLabel="name" placeholder="Группа" class="w-full md:w-[10rem]" />
+                    <Select :disabled="selectedGroup" class="" showClear v-model="course" :options="courses"
+                        option-label="course" placeholder="Курс"></Select>
 
 
                 </div>
