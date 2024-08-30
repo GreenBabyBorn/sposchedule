@@ -26,9 +26,14 @@ axios.interceptors.response.use(
     // Если ответ успешен, просто возвращаем его
     return response;
   },
-  error => {
+  (error: AxiosError) => {
     // Если произошла ошибка, проверяем код статуса
-    if (error.response && error.response.status === 401) {
+    if (
+      error.response &&
+      error?.request?.responseURL.includes('/api/user') &&
+      error.response.status === 401
+    ) {
+      console.log(error);
       // Если ошибка 401, перенаправляем пользователя на страницу входа
       localStorage.removeItem('token');
       router.push('/admin/login');
