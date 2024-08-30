@@ -131,7 +131,7 @@ class GroupController extends Controller
 
     public function getCourses()
     {
-        $courses = Group::select('course')->get();
+        $courses = Group::select('course')->distinct()->get();
         return $courses;
     }
 

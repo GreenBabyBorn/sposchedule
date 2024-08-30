@@ -12,11 +12,21 @@ import SchedulesChanges from '../pages/ChangesSchedules.vue';
 import SemestersView from '../pages/Semesters.vue';
 import UserView from '../pages/User.vue';
 import AuthView from '../pages/Login.vue';
+import NotFound from '../pages/NotFound.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
+    {
+      path: '/404',
+      name: 'NotFound',
+      component: NotFound,
+    },
+    {
+      path: '/:catchAll(.*)',
+      redirect: '404',
+    },
     { path: '/', component: HomeView },
     {
       path: '/admin/login',
@@ -126,9 +136,9 @@ router.beforeEach(async (to, from, next) => {
 router.beforeEach(to => {
   const { title, description }: any = to.meta;
   const defaultTitle = 'Пары РКЭ';
-  const defaultDescription = 'Система управления расписанием';
+  const defaultDescription = 'Расписание РКЭ';
 
-  document.title = `${defaultTitle} | ${title}` || defaultTitle;
+  document.title = title ? `${title} | ${defaultTitle}` : defaultTitle;
 
   const descriptionElement = document.querySelector(
     'head meta[name="description"]'

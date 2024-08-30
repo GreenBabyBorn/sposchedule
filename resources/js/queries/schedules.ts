@@ -85,3 +85,19 @@ export function useCoursesQuery() {
     queryFn: async () => (await axios.get(`/api/groups/courses`)).data,
   });
 }
+
+export function usePublicSchedulesQuery(date, course, selectedGroup) {
+  const enabled = computed(() => Boolean(date.value));
+
+  return useQuery({
+    enabled: enabled,
+    queryKey: ['scheduleChanges', date, course, selectedGroup],
+    retry: 0,
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/api/schedules/public?date=${date.value}&course=${course.value || ''}&group=${selectedGroup.value?.name || ''}`
+        )
+      ).data,
+  });
+}

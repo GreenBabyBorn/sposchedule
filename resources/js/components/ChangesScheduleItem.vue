@@ -11,7 +11,6 @@ import { useToast } from 'primevue/usetoast';
 import { reactive, ref, toRef, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
 
-
 const toast = useToast();
 const props = defineProps({
     group: { required: true, type: Object },
@@ -21,7 +20,7 @@ const props = defineProps({
     semester: { required: false, type: Object },
     lessons: { required: true },
     schedule: { required: true, type: Object },
-    published: { required: true, type: Boolean },
+    published: { required: false, type: Boolean },
 })
 const lessons: any = toRef<any>(() => props.lessons)
 const published = ref(props.published)
@@ -58,6 +57,7 @@ async function editLesson(item) {
             id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).id : item.id,
             body: {
                 ...item,
+                subject_id: item.subject.id,
                 id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).id : item.id,
                 schedule_id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).schedule_id : item.schedule_id,
             }
@@ -216,7 +216,7 @@ async function handlePublished() {
 
 <template>
     <div class="schedule-item">
-        <div class="p-2  bg-surface-800  flex flex-wrap  justify-between items-center"> <span
+        <div class="p-2  dark:bg-surface-800  flex flex-wrap  justify-between items-center"> <span
                 class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
                     props.group.name }}</span>
             <span>{{ props.week_type }}</span>
@@ -226,13 +226,14 @@ async function handlePublished() {
             </div>
             <span :class="{
                 'border border-green-400 ': props.type
-                    !== 'main'
-            }" class="text-sm text-right bg-surface-600 py-1 px-2 rounded-lg text-white/80">{{
+                    !== 'main',
+                'border border-surface-400 ': props.type
+                    === 'main'
+            }" class="text-sm text-right  py-1 px-2 rounded-lg dark:text-white/80">{{
                 props.type
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
         </div>
         <table class="schedule-table dark:bg-surface-900">
-
             <thead>
                 <tr>
                     <th>
@@ -260,8 +261,6 @@ async function handlePublished() {
                                 {{ item.index }}
                             </span></td>
                         <td>
-
-
                             <div v-if="item.id" class="table-subrow"><Select @change="editLesson(item)"
                                     v-model="item.subject" class="w-full text-left" :options="subjects"
                                     optionLabel="name"></Select>
@@ -274,9 +273,7 @@ async function handlePublished() {
 
                             </div>
                         </td>
-
                         <td>
-
                             <div class="table-subrow" v-if="item.id">
                                 <InputText class="w-full" @change="editLesson(item)" v-model="item.building" />
                             </div>
@@ -337,11 +334,7 @@ async function handlePublished() {
 
             </tbody>
         </table>
-
-
-
     </div>
-
 </template>
 
 <style scoped>

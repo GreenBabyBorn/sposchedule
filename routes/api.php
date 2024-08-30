@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
+Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
 // Маршруты, защищенные Sanctum
 Route::middleware('auth:sanctum')->group(function () {

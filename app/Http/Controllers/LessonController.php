@@ -52,6 +52,7 @@ class LessonController extends Controller
             $teachersIds = array_column($request->teachers, 'id');
             $lesson->teachers()->sync($teachersIds);
         }
+
         return new LessonResource($lesson);
     }
 

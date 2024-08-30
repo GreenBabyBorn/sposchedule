@@ -39,6 +39,7 @@ async function editLesson(item) {
             id: item.id,
             body: {
                 ...item,
+                subject_id: item.subject.id,
             },
         });
     } catch (e) {
