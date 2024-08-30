@@ -6,8 +6,7 @@ import Button from 'primevue/button';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
 import router from '@/router';
-
-import { useToast } from 'primevue/usetoast';
+import LoadingBar from '../components/LoadingBar.vue';
 import { useDebounceFn } from '@vueuse/core';
 
 const authStore = useAuthStore()
@@ -46,6 +45,7 @@ const debouncedAuth = useDebounceFn(auth, 300);
 </script>
 
 <template>
+    <LoadingBar />
     <div class="">
 
         <form @submit.prevent="debouncedAuth()" class="flex flex-col justify-center items-center h-screen gap-4">

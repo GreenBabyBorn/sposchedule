@@ -3,6 +3,7 @@ import AdminNav from '../components/AdminNavbar.vue'
 import AdminTopbar from '../components/AdminTopbar.vue'
 import Toast from 'primevue/toast';
 import ConfirmDialog from 'primevue/confirmdialog';
+import LoadingBar from '../components/LoadingBar.vue';
 
 import { useAppStore } from '@/stores/app';
 const { isNavbarActive } = useAppStore();
@@ -12,6 +13,7 @@ const { isNavbarActive } = useAppStore();
   <Toast></Toast>
   <ConfirmDialog></ConfirmDialog>
   <div class="h-screen">
+    <LoadingBar />
     <AdminTopbar></AdminTopbar>
     <AdminNav></AdminNav>
     <main :class="{ 'ml-80': !isNavbarActive }"

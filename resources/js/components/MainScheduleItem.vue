@@ -214,7 +214,7 @@ async function handlePublished() {
             <div class="flex items-center h-full gap-4 mb-2">
                 <span class="text-2xl font-medium  ">{{ props.weekDay }}</span>
                 <ToggleButton @change="handlePublished" :disabled="!props.item.length" v-model="published"
-                    class="text-sm" fluid onLabel="Опубликовано" offLabel="Не опубликовано" />
+                    class="text-sm" fluid onLabel="Снять с публикации" offLabel="Опубликовать" />
             </div>
             <table class="schedule-table dark:bg-surface-900">
                 <!-- <caption class="text-2xl font-medium  mb-2">{{ props.weekDay }}</caption> -->

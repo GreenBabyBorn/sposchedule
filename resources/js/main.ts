@@ -13,6 +13,7 @@ import type { AxiosError } from 'axios';
 import axios from 'axios';
 import ConfirmationService from 'primevue/confirmationservice';
 
+
 declare module '@tanstack/vue-query' {
   interface Register {
     defaultError: AxiosError;
@@ -46,6 +47,8 @@ axios.interceptors.response.use(
 );
 
 const pinia = createPinia();
+
+
 
 createApp(App)
   .use(pinia)
