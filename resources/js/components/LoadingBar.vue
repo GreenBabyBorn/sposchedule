@@ -2,7 +2,7 @@
 <template>
     <div v-if="isLoading" class="loading-bar">
         <div class="loading-progress"></div>
-        <span class="loading-time">{{ requestDuration }} ms</span>
+        <!-- <span class="loading-time">{{ requestDuration }} ms</span> -->
     </div>
 </template>
 
@@ -22,18 +22,17 @@ const requestDuration = computed(() => loadingStore.requestDuration);
     left: 0;
     width: 100%;
     height: 2px;
-    background: rgba(255, 37, 37, 0.641);
+    /* background: rgba(255, 0, 0, 0.212); */
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    color: #000;
     z-index: 1000;
 }
 
 .loading-progress {
     height: 100%;
     background-color: #007bff;
-    /* animation: loading 3s infinite; */
+    animation: loading 2s infinite;
 }
 
 @keyframes loading {

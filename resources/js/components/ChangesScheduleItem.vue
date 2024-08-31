@@ -212,6 +212,8 @@ async function handlePublished() {
         return
     }
 }
+
+const hideAddNewLesson = ref(false)
 </script>
 
 <template>
@@ -234,7 +236,7 @@ async function handlePublished() {
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
         </div>
         <table class="schedule-table dark:bg-surface-900">
-            <thead>
+            <thead v-show="lessons?.length > 0 || hideAddNewLesson">
                 <tr>
                     <th>
                         <div class="">№</div>
@@ -298,7 +300,7 @@ async function handlePublished() {
                         </td>
                     </tr>
                 </template>
-                <tr>
+                <tr v-show="hideAddNewLesson">
                     <td>
                         <InputText size="small" class="w-full text-center" v-model="newLesson.index" />
                     </td>
@@ -334,6 +336,11 @@ async function handlePublished() {
 
             </tbody>
         </table>
+        <div class="mt-2 flex items-center justify-center">
+            <Button label="Добавить пару" title="Открыть форму для добавления пары" size="small" outlined
+                severity="secondary" class="w-full" @click="hideAddNewLesson = !hideAddNewLesson"
+                :class="{ 'pi pi-angle-down': hideAddNewLesson, 'pi pi-angle-up': !hideAddNewLesson }"></Button>
+        </div>
     </div>
 </template>
 

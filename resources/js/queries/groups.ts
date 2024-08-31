@@ -1,11 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
+import { computed } from 'vue';
 
-export function useGroupsQuery() {
+export function useGroupsQuery(name?) {
+  const enabled = computed(() => {
+    return Boolean(name?.value);
+  });
   return useQuery({
     queryKey: ['groups'],
-
-    queryFn: async () => (await axios.get('/api/groups')).data,
+    // enabled: true || enabled,
+    queryFn: useDebounceFn(
+      async () => (await axios.get(`/api/groups`)).data,
+      300
+    ),
   });
 }
 

@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 
 export const useScheduleStore = defineStore('useScheduleStore', () => {
   const route = useRoute();
-  const selectedMainGroup: any = ref(null);
+  const selectedMainGroupName: any = ref(null);
   const selectedMainSemester: any = ref(null);
   const queryParams = ref(route.query);
   const schedules = ref();
@@ -24,7 +24,7 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
   return {
     schedules,
     setSchedules,
-    selectedMainGroup,
+    selectedMainGroupName,
     selectedMainSemester,
     queryParams,
     schedulesChanges,

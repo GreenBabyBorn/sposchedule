@@ -3,7 +3,7 @@ import DatePicker from 'primevue/datepicker';
 import ChangesScheduleItem from '@/components/ChangesScheduleItem.vue';
 import { computed, onMounted, ref, watch } from "vue";
 import { useChangesSchedulesQuery, useCoursesQuery } from '@/queries/schedules';
-import { useDateFormat } from '@vueuse/core';
+import { useDateFormat, useNow } from '@vueuse/core';
 import { useScheduleStore } from '@/stores/schedule';
 import { storeToRefs } from 'pinia';
 import router from '@/router';
@@ -21,7 +21,7 @@ const { setSchedulesChanges } = scheduleStore;
 const localStorage = useStorage('changesSchedules', { date: '', course: '' });
 
 const isoDate = computed(() => {
-    return date.value ? useDateFormat(date.value, 'YYYY/MM/DD').value : null;
+    return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
 });
 
 const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
@@ -46,7 +46,7 @@ const updateQueryParams = () => {
 
     // Обновляем localStorage при изменении query параметров
     if (isoDate.value) localStorage.value.date = isoDate.value;
-    if (selectedCourse.value) localStorage.value.course = selectedCourse.value;
+    localStorage.value.course = selectedCourse.value; 2
 };
 
 watch(changesSchedules, (newData) => {
@@ -58,14 +58,27 @@ watch(changesSchedules, (newData) => {
 watch([isoDate, selectedCourse], updateQueryParams, { deep: true });
 
 onMounted(() => {
-    // Восстанавливаем значения из localStorage при загрузке
-    if (localStorage.value.date) {
-        date.value = new Date(Date.parse(localStorage.value.date));
-    } else if (!date.value) {
+    // Восстанавливаем значения сначала из query параметров, если они есть
+    if (route.query.date) {
+        // Если дата есть в query параметрах, используем ее
+        const [day, month, year] = (route.query.date as string).split('.').map(Number);
+        date.value = new Date(year, month - 1, day);
+        localStorage.value.date = route.query.date as string; // Сохраняем в localStorage
+    } else if (localStorage.value.date) {
+        // Если даты нет в query, используем из localStorage
+        const [day, month, year] = localStorage.value.date.split('.').map(Number);
+        date.value = new Date(year, month - 1, day);
+    } else {
+        // Если нет даты ни в query, ни в localStorage, используем текущую дату
         date.value = new Date();
     }
 
-    if (localStorage.value.course) {
+    if (route.query.course) {
+        // Если курс есть в query параметрах, используем его
+        course.value = { course: Number(route.query.course as string) };
+        localStorage.value.course = route.query.course as string; // Сохраняем в localStorage
+    } else if (localStorage.value.course) {
+        // Если курса нет в query, используем из localStorage
         course.value = { course: localStorage.value.course };
     }
 
@@ -80,14 +93,21 @@ onMounted(() => {
 <template>
     <div class="flex flex-col gap-4">
         <div class="flex flex-wrap justify-between items-baseline">
-            <h1 class="text-2xl">Расписание (изменения) | <span>{{ useDateFormat(date, 'dddd').value.toUpperCase()
-                    }}</span> |
-                <span>{{ schedulesChanges?.week_type }}</span>
+            <h1 class="text-2xl">Расписание изменений
             </h1>
         </div>
         <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex gap-2 items-center">
-                <DatePicker :invalid="isError" dateFormat="dd.mm.yy" v-model="date" />
+                <DatePicker showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy" v-model="date">
+                    <template #inputicon="slotProps">
+                        <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
+                            <small>{{ useDateFormat(date, 'dddd').value.toUpperCase()
+                                }}</small>
+                            <small>{{ schedulesChanges?.week_type }}</small>
+                        </div>
+
+                    </template>
+                </DatePicker>
                 <Select class="basis-1/5" showClear v-model="course" :options="courses" option-label="course"
                     placeholder="Курс"></Select>
 

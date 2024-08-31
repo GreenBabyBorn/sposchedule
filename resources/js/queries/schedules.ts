@@ -1,21 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
+import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { computed } from 'vue';
 
 export function useMainSchedulesQuery(mainGroup, mainSemester) {
-  const enabled = computed(() =>
-    Boolean(mainGroup.value && mainSemester.value)
-  );
+  const enabled = computed(() => Boolean(mainGroup && mainSemester.value));
 
   return useQuery({
     enabled: enabled,
     queryKey: ['scheduleMain', mainGroup, mainSemester],
-    queryFn: async () =>
-      (
+    queryFn: useDebounceFn(async () => {
+      const res = (
         await axios.get(
           `/api/groups/${mainGroup.value.id}/semester/${mainSemester.value.id}/schedules/main/`
         )
-      ).data,
+      ).data;
+      return res;
+    }, 300),
   });
 }
 export function useStoreSchedule() {
@@ -93,11 +94,14 @@ export function usePublicSchedulesQuery(date, course, selectedGroup) {
     enabled: enabled,
     queryKey: ['scheduleChanges', date, course, selectedGroup],
     retry: 0,
-    queryFn: async () =>
-      (
-        await axios.get(
-          `/api/schedules/public?date=${date.value}&course=${course.value || ''}&group=${selectedGroup.value?.name || ''}`
-        )
-      ).data,
+    queryFn: useDebounceFn(
+      async () =>
+        (
+          await axios.get(
+            `/api/schedules/public?date=${date.value}&course=${course.value || ''}&group=${selectedGroup.value || ''}`
+          )
+        ).data,
+      300
+    ),
   });
 }

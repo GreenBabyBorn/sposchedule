@@ -12,24 +12,20 @@ fetchUser();
 
 const loadingStore = useLoadingStore();
 
-// Добавляем интерсептор запроса
-axios.interceptors.request.use(config => {
-    loadingStore.startLoading();
-    // @ts-ignore
-    config.meta = { startTime: performance.now() }; // Сохраняем время начала запроса
-    console.log(config)
+
+
+axios.interceptors.request.use((config) => {
+    loadingStore.startLoading(); // Увеличиваем счетчик активных запросов и запускаем загрузку при первом запросе
     return config;
 });
 
-// Добавляем интерсептор ответа
 axios.interceptors.response.use(
-    response => {
-        // @ts-ignore
-        loadingStore.stopLoading(response.config.meta.startTime);
+    (response) => {
+        loadingStore.stopLoading(); // Уменьшаем счетчик при успешном ответе
         return response;
     },
-    error => {
-        loadingStore.stopLoading(error.config?.meta?.startTime || 0);
+    (error) => {
+        loadingStore.stopLoading(); // Уменьшаем счетчик при ошибке
         return Promise.reject(error);
     }
 );

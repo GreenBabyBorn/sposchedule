@@ -15,7 +15,7 @@ const toast = useToast();
 
 const props = defineProps({
     weekDay: { type: String, required: true },
-    group: { required: true, type: Object },
+    group: { required: false, type: Object },
     semester: { required: true, type: Object },
     item: { required: true, type: [Object] },
     published: { required: false, type: Boolean },
@@ -206,19 +206,21 @@ async function handlePublished() {
         return
     }
 }
+
+const hideAddNewLesson = ref(false)
 </script>
 
 <template>
-    <div class="relative overflow-x-auto">
+    <div class="relative overflow-x-auto schedule-item py-1">
         <div class="">
-            <div class="flex items-center h-full gap-4 mb-2">
+            <div class="flex dark:bg-surface-800 py-2 px-4 items-center h-full gap-4">
                 <span class="text-2xl font-medium  ">{{ props.weekDay }}</span>
                 <ToggleButton @change="handlePublished" :disabled="!props.item.length" v-model="published"
                     class="text-sm" fluid onLabel="Снять с публикации" offLabel="Опубликовать" />
             </div>
             <table class="schedule-table dark:bg-surface-900">
                 <!-- <caption class="text-2xl font-medium  mb-2">{{ props.weekDay }}</caption> -->
-                <thead>
+                <thead v-show="items.length > 0 || hideAddNewLesson">
                     <tr>
                         <th>№</th>
                         <th>Предмет</th>
@@ -326,7 +328,7 @@ async function handlePublished() {
                             </td>
                         </tr>
                     </template>
-                    <tr>
+                    <tr v-show="hideAddNewLesson" class="new-schedule">
                         <td>
                             <InputText size="small" class="min-w-10 w-full text-center" v-model="newLesson.index" />
                         </td>
@@ -380,7 +382,11 @@ async function handlePublished() {
 
                 </tbody>
             </table>
-
+            <div class="mt-2 flex items-center justify-center">
+                <Button label="Добавить пару" title="Открыть форму для добавления пары" size="small" outlined
+                    severity="secondary" class="w-full" @click="hideAddNewLesson = !hideAddNewLesson"
+                    :class="{ 'pi pi-angle-down': hideAddNewLesson, 'pi pi-angle-up': !hideAddNewLesson }"></Button>
+            </div>
         </div>
 
     </div>
@@ -388,13 +394,25 @@ async function handlePublished() {
 </template>
 
 <style scoped>
+.new-schedule {}
+
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
     font-size: 0.8rem;
+    position: relative;
     /* Чтобы все столбцы имели фиксированную ширину */
 }
+
+.add-btn {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    color: red;
+    cursor: pointer;
+}
+
 
 .schedule-table th,
 .schedule-table td {
