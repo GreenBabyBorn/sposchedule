@@ -329,7 +329,7 @@ const hideAddNewLesson = ref(false)
                     <td>
                         <div class="table-subrow"><Button
                                 :disabled="!newLesson.building || !newLesson.cabinet || !newLesson.subject"
-                                @click="addNewLesson()" text icon="pi pi-plus"></Button>
+                                @click="addNewLesson()" text icon="pi pi-save"></Button>
                         </div>
                     </td>
                 </tr>

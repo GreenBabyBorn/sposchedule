@@ -10,6 +10,7 @@ import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/les
 import { useToast } from 'primevue/usetoast';
 import { reactive, ref, toRef, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
+import Teachers from '@/pages/Teachers.vue';
 
 const toast = useToast();
 
@@ -28,7 +29,11 @@ const weekDay = toRef(props, 'weekDay');
 const items = toRef(props, 'item');
 
 const { data: subjects } = useSubjectsQuery();
+
+const subjectForTeacher = ref()
 const { data: teachers } = useTeachersQuery();
+
+
 
 const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson();
 async function editLesson(item) {
@@ -151,6 +156,16 @@ async function createLesson(weekType, schedule_id) {
                 schedule_id: schedule_id,
             },
         });
+        // newLesson = {
+        //     index: null,
+        //     ЧИСЛ: {
+        //         subject: null,
+        //         teachers: [],
+        //         building: null,
+        //         cabinet: null,
+        //     },
+        // }
+
     } catch (e) {
         showError(e);
     }
@@ -237,17 +252,17 @@ const hideAddNewLesson = ref(false)
                                     {{ item.index }}
                                 </span></td>
                             <td>
-                                <div v-if="item['ЧИСЛ']" class="table-subrow"><Select @change="editLesson(item['ЧИСЛ'])"
-                                        v-model="item['ЧИСЛ'].subject" class="w-full text-left" :options="subjects"
-                                        optionLabel="name"></Select></div>
+                                <div v-if="item['ЧИСЛ']" class="table-subrow"><Select filter
+                                        @change="editLesson(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].subject"
+                                        class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
 
-                                <div class="table-subrow" v-if="item.lesson"><Select @change="editLesson(item.lesson)"
-                                        v-model="item.lesson.subject" class="w-full text-left" :options="subjects"
-                                        optionLabel="name"></Select></div>
+                                <div class="table-subrow" v-if="item.lesson"><Select filter
+                                        @change="editLesson(item.lesson)" v-model="item.lesson.subject"
+                                        class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
 
-                                <div v-if="item['ЗНАМ']" class="table-subrow"><Select @change="editLesson(item['ЗНАМ'])"
-                                        v-model="item['ЗНАМ'].subject" class="w-full text-left" :options="subjects"
-                                        optionLabel="name"></Select></div>
+                                <div v-if="item['ЗНАМ']" class="table-subrow"><Select filter
+                                        @change="editLesson(item['ЗНАМ'])" v-model="item['ЗНАМ'].subject"
+                                        class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
                             </td>
                             <td>
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">
@@ -333,9 +348,9 @@ const hideAddNewLesson = ref(false)
                             <InputText size="small" class="min-w-10 w-full text-center" v-model="newLesson.index" />
                         </td>
                         <td>
-                            <div class="table-subrow"><Select editable v-model="newLesson['ЧИСЛ'].subject"
+                            <div class="table-subrow"><Select filter v-model="newLesson['ЧИСЛ'].subject"
                                     class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
-                            <div v-if="newLesson['ЗНАМ']" class="table-subrow"><Select editable
+                            <div v-if="newLesson['ЗНАМ']" class="table-subrow"><Select filter
                                     v-model="newLesson['ЗНАМ'].subject" class="w-full text-left" :options="subjects"
                                     optionLabel="name"></Select></div>
                         </td>
@@ -373,7 +388,7 @@ const hideAddNewLesson = ref(false)
                         </td>
                         <td>
                             <div class="table-subrow"><Button @click="addNewLesson()" text
-                                    icon="pi pi-plus"></Button><Button @click="addRowAddNewLesson()" text
+                                    icon="pi pi-save"></Button><Button @click="addRowAddNewLesson()" text
                                     :title="`${addRowAddNewLessonState ? 'Не дробное' : 'Дробное'} `"
                                     :icon="`pi ${addRowAddNewLessonState ? 'pi-arrows-h' : 'pi-percentage'} `"></Button>
                             </div>

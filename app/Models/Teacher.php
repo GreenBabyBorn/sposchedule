@@ -11,9 +11,6 @@ class Teacher extends Model
     use HasFactory;
 
     protected $fillable = [
-        // 'first_name',
-        // 'last_name',
-        // 'patronymic'
         'name'
     ];
 

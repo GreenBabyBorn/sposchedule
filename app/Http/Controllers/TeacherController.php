@@ -20,6 +20,14 @@ class TeacherController extends Controller
     public function index(Request $request)
     {
         $query = Teacher::query();
+
+        if ($request->has('subject_id')) {
+            $subjectId = $request->input('subject_id');
+            $query->whereHas('subjects', function ($q) use ($subjectId) {
+                $q->where('subject_id', $subjectId);
+            });
+        }
+
         $orderField = $request->input('order_field', 'id'); // Поле для сортировки, по умолчанию id
         $orderDirection = $request->input('order_direction', 'desc'); // Направление сортировки, по умолчанию
 

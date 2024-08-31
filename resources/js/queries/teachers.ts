@@ -1,10 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
+import { computed } from 'vue';
 
 export function useTeachersQuery() {
   return useQuery({
     queryKey: ['teachers'],
-    queryFn: async () => (await axios.get('/api/teachers')).data,
+    queryFn: async () => (await axios.get(`/api/teachers`)).data,
   });
 }
 
