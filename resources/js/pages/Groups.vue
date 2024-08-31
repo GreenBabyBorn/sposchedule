@@ -11,6 +11,9 @@ import Chip from 'primevue/chip';
 import MultiSelect from 'primevue/multiselect';
 import { FilterMatchMode } from '@primevue/core/api';
 
+import Textarea from 'primevue/textarea';
+
+
 
 import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup, useDestroySemesterForGroup, useStoreSemesterForGroup } from '../queries/groups'
 import { useSemestersQuery } from '@/queries/semesters';
@@ -198,6 +201,62 @@ const filters = ref({
     course: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
 
 });
+
+const importGroupsState = ref()
+const importingGroups = ref()
+
+const regexGroup = /^[a-zA-Zа-яА-Я]{2,4}-[1-4]\d{2}$/;
+const parseAndSendGroups = async () => {
+    // Разделяем введенные группы на массив строк, убирая пустые строки и пробелы
+    const groups = importingGroups.value.split('\n').map(group => group.trim()).filter(group => group);
+
+    // Проходим по каждой группе и отправляем её на сервер
+    for (const group of groups) {
+        if (!regexGroup.test(group)) {
+            toast.add({
+                severity: 'error',
+                summary: 'Ошибка',
+                detail: `Неверный формат названия группы: ${group}. Пример: ИС-401`,
+                life: 3000,
+                closable: true
+            });
+            continue; // Пропускаем группу с неверным форматом
+        }
+
+        try {
+            // Отправляем данные на сервер
+            await storeSubject({
+                specialization: group.split('-')[0],
+                course: group.split('-')[1][0],
+                index: group.split('-')[1].slice(1),
+                semesters: selectedSemesters.value,
+            });
+
+            // Успешное добавление группы
+            toast.add({
+                severity: 'success',
+                summary: 'Успех',
+                detail: `Группа ${group} успешно добавлена`,
+                life: 3000,
+                closable: true
+            });
+        } catch (e) {
+            // Обработка ошибки при отправке
+            toast.add({
+                severity: 'error',
+                summary: 'Ошибка',
+                detail: e?.response?.data?.message || `Ошибка при добавлении группы ${group}`,
+                life: 3000,
+                closable: true
+            });
+        }
+    }
+
+    // Очистка поля после завершения отправки
+    importingGroups.value = '';
+    selectedSemesters.value = [];
+};
+
 </script>
 
 <template>
@@ -212,6 +271,13 @@ const filters = ref({
                 <MultiSelect v-model="selectedSemesters" display="chip" :options="semesters" optionLabel="name" filter
                     placeholder="Выбрать семестры" :maxSelectedLabels="3" class="" />
                 <Button type="submit" @click.prevent="addGroup" :disabled="!newGroupName">Добавить группу</Button>
+                <Button icon="pi pi-file-import" outlined type="submit"
+                    @click.prevent="importGroupsState = !importGroupsState" label="Импорт"></Button>
+                <div v-if="importGroupsState" class="flex flex-col gap-2">
+                    <Textarea placeholder="Введите в столбик название групп" v-model="importingGroups" rows="5"
+                        cols="30" />
+                    <Button type="submit" @click.prevent="parseAndSendGroups">Импортировать</Button>
+                </div>
             </form>
         </div>
         <div class="">

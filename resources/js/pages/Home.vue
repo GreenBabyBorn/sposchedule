@@ -125,9 +125,9 @@ const { data: groups } = useGroupsQuery(selectedGroup);
 
                     </div>
 
-                    <Select emptyFilterMessage="Группы не найдены" :virtualScrollerOptions="{ itemSize: 38 }"
-                        :disabled="Boolean(course)" filter showClear v-model="selectedGroup" optionValue="name"
-                        :options="groups" optionLabel="name" placeholder="Группа" class="w-full md:w-[10rem]" />
+                    <Select emptyFilterMessage="Группы не найдены" :disabled="Boolean(course)" filter showClear
+                        v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
+                        placeholder="Группа" class="w-full md:w-[10rem]" />
                     <Select :disabled="Boolean(selectedGroup)" class="" showClear v-model="course" :options="courses"
                         option-label="course" placeholder="Курс"></Select>
 

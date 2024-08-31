@@ -8,6 +8,8 @@ import { useDateFormat } from '@vueuse/core'
 import InputNumber from 'primevue/inputnumber';
 import { useToast } from 'primevue/usetoast';
 import { useSubjectsQuery, useDestroySubject, useStoreSubject, useUpdateSubject } from '../queries/subjects'
+import Textarea from 'primevue/textarea';
+import { FilterMatchMode } from '@primevue/core/api';
 
 const { data: subjects } = useSubjectsQuery()
 
@@ -61,6 +63,52 @@ const addSubject = async () => {
     newSubjectError.value = false
     newSubjectName.value = ''
 }
+
+const importSubjectsState = ref()
+const importingSubjects = ref()
+
+async function parseAndSendSubjects() {
+    // Разделяем введенные предметы на массив строк, убирая пустые строки и пробелы
+    const subjects = importingSubjects.value.split('\n').map(subject => subject.trim()).filter(subject => subject);
+
+    // Проходим по каждому предмету и отправляем его на сервер
+    for (const subject of subjects) {
+        try {
+            // Отправляем данные на сервер
+            await storeSubject(subject);
+
+            // Успешное добавление предмета
+            toast.add({
+                severity: 'success',
+                summary: 'Успех',
+                detail: `Предмет "${subject}" успешно добавлен`,
+                life: 3000,
+                closable: true
+            });
+        } catch (e) {
+            // Обработка ошибки при отправке
+            newSubjectError.value = true;
+            toast.add({
+                severity: 'error',
+                summary: 'Ошибка',
+                detail: e?.response?.data?.message || `Ошибка при добавлении предмета "${subject}"`,
+                life: 3000,
+                closable: true
+            });
+            continue; // Продолжаем с следующего предмета
+        }
+    }
+
+    // Очистка поля после завершения отправки
+    newSubjectError.value = false;
+    importingSubjects.value = '';
+}
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
+});
 </script>
 
 <template>
@@ -73,11 +121,21 @@ const addSubject = async () => {
             <form class="flex flex-wrap  items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <InputText :invalid="newSubjectError" placeholder="Пример: Математика" v-model="newSubjectName">
                 </InputText>
-                <Button type="submit" @click.prevent="addSubject" :disabled="!newSubjectName">Добавить предмет</Button>
+                <Button type="submit" @click.prevent="addSubject" :disabled="!newSubjectName"
+                    label="Добавить предмет"></Button>
+                <Button label="Импорт" icon="pi pi-file-import" outlined type="submit"
+                    @click.prevent="importSubjectsState = !importSubjectsState"></Button>
+                <div v-if="importSubjectsState" class="flex flex-col gap-2">
+
+                    <Textarea placeholder="Введите в столбик название предметов" v-model="importingSubjects" rows="5"
+                        cols="30" />
+                    <Button type="submit" @click.prevent="parseAndSendSubjects">Импортировать</Button>
+                </div>
             </form>
         </div>
         <div class="">
-            <DataTable :loading="isUpdated || isDestroyed || isStored" v-model:selection="selectedSubjects"
+            <DataTable paginator :rows="10" v-model:filters="filters" :globalFilterFields="['name']"
+                :loading="isUpdated || isDestroyed || isStored" v-model:selection="selectedSubjects"
                 v-model:editingRows="editingRows" :value="subjects" editMode="row" dataKey="id"
                 @row-edit-save="onRowEditSave" :pt="{
                     table: { style: 'min-width: 50rem' }
@@ -86,7 +144,7 @@ const addSubject = async () => {
                     <div class="flex justify-between">
                         <Button severity="danger" :disabled="!selectedSubjects.length || !subjects.length" type="button"
                             icon="pi pi-trash" label="Удалить" outlined @click="deleteSubjects" />
-
+                        <InputText v-model="filters['global'].value" placeholder="Поиск" />
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
