@@ -6,12 +6,14 @@ use App\Http\Requests\Schedule\StoreScheduleRequest;
 use App\Http\Requests\Schedule\UpdateScheduleRequest;
 use App\Http\Resources\LessonResource;
 use App\Http\Resources\ScheduleResource;
+use App\Http\Resources\SkinnyGroup;
 use App\Models\Schedule;
 use Illuminate\Support\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Group;
 use App\Models\Lesson;
 use App\Models\Semester;
+use App\Http\Resources\SemesterResource;
 
 class ScheduleController extends Controller
 {
@@ -210,13 +212,13 @@ class ScheduleController extends Controller
 
             array_push($finalSchedules['schedules'], [
 
-                'semester' => $group->semesters->filter(function ($semester) use ($carbonDate) {
+                'semester' => new SemesterResource($group->semesters->filter(function ($semester) use ($carbonDate) {
                     $start = Carbon::parse($semester->start);
                     $end = Carbon::parse($semester->end);
 
                     return $carbonDate->between($start, $end);
-                })->first(),
-                'group' => $group,
+                })->first()),
+                'group' => new SkinnyGroup($group),
                 'schedule' => $groupSchedule
             ]);
             // $finalSchedules[$group->id] = [
@@ -357,13 +359,13 @@ class ScheduleController extends Controller
 
             array_push($finalSchedules['schedules'], [
 
-                'semester' => $group->semesters->filter(function ($semester) use ($carbonDate) {
+                'semester' => new SemesterResource($group->semesters->filter(function ($semester) use ($carbonDate) {
                     $start = Carbon::parse($semester->start);
                     $end = Carbon::parse($semester->end);
 
                     return $carbonDate->between($start, $end);
-                })->first(),
-                'group' => $group,
+                })->first()),
+                'group' => new SkinnyGroup($group),
                 'schedule' => $groupSchedule
             ]);
 

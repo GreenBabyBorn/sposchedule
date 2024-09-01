@@ -144,7 +144,7 @@ async function addNewLesson() {
     } else {
         scheduleId = newSchedule.value?.data?.id; // Тоже необходимо проверить наличие значения
     }
-    console.log(scheduleId, newSchedule.value)
+    // console.log(scheduleId, newSchedule.value)
     try {
         await storeLesson({
             body: {
