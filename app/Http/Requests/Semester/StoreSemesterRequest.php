@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Semester;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\NoOverlappingSemesters;
 
 class StoreSemesterRequest extends FormRequest
 {
@@ -21,8 +22,13 @@ class StoreSemesterRequest extends FormRequest
      */
     public function rules(): array
     {
+        $semesterId = $this->route('semester') ? $this->route('semester')->id : null; // Используйте при редактировании семестра
+
         return [
-            //
+            'years' => 'required|',
+            'index' => 'required|integer|min:0',
+            'start' => ['required', 'date', 'before:end', new NoOverlappingSemesters($this->input('years'), $this->input('start'), $this->input('end'), $semesterId)],
+            'end' => 'required|date|after:start',
         ];
     }
 }
