@@ -41,46 +41,46 @@ class StoreLessonRequest extends FormRequest
         ];
     }
 
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            // Извлекаем значения из запроса
-            $scheduleId = $this->input('schedule_id');
-            $index = $this->input('index');
-            $weekType = $this->input('week_type');
+    // public function withValidator($validator)
+    // {
+    //     $validator->after(function ($validator) {
+    //         // Извлекаем значения из запроса
+    //         $scheduleId = $this->input('schedule_id');
+    //         $index = $this->input('index');
+    //         $weekType = $this->input('week_type');
 
-            // Ищем совпадающие уроки с таким же schedule_id и index
-            $existingLessons = Lesson::where('schedule_id', $scheduleId)
-                ->where('index', $index)
-                ->get();
+    //         // Ищем совпадающие уроки с таким же schedule_id и index
+    //         $existingLessons = Lesson::where('schedule_id', $scheduleId)
+    //             ->where('index', $index)
+    //             ->get();
 
-            // Фильтрация уроков с несовпадающими типами недели
-            $hasSameType = $existingLessons->contains(function ($lesson) use ($weekType) {
-                return $lesson->week_type === $weekType;
-            });
+    //         // Фильтрация уроков с несовпадающими типами недели
+    //         $hasSameType = $existingLessons->contains(function ($lesson) use ($weekType) {
+    //             return $lesson->week_type === $weekType;
+    //         });
 
-            // Если существует урок с таким же типом недели, добавляем ошибку
-            if ($hasSameType) {
-                $validator->errors()->add('index', 'Урок с таким же index и schedule_id уже существует.');
-            }
+    //         // Если существует урок с таким же типом недели, добавляем ошибку
+    //         if ($hasSameType) {
+    //             $validator->errors()->add('index', 'Урок с таким же index и schedule_id уже существует.');
+    //         }
 
-            // Проверяем случаи "ЧИСЛ" и "ЗНАМ"
-            if ($weekType === 'ЧИСЛ' || $weekType === 'ЗНАМ') {
-                $oppositeType = $weekType === 'ЧИСЛ' ? 'ЗНАМ' : 'ЧИСЛ';
-                $oppositeExists = $existingLessons->contains('week_type', $oppositeType);
+    //         // Проверяем случаи "ЧИСЛ" и "ЗНАМ"
+    //         if ($weekType === 'ЧИСЛ' || $weekType === 'ЗНАМ') {
+    //             $oppositeType = $weekType === 'ЧИСЛ' ? 'ЗНАМ' : 'ЧИСЛ';
+    //             $oppositeExists = $existingLessons->contains('week_type', $oppositeType);
 
-                // Если существует противоположный тип, то разрешаем добавление
-                if ($oppositeExists) {
-                    return;
-                }
-            }
+    //             // Если существует противоположный тип, то разрешаем добавление
+    //             if ($oppositeExists) {
+    //                 return;
+    //             }
+    //         }
 
-            // Если оба week_type не разрешают добавление, отклоняем запрос
-            if ($existingLessons->isNotEmpty()) {
-                $validator->errors()->add('index', 'Невозможно добавить урок: дублирование schedule_id и index.');
-            }
-        });
-    }
+    //         // Если оба week_type не разрешают добавление, отклоняем запрос
+    //         if ($existingLessons->isNotEmpty()) {
+    //             $validator->errors()->add('index', 'Невозможно добавить урок: дублирование schedule_id и index.');
+    //         }
+    //     });
+    // }
 
     /**
      * Get custom messages for validator errors.

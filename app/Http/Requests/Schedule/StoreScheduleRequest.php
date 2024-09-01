@@ -6,6 +6,7 @@ use App\Rules\ValidWeekType;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class StoreScheduleRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class StoreScheduleRequest extends FormRequest
     public function rules()
     {
         return [
-            'group_id' => ['required', 'exists:groups,id', 
+            'group_id' => ['required', 'exists:groups,id',
             // function ($attribute, $value, $fail) {
             //     if ($this->type === 'main') {
             //         $exists = \App\Models\Schedule::where('group_id', $this->group_id)
@@ -38,14 +39,19 @@ class StoreScheduleRequest extends FormRequest
             //             $fail('Для данной группы уже существует расписание с таким типом, типом недели и днем недели.');
             //         }
             //     }
-            // }, 
+            // },
         ],
             'date' => [
                 'nullable',
-                'date',
                 'required_if:type,changes',
+                // Проверяем уникальность по группе и типу расписания, с учетом преобразованной даты
                 Rule::unique('schedules')->where(function ($query) {
-                    return $query->where(['group_id' => $this->safe()->input('group_id'), 'type' => $this->safe()->input('type')]);
+                    $groupId = $this->input('group_id');
+                    $type = $this->input('type');
+
+                    // Учитываем только те записи, где group_id и type совпадают с текущими значениями
+                    return $query->where('group_id', $groupId)
+                                 ->where('type', $type);
                 }),
             ],
             'type' => [
@@ -65,32 +71,29 @@ class StoreScheduleRequest extends FormRequest
         ];
     }
 
+    public function prepareForValidation()
+    {
+        // Преобразуем дату в формат 'Y-m-d' перед валидацией, если она существует и в формате 'dd.mm.yyyy'
+        if ($this->has('date') && preg_match('/\d{2}\.\d{2}\.\d{4}/', $this->input('date'))) {
+            try {
+                $this->merge([
+                    'date' => Carbon::createFromFormat('d.m.Y', $this->input('date'))->format('Y-m-d')
+                ]);
+            } catch (\Exception $e) {
+                throw new ValidationException('Дата в неправильном формате. Пожалуйста, используйте формат dd.mm.yyyy.');
+            }
+        }
+    }
+
     public function withValidator($validator)
     {
 
         $validator->after(function ($validator) {
-            $date = $this->safe()->input('date');
+            // $date = $this->safe()->input('date');
             $week_type = $this->safe()->input('week_type');
             if(!$week_type) {
                 return;
             }
-
-            // День отсчета
-            // $currentDate = Carbon::parse('2024-09-01');
-
-            // $daysSinceStart = $currentDate->diffInDays($date);
-            // $weekNumber = intdiv($daysSinceStart, 7) + 1;
-            // $isOddWeek = $weekNumber % 2 !== 0;
-
-            // if (!$isOddWeek && $week_type === 'ЗНАМ') {
-            //     return;
-            // }
-
-            // if ($isOddWeek && $week_type === 'ЧИСЛ') {
-            //     return;
-            // }
-
-            // $validator->errors()->add('week_type', 'Неверный тип недели для указанной даты.');
         });
     }
 

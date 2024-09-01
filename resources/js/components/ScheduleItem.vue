@@ -63,13 +63,14 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 {{ item.index }}
                             </span></td>
                         <td>
-                            <div v-if="item.id" class="border-b border-surface-700 flex p-2"><span class="text-lg">{{
-                                item.subject.name }}</span>
+                            <div v-if="item.id" :class="{ 'border-b border-surface-700': item.teachers?.length }"
+                                class=" flex p-2"><span class="text-lg">{{
+                                    item.subject.name }}</span>
                             </div>
                             <div class="flex flex-wrap px-2 justify-end" v-if="item.id">
                                 <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                     teacher.name
-                                    }}</span>
+                                }}</span>
                             </div>
                         </td>
                         <td>

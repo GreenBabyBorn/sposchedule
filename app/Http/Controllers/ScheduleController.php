@@ -28,7 +28,14 @@ class ScheduleController extends Controller
      */
     public function store(StoreScheduleRequest $request)
     {
-        $schedule = Schedule::create($request->all());
+        $data = $request->all();
+
+        // if (isset($data['date'])) {
+        //     // Преобразуем дату, используя Carbon
+        //     $data['date'] = Carbon::createFromFormat('d.m.Y', $data['date'])->format('Y-m-d');
+        // }
+        // Создаем расписание с преобразованной датой
+        $schedule = Schedule::create($data);
         return $schedule;
     }
 
@@ -104,11 +111,12 @@ class ScheduleController extends Controller
         $weekDay = $weekDayMapping[$carbonDate->dayOfWeek];
 
         // Продолжаем с группами
-        $groups = Group::all();
+        $groupsQuery = Group::query();
         $course = $request->input('course');
         if($course) {
-            $groups = Group::all()->where('course', $course);
+            $groupsQuery->where('course', $course);
         }
+        $groups = $groupsQuery->get();
         // Получаем все изменения расписания (type = 'changes') для выбранного дня недели
         $changes = Schedule::where('type', 'changes')
             ->where('date', $carbonDate)
@@ -358,6 +366,11 @@ class ScheduleController extends Controller
                 'group' => $group,
                 'schedule' => $groupSchedule
             ]);
+
+            usort($finalSchedules['schedules'], function ($a, $b) {
+                // Если у объекта есть расписание, то он будет выше
+                return !empty($b['schedule']) <=> !empty($a['schedule']);
+            });
             // $finalSchedules[$group->id] = [
             //     'group_name' => $group->name,
             //     'schedule' => $groupSchedule

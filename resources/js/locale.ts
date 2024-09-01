@@ -86,7 +86,7 @@ export const locale = {
   pm: 'пп',
   today: 'Сегодня',
   weekHeader: 'Нед',
-  firstDayOfWeek: 0,
+  firstDayOfWeek: 1,
   showMonthAfterYear: false,
   dateFormat: 'дд/мм/гг',
   weak: 'Слабый',
