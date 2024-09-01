@@ -62,7 +62,12 @@ const lessons: any = toRef<any>(() => props.lessons)
                         <td><span class="text-xl font-medium text-surface-800 dark:text-white/80">
                                 {{ item.index }}
                             </span></td>
-                        <td>
+                        <td v-if="item.message" colspan="3/1">
+                            <div class="table-subrow">
+                                <p>{{ item.message }}</p>
+                            </div>
+                        </td>
+                        <td v-if="!item.message">
                             <div v-if="item.id" :class="{ 'border-b border-surface-700': item.teachers?.length }"
                                 class=" flex p-2"><span class="text-lg">{{
                                     item.subject.name }}</span>
@@ -73,12 +78,12 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 }}</span>
                             </div>
                         </td>
-                        <td>
+                        <td v-if="!item.message">
                             <div class="table-subrow" v-if="item.id">
                                 <span>{{ item.building }}</span>
                             </div>
                         </td>
-                        <td>
+                        <td v-if="!item.message">
 
                             <div class="table-subrow" v-if="item.id">
                                 <span>{{ item.cabinet }}</span>

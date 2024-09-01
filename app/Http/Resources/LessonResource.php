@@ -24,6 +24,7 @@ class LessonResource extends JsonResource
             'teachers' => TeacherResource::collection($this->teachers),
             'building' => $this->building,
             'week_type' => $this->week_type,
+            'message' => $this->message,
         ];
     }
 }

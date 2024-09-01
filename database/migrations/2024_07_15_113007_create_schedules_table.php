@@ -19,7 +19,7 @@ return new class () extends Migration {
             $table->enum('type', ['main', 'changes']);
             $table->enum('week_day', ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'])->nullable();
             $table->enum('view_mode', ['table', 'message'])->default('table');
-            $table->text('message')->nullable();
+            // $table->text('message')->nullable();
             $table->boolean('published')->default(false)->nullable();
             $table->timestamps();
         });

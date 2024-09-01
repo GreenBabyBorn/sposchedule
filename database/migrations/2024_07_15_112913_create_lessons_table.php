@@ -12,12 +12,13 @@ return new class () extends Migration {
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id');
+            $table->foreignId('subject_id')->nullable();
             $table->foreignId('schedule_id');
             $table->enum('week_type', ['ЗНАМ', 'ЧИСЛ'])->nullable();
-            $table->string('cabinet');
+            $table->string('cabinet')->nullable();
             $table->integer('index')->min(0)->max(10); // Номер пары
-            $table->string('building')->default('1'); // Номер корпуса
+            $table->string('building')->nullable(); // Номер корпуса
+            $table->text('message')->nullable();
             $table->timestamps();
         });
     }

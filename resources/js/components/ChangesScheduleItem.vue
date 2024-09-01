@@ -10,6 +10,7 @@ import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/les
 import { useToast } from 'primevue/usetoast';
 import { reactive, ref, toRef, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
+import Textarea from 'primevue/textarea';
 
 const toast = useToast();
 const props = defineProps({
@@ -38,6 +39,7 @@ const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson()
 const { mutateAsync: fromMainToChangesSchedule, data: newChanges } = useFromMainToChangesSchedule()
 async function editLesson(item) {
     if (!item.id) return
+    if (!item.message == (!item.cabinet || !item.building || !item.subject)) return
 
     if (props.type === 'main') {
         try {
@@ -64,7 +66,7 @@ async function editLesson(item) {
         })
     }
     catch (e) {
-        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response?.data.message, life: 3000, closable: true });
         return
     }
 }
@@ -75,6 +77,7 @@ type LessonWithWeekTypes = {
     teachers: [] | null,
     building: string | null,
     cabinet: string | null,
+    message?: string | null,
 }
 let newLesson = reactive<LessonWithWeekTypes>({
     index: null,
@@ -82,6 +85,7 @@ let newLesson = reactive<LessonWithWeekTypes>({
     teachers: [],
     building: null,
     cabinet: null,
+    message: null
 })
 
 const { mutateAsync: storeSchedule, data: newSchedule } = useStoreScheduleChange()
@@ -155,6 +159,14 @@ async function addNewLesson() {
                 schedule_id: scheduleId,
             },
         });
+        newLesson = reactive<LessonWithWeekTypes>({
+            index: (Number(newLesson.index) + 1),
+            subject: null,
+            teachers: [],
+            building: null,
+            cabinet: null,
+            message: null
+        })
     } catch (e) {
         toast.add({
             severity: 'error',
@@ -214,6 +226,20 @@ async function handlePublished() {
 }
 
 const hideAddNewLesson = ref(false)
+
+const newLessonMessageState = ref(false)
+function handlenewLessonMessage() {
+    newLessonMessageState.value = !newLessonMessageState.value
+    if (newLessonMessageState.value) {
+        newLesson = reactive<LessonWithWeekTypes>({
+            index: newLesson.index,
+            subject: null,
+            teachers: [],
+            building: null,
+            cabinet: null,
+        })
+    }
+}
 </script>
 
 <template>
@@ -262,41 +288,41 @@ const hideAddNewLesson = ref(false)
                         <td><span class="text-xl font-medium text-surface-800 dark:text-white/80">
                                 {{ item.index }}
                             </span></td>
-                        <td>
+                        <td v-show="item.message" colspan="3/1">
+                            <div class="table-subrow">
+                                <Textarea @change="editLesson(item)" v-model="item.message"
+                                    placeholder="Введите сообщение для группы" class="w-full"></Textarea>
+                            </div>
+                        </td>
+                        <td v-show="!item.message">
                             <div v-if="item.id" class="table-subrow"><Select @change="editLesson(item)"
                                     v-model="item.subject" class="w-full text-left" :options="subjects"
                                     optionLabel="name"></Select>
-
                             </div>
                             <div class="table-subrow" v-if="item.id">
                                 <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item)"
                                     v-model="item.teachers" class="w-full" :options="teachers" optionLabel="name">
                                 </MultiSelect>
-
                             </div>
                         </td>
-                        <td>
+                        <td v-show="!item.message">
                             <div class="table-subrow" v-if="item.id">
                                 <InputText class="w-full" @change="editLesson(item)" v-model="item.building" />
                             </div>
                         </td>
-                        <td>
-
+                        <td v-show="!item.message">
                             <div class="table-subrow" v-if="item.id">
                                 <InputText class="w-full" @change="editLesson(item)" v-model="item.cabinet" />
                             </div>
                         </td>
                         <td>
-
-
                             <div class="table-subrow" v-if="item.id">
                                 <Button text :disabled="!item.cabinet || !item.building || !item.subject"
-                                    icon="pi pi-check" v-if="!item.id"></Button>
+                                    icon="pi pi-check" v-if="!item.id" />
 
                                 <Button text @click="removeLesson(item.id)" icon="pi pi-trash" severity="danger"
-                                    v-if="item.id"></Button>
+                                    v-if="item.id" />
                             </div>
-
                         </td>
                     </tr>
                 </template>
@@ -304,7 +330,14 @@ const hideAddNewLesson = ref(false)
                     <td>
                         <InputText size="small" class="w-full text-center" v-model="newLesson.index" />
                     </td>
-                    <td>
+
+                    <td v-show="newLessonMessageState" colspan="3/1">
+                        <div class="table-subrow">
+                            <Textarea v-model="newLesson.message" placeholder="Введите сообщение для группы"
+                                class="w-full"></Textarea>
+                        </div>
+                    </td>
+                    <td v-show="!newLessonMessageState">
                         <div class="table-subrow"><Select placeholder="Предмет" editable v-model="newLesson.subject"
                                 class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
                         <div class="table-subrow">
@@ -314,22 +347,23 @@ const hideAddNewLesson = ref(false)
                         </div>
                     </td>
 
-                    <td>
+                    <td v-show="!newLessonMessageState">
 
                         <div class="table-subrow">
                             <InputText size="small" class="w-full text-center" v-model="newLesson.building" />
                         </div>
                     </td>
-                    <td>
-
+                    <td v-show="!newLessonMessageState">
                         <div class="table-subrow">
                             <InputText size="small" class="w-full text-center" v-model="newLesson.cabinet" />
                         </div>
                     </td>
                     <td>
-                        <div class="table-subrow"><Button
-                                :disabled="!newLesson.building || !newLesson.cabinet || !newLesson.subject"
-                                @click="addNewLesson()" text icon="pi pi-save"></Button>
+                        <div class="table-subrow">
+                            <Button
+                                :disabled="!newLessonMessageState && (!newLesson.index || !newLesson.building || !newLesson.cabinet || !newLesson.subject) || newLessonMessageState && !newLesson.message"
+                                @click="addNewLesson()" text icon="pi pi-save" />
+                            <Button @click="handlenewLessonMessage" text icon="pi pi-comments" />
                         </div>
                     </td>
                 </tr>
@@ -337,7 +371,7 @@ const hideAddNewLesson = ref(false)
             </tbody>
         </table>
         <div class="mt-2 flex items-center justify-center">
-            <Button label="Добавить пару" title="Открыть форму для добавления пары" size="small" outlined
+            <Button label="Новая пара" title="Открыть форму для добавления пары" size="small" outlined
                 severity="secondary" class="w-full" @click="hideAddNewLesson = !hideAddNewLesson"
                 :class="{ 'pi pi-angle-down': hideAddNewLesson, 'pi pi-angle-up': !hideAddNewLesson }"></Button>
         </div>
