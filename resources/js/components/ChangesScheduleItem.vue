@@ -163,7 +163,7 @@ async function addNewLesson() {
             index: (Number(newLesson.index) + 1),
             subject: null,
             teachers: [],
-            building: null,
+            building: newLesson.building,
             cabinet: null,
             message: null
         })

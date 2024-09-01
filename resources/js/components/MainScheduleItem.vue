@@ -127,15 +127,34 @@ async function addNewLesson() {
     if (addRowAddNewLessonState.value) {
 
         await createLesson('ЧИСЛ', schedule_id);
+
     }
     else {
         await createLesson('', schedule_id);
     }
 
+
     // Если 'ЗНАМ' также добавляется
     if (addRowAddNewLessonState.value && newLesson.ЗНАМ?.subject && newLesson.index) {
         await createLesson('ЗНАМ', schedule_id);
+        newLesson.ЗНАМ = {
+            subject: null,
+            teachers: [],
+            building: newLesson.ЗНАМ.building,
+            cabinet: null,
+        };
     }
+    newLesson = reactive<LessonWithWeekTypes>({
+        index: Number(newLesson.index) + 1,
+        ЧИСЛ: {
+            subject: null,
+            teachers: [],
+            building: newLesson.ЧИСЛ.building,
+            cabinet: null,
+        },
+
+    });
+
 }
 
 async function createLesson(weekType, schedule_id) {

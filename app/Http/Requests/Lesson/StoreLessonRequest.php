@@ -36,9 +36,9 @@ class StoreLessonRequest extends FormRequest
                     'min:0',
                     'max:10',
                     // Правила уникальности будут применяться только если message отсутствует
-                    !$hasMessage ? Rule::unique('lessons')->where(function ($query) {
-                        return $query->where('schedule_id', $this->input('schedule_id'));
-                    }) : '',
+                    // !$hasMessage ? Rule::unique('lessons')->where(function ($query) {
+                    //     return $query->where('schedule_id', $this->input('schedule_id'));
+                    // }) : '',
                 ],
             ];
         } else {
@@ -53,9 +53,9 @@ class StoreLessonRequest extends FormRequest
                     'min:0',
                     'max:10',
                     // Правила уникальности будут применяться только если message отсутствует
-                    !$hasMessage ? Rule::unique('lessons')->where(function ($query) {
-                        return $query->where('schedule_id', $this->input('schedule_id'));
-                    }) : '',
+                    // !$hasMessage ? Rule::unique('lessons')->where(function ($query) {
+                    //     return $query->where('schedule_id', $this->input('schedule_id'));
+                    // }) : '',
                 ],
                 'building' => 'required|integer|min:1',
             ];
