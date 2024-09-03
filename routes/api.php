@@ -9,6 +9,8 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\BellController;
+use App\Http\Controllers\BellsPeriodController;
 
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
@@ -24,6 +26,12 @@ Route::apiResource('schedules', ScheduleController::class)->only(['index', 'show
 Route::apiResource('subjects', SubjectController::class)->only(['index', 'show']);
 Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']);
 Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
+
+
+
+Route::apiResource('bells', BellController::class);
+Route::apiResource('bells-periods', BellsPeriodController::class);
+
 
 // Маршруты, требующие аутентификации
 Route::middleware('auth:sanctum')->group(function () {
@@ -50,4 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('teachers', TeacherController::class)->except(['index', 'show']);
 
     Route::apiResource('semesters', SemesterController::class)->except(['index', 'show']);
+
+
+
 });

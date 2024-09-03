@@ -36,6 +36,11 @@ const items = ref([
         icon: 'pi pi-calendar',
         route: '/admin/schedules/changes'
     },
+    // {
+    //     label: 'Звонки',
+    //     icon: 'pi pi-bell',
+    //     route: '/admin/bells'
+    // },
 
 
 ]);

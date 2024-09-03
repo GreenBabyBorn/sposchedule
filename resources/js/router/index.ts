@@ -12,6 +12,7 @@ import SchedulesChanges from '../pages/ChangesSchedules.vue';
 import SemestersView from '../pages/Semesters.vue';
 import UserView from '../pages/User.vue';
 import AuthView from '../pages/Login.vue';
+import Bells from '../pages/Bells.vue';
 import NotFound from '../pages/NotFound.vue';
 import { useAuthStore } from '@/stores/auth';
 
@@ -44,6 +45,15 @@ const router = createRouter({
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Пользователь',
+      },
+    },
+    {
+      path: '/admin/bells',
+      name: RouteNamesEnum.bells,
+      component: Bells,
+      meta: {
+        layout: AppLayoutsEnum.admin,
+        title: 'Звонки',
       },
     },
     {

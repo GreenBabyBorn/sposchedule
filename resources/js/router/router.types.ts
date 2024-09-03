@@ -18,4 +18,5 @@ export enum RouteNamesEnum {
   semesters = 'semesters',
   user = 'user',
   auth = 'auth',
+  bells = 'bells',
 }
