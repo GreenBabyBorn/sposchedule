@@ -14,14 +14,12 @@ class CreateBellsTable extends Migration
             $table->enum('variant', ['normal', 'reduced']);
             $table->string('week_day', 2)->nullable();
             $table->date('date')->nullable();
+            $table->integer('building')->nullable();
             $table->timestamps();
 
-            // Ограничение на целостность расписания
-            // $table->check("((type = 'main' AND week_day IS NOT NULL) OR (type = 'changes' AND date IS NOT NULL))");
-
             // Уникальные ограничения
-            $table->unique(['variant', 'week_day'], 'unique_variant_week_day');
-            $table->unique(['variant', 'date'], 'unique_variant_date');
+            $table->unique(['variant', 'week_day', 'building'], 'unique_variant_week_day');
+            $table->unique(['variant', 'date', 'building'], 'unique_variant_date_building');
         });
     }
 

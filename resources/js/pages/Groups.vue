@@ -111,11 +111,11 @@ const onRowEditSave = async (event) => {
 };
 
 
-
+const regexGroup = /^[a-zA-Zа-яА-Я]{2,4}-[1-4]\d{1,4}$/;
 const { mutateAsync: storeSubject, isPending: isStored } = useStoreGroup()
 
 const addGroup = async () => {
-    const regexGroup = /^[a-zA-Zа-яА-Я]{2,4}-[1-4]\d{2}$/;
+
 
     if (!regexGroup.test(newGroupName.value)) {
         toast.add({ severity: 'error', summary: 'Ошибка', detail: "Неверный формат названия Группы. Пример: ИС-401", life: 3000, closable: true });
@@ -205,7 +205,7 @@ const filters = ref({
 const importGroupsState = ref()
 const importingGroups = ref()
 
-const regexGroup = /^[a-zA-Zа-яА-Я]{2,4}-[1-4]\d{2}$/;
+
 const parseAndSendGroups = async () => {
     // Разделяем введенные группы на массив строк, убирая пустые строки и пробелы
     const groups = importingGroups.value.split('\n').map(group => group.trim()).filter(group => group);

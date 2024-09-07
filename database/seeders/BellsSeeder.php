@@ -20,21 +20,54 @@ class BellsSeeder extends Seeder
         $types = ['main', 'changes'];
         $variants = ['normal', 'reduced'];
         $weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']; // Дни недели
+        $buildings = range(1, 6); // Значения для building от 1 до 6
 
         foreach ($types as $type) {
             foreach ($variants as $variant) {
-                for ($i = 0; $i < 7; $i++) {
-                    // Если тип 'main', используем дни недели, если 'changes', используем даты
-                    $week_day = $type === 'main' ? $weekDays[$i] : null;
-                    // $date = $type === 'changes' ? Carbon::now()->addDays($i)->format('Y-m-d') : null;
+                foreach ($weekDays as $week_day) {
+                    foreach ($buildings as $building) {
+                        // Устанавливаем день недели только для типа "main"
+                        $currentWeekDay = $type === 'main' ? $week_day : null;
 
-                    Bell::create([
-                        'type' => $type,
-                        'variant' => $variant,
-                        'week_day' => $week_day,
-                    ]);
+                        // Проверяем на существование записи перед созданием
+                        $existingBell = Bell::where('variant', $variant)
+                            ->where('week_day', $currentWeekDay)
+                            ->where('building', $building)
+                            ->exists();
+
+                        if (!$existingBell) {
+                            Bell::create([
+                                'type' => $type,
+                                'variant' => $variant,
+                                'week_day' => $currentWeekDay,
+                                'building' => $building,
+                            ]);
+                        }
+                    }
+                }
+
+                // Для типа "changes", создаем записи без week_day
+                if ($type === 'changes') {
+                    foreach ($buildings as $building) {
+                        $existingBell = Bell::where('variant', $variant)
+                            ->whereNull('week_day')
+                            ->where('building', $building)
+                            ->exists();
+
+                        if (!$existingBell) {
+                            Bell::create([
+                                'type' => $type,
+                                'variant' => $variant,
+                                'week_day' => null,
+                                'building' => $building,
+                            ]);
+                        }
+                    }
                 }
             }
         }
     }
+
+
+
 }

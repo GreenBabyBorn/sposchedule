@@ -11,21 +11,22 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Support\Carbon;
 
 class BellController extends Controller
 {
     // Получение всех расписаний звонков
     public function index(Request $request)
     {
-
-        $queryParams = $request->only(['type', 'variant', 'week_day', 'date']);
+        $queryParams = $request->only(['type', 'variant', 'week_day', 'date', 'building']);
 
         // Валидация входных параметров
         $validator = Validator::make($queryParams, [
             'type' => 'required|string|in:main,changes',
             'variant' => 'required|string',
             'week_day' => 'nullable|string',
-            'date' => 'nullable|date_format:Y-m-d',
+            'date' => 'nullable|date',
+            'building' => 'nullable|integer|between:1,6', // Валидация параметра building
         ]);
 
         if ($validator->fails()) {
@@ -34,32 +35,49 @@ class BellController extends Controller
 
         try {
             // Поиск записи на основе переданных параметров
-            if ($queryParams['type'] === 'main') {
-                $bells = Bell::where('variant', $queryParams['variant'])
-                    ->where('week_day', $queryParams['week_day'])
-                    ->firstOrFail();
-            } elseif ($queryParams['type'] === 'changes') {
-                $bells = Bell::where('variant', $queryParams['variant'])
-                    ->where('date', $queryParams['date'])
-                    ->firstOrFail();
-            } else {
-                $bells = Bell::where('variant', $queryParams['variant'])
-                    ->where(function (Builder $query) use ($queryParams) {
-                        $query->where('date', $queryParams['date'])
-                              ->orWhere('week_day', $queryParams['week_day']);
-                    })
-                    ->whereDoesntHave('self', function (Builder $query) use ($queryParams) {
-                        $query->where('variant', $queryParams['variant'])
-                              ->where('date', $queryParams['date']);
-                    })
-                    ->firstOrFail();
+            $query = Bell::where('variant', $queryParams['variant']);
+
+            // Добавляем фильтрацию по building, если он передан
+            if (!empty($queryParams['building'])) {
+                $query->where('building', $queryParams['building']);
             }
+
+            // Фильтрация по типу main
+            if ($queryParams['type'] === 'main') {
+                $query->where('week_day', $queryParams['week_day']);
+            }
+            // Фильтрация по типу changes
+            elseif ($queryParams['type'] === 'changes') {
+                if (!empty($queryParams['date'])) {
+                    $carbonDate = Carbon::parse($queryParams['date']); // Преобразуем строку даты в объект Carbon
+                    $query->whereDate('date', $carbonDate->format('Y-m-d')); // Учитываем только дату без времени
+
+                }
+            }
+            // Фильтрация по остальным типам
+            else {
+                $carbonDate = Carbon::parse($queryParams['date']);
+
+                $query->where(function (Builder $query) use ($queryParams, $carbonDate) {
+                    $query->whereDate('date', $carbonDate->format('Y-m-d'))
+                          ->orWhere('week_day', $queryParams['week_day']);
+                })
+                ->whereDoesntHave('self', function (Builder $query) use ($queryParams, $carbonDate) {
+                    $query->where('variant', $queryParams['variant'])
+                          ->whereDate('date', $carbonDate->format('Y-m-d'));
+                });
+            }
+
+            // Выполняем запрос
+            $bells = $query->firstOrFail();
+
         } catch (\Exception $e) {
             throw new NotFoundHttpException('Запись не найдена');
         }
-        // $bells = Bell::all();
+
         return new BellsResource($bells);
     }
+
 
     // Получение конкретного расписания звонков
     public function show($id)
@@ -76,6 +94,7 @@ class BellController extends Controller
             'variant' => 'required|in:normal,reduced',
             'week_day' => 'nullable|string|max:2|required_if:type,main',
             'date' => 'nullable|date|required_if:type,changes',
+            'building' => 'integer|between:1,6',
         ]);
 
         if ($validator->fails()) {

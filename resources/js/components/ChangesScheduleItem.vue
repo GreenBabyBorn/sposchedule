@@ -295,7 +295,7 @@ function handlenewLessonMessage() {
                             </div>
                         </td>
                         <td v-show="!item.message">
-                            <div v-if="item.id" class="table-subrow"><Select @change="editLesson(item)"
+                            <div v-if="item.id" class="table-subrow"><Select filter @change="editLesson(item)"
                                     v-model="item.subject" class="w-full text-left" :options="subjects"
                                     optionLabel="name"></Select>
                             </div>
@@ -338,10 +338,11 @@ function handlenewLessonMessage() {
                         </div>
                     </td>
                     <td v-show="!newLessonMessageState">
-                        <div class="table-subrow"><Select placeholder="Предмет" editable v-model="newLesson.subject"
-                                class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
+                        <div class="table-subrow"><Select filter placeholder="Предмет" editable
+                                v-model="newLesson.subject" class="w-full text-left" :options="subjects"
+                                optionLabel="name"></Select></div>
                         <div class="table-subrow">
-                            <MultiSelect placeholder="Преподаватели" v-model="newLesson.teachers" class="w-full"
+                            <MultiSelect filter placeholder="Преподаватели" v-model="newLesson.teachers" class="w-full"
                                 :options="teachers" optionLabel="name">
                             </MultiSelect>
                         </div>
@@ -363,7 +364,8 @@ function handlenewLessonMessage() {
                             <Button
                                 :disabled="!newLessonMessageState && (!newLesson.index || !newLesson.building || !newLesson.cabinet || !newLesson.subject) || newLessonMessageState && !newLesson.message"
                                 @click="addNewLesson()" text icon="pi pi-save" />
-                            <Button @click="handlenewLessonMessage" text icon="pi pi-comments" />
+                            <Button @click="handlenewLessonMessage" text
+                                :icon="`pi ${newLessonMessageState ? 'pi-table' : 'pi-comment'}`" />
                         </div>
                     </td>
                 </tr>
@@ -373,7 +375,7 @@ function handlenewLessonMessage() {
         <div class="mt-2 flex items-center justify-center">
             <Button label="Новая пара" title="Открыть форму для добавления пары" size="small" outlined
                 severity="secondary" class="w-full" @click="hideAddNewLesson = !hideAddNewLesson"
-                :class="{ 'pi pi-angle-down': hideAddNewLesson, 'pi pi-angle-up': !hideAddNewLesson }"></Button>
+                :class="{ 'pi pi-angle-down': !hideAddNewLesson, 'pi pi-angle-up': hideAddNewLesson }"></Button>
         </div>
     </div>
 </template>

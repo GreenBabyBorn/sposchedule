@@ -12,6 +12,7 @@ class Bell extends Model
         'variant',
         'week_day',
         'date',
+        'building'
     ];
 
     // Определение вариантов расписания

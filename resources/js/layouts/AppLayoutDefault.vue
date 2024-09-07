@@ -6,7 +6,7 @@ import Toast from 'primevue/toast';
 
 <template>
   <Toast></Toast>
-  <div class="page bg-surface-0 dark:text-surface-0 dark:bg-surface-950 h-screen">
+  <div class="page bg-surface-0 dark:text-surface-0 dark:bg-surface-950 min-h-screen">
     <!-- <TheHeader></TheHeader> -->
     <main>
       <slot />

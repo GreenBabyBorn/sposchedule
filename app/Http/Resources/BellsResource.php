@@ -19,6 +19,7 @@ class BellsResource extends JsonResource
             'type' => $this->type,
             'variant' => $this->variant,
             'date' => $this->date,
+            'building' => $this->building,
             'periods' => $this->periods,
         ];
     }

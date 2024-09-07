@@ -115,16 +115,15 @@ const { data: groups } = useGroupsQuery(selectedGroup);
                             v-model="date">
                             <template #inputicon="slotProps">
                                 <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
-                                    <small>{{ useDateFormat(date, 'dddd').value.toUpperCase()
+                                    <small>{{ useDateFormat(date, 'dddd', {
+                                        locales: 'ru-RU'
+                                    }).value.toUpperCase()
                                         }}</small>
                                     <small>{{ schedulesChanges?.week_type }}</small>
                                 </div>
 
                             </template>
                         </DatePicker>
-
-
-
                     </div>
 
                     <Select emptyFilterMessage="Группы не найдены" :disabled="Boolean(course)" filter showClear
@@ -132,8 +131,6 @@ const { data: groups } = useGroupsQuery(selectedGroup);
                         placeholder="Группа" class="w-full md:w-[10rem]" />
                     <Select :disabled="Boolean(selectedGroup)" class="" showClear v-model="course" :options="courses"
                         option-label="course" placeholder="Курс"></Select>
-
-
                 </div>
 
             </div>

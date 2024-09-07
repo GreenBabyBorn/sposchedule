@@ -285,21 +285,21 @@ const hideAddNewLesson = ref(false)
                             </td>
                             <td>
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">
-                                    <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item['ЧИСЛ'])"
-                                        v-model="item['ЧИСЛ'].teachers" class="w-full" :options="teachers"
-                                        optionLabel="name">
+                                    <MultiSelect filter placeholder="Выберите преподавателя"
+                                        @change="editLesson(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].teachers"
+                                        class="w-full" :options="teachers" optionLabel="name">
                                     </MultiSelect>
                                 </div>
                                 <div class="table-subrow" v-if="item.lesson">
-                                    <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item.lesson)"
-                                        v-model="item.lesson.teachers" class="w-full" :options="teachers"
-                                        optionLabel="name">
+                                    <MultiSelect filter placeholder="Выберите преподавателя"
+                                        @change="editLesson(item.lesson)" v-model="item.lesson.teachers" class="w-full"
+                                        :options="teachers" optionLabel="name">
                                     </MultiSelect>
                                 </div>
                                 <div class="table-subrow" v-if="item['ЗНАМ']">
-                                    <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item['ЗНАМ'])"
-                                        v-model="item['ЗНАМ'].teachers" class="w-full" :options="teachers"
-                                        optionLabel="name">
+                                    <MultiSelect filter placeholder="Выберите преподавателя"
+                                        @change="editLesson(item['ЗНАМ'])" v-model="item['ЗНАМ'].teachers"
+                                        class="w-full" :options="teachers" optionLabel="name">
                                     </MultiSelect>
                                 </div>
                             </td>
@@ -375,13 +375,15 @@ const hideAddNewLesson = ref(false)
                         </td>
                         <td>
                             <div class="table-subrow">
-                                <MultiSelect placeholder="Выберите преподавателя" v-model="newLesson['ЧИСЛ'].teachers"
-                                    class="w-full" :options="teachers" optionLabel="name">
+                                <MultiSelect filter placeholder="Выберите преподавателя"
+                                    v-model="newLesson['ЧИСЛ'].teachers" class="w-full" :options="teachers"
+                                    optionLabel="name">
                                 </MultiSelect>
                             </div>
                             <div v-if="newLesson['ЗНАМ']" class="table-subrow">
-                                <MultiSelect placeholder="Выберите преподавателя" v-model="newLesson['ЗНАМ'].teachers"
-                                    class="w-full" :options="teachers" optionLabel="name">
+                                <MultiSelect filter placeholder="Выберите преподавателя"
+                                    v-model="newLesson['ЗНАМ'].teachers" class="w-full" :options="teachers"
+                                    optionLabel="name">
                                 </MultiSelect>
                             </div>
                         </td>
@@ -419,7 +421,7 @@ const hideAddNewLesson = ref(false)
             <div class="mt-2 flex items-center justify-center">
                 <Button label="Новая пара" title="Открыть форму для добавления пары" size="small" outlined
                     severity="secondary" class="w-full" @click="hideAddNewLesson = !hideAddNewLesson"
-                    :class="{ 'pi pi-angle-down': hideAddNewLesson, 'pi pi-angle-up': !hideAddNewLesson }"></Button>
+                    :class="{ 'pi pi-angle-down': !hideAddNewLesson, 'pi pi-angle-up': hideAddNewLesson }"></Button>
             </div>
         </div>
 
