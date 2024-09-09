@@ -48,7 +48,7 @@ const updateQueryParams = () => {
     });
 
     // Обновляем localStorage при изменении query параметров
-    if (isoDate.value) localStorage.value.date = isoDate.value;
+    // if (isoDate.value) localStorage.value.date = isoDate.value;
     localStorage.value.course = selectedCourse.value;
     localStorage.value.group = selectedGroup.value;
 };
@@ -66,15 +66,17 @@ onMounted(() => {
     // Восстанавливаем значения сначала из query параметров, если они есть
     if (route.query.date && dateRegex.test(route.query.date as string)) {
 
-        // Если дата есть в query параметрах, используем ее
+        //     // Если дата есть в query параметрах, используем ее
         const [day, month, year] = (route.query.date as string).split('.').map(Number);
         date.value = new Date(year, month - 1, day);
         localStorage.value.date = route.query.date as string; // Сохраняем в localStorage
-    } else if (localStorage.value.date && dateRegex.test(localStorage.value.date as string)) {
-        // Если даты нет в query, используем из localStorage
-        const [day, month, year] = localStorage.value.date.split('.').map(Number);
-        date.value = new Date(year, month - 1, day);
-    } else {
+    }
+    // else if (localStorage.value.date && dateRegex.test(localStorage.value.date as string)) {
+    //     // Если даты нет в query, используем из localStorage
+    //     const [day, month, year] = localStorage.value.date.split('.').map(Number);
+    //     date.value = new Date(year, month - 1, day);
+    // }
+    else {
         // Если нет даты ни в query, ни в localStorage, используем текущую дату
         date.value = new Date();
     }
