@@ -9,21 +9,27 @@ const building = ref(1)
 const buildings = ref([
     {
         value: 1,
+        label: '1 корпус',
     },
     {
         value: 2,
+        label: '2 корпус',
     },
     {
         value: 3,
+        label: '3 корпус',
     },
     {
         value: 4,
+        label: '4 корпус',
     },
     {
         value: 5,
+        label: '5 корпус',
     },
     {
         value: 6,
+        label: '6 корпус',
     },
 ])
 const date = ref(new Date())
@@ -41,7 +47,7 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
             <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <div class="flex flex-wrap gap-2 items-start w-full">
                     <Select title="Корпус" optionValue="value" v-model="building" :options="buildings"
-                        option-label="value" placeholder="Корпус"></Select>
+                        option-label="label" placeholder="Корпус"></Select>
 
                 </div>
 
