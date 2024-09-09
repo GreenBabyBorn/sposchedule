@@ -9,15 +9,14 @@ class Bell extends Model
 {
     protected $fillable = [
         'type',
-        'variant',
         'week_day',
         'date',
         'building'
     ];
 
     // Определение вариантов расписания
-    public const VARIANT_NORMAL = 'normal';
-    public const VARIANT_REDUCED = 'reduced';
+    // public const VARIANT_NORMAL = 'normal';
+    // public const VARIANT_REDUCED = 'reduced';
 
     public const TYPE_MAIN = 'main';
     public const TYPE_CHANGES = 'changes';
@@ -29,6 +28,6 @@ class Bell extends Model
     // Связь с BellsPeriod
     public function periods(): HasMany
     {
-        return $this->hasMany(BellsPeriod::class, 'bells_id');
+        return $this->hasMany(BellsPeriod::class, 'bells_id')->orderBy('index', 'asc');
     }
 }

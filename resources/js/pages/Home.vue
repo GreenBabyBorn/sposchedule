@@ -110,7 +110,7 @@ const { data: groups } = useGroupsQuery(selectedGroup);
 
             <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <div class="flex flex-wrap gap-2 items-start w-full">
-                    <div class="flex flex-col ">
+                    <div class="flex flex-col md:w-auto w-full">
                         <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
                             v-model="date">
                             <template #inputicon="slotProps">

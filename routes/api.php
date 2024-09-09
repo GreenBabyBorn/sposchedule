@@ -29,6 +29,7 @@ Route::apiResource('semesters', SemesterController::class)->only(['index', 'show
 
 
 
+Route::get('/bells/public', [BellController::class, 'publicBells']);
 Route::apiResource('bells', BellController::class);
 Route::apiResource('bells-periods', BellsPeriodController::class);
 

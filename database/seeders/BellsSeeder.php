@@ -2,72 +2,68 @@
 
 namespace Database\Seeders;
 
-use App\Models\Bell;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
+use App\Models\Bell;
+use App\Models\BellsPeriod;
 
 class BellsSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
-        $types = ['main', 'changes'];
-        $variants = ['normal', 'reduced'];
-        $weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']; // Дни недели
-        $buildings = range(1, 6); // Значения для building от 1 до 6
+        // Дни недели
+        $weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
 
-        foreach ($types as $type) {
-            foreach ($variants as $variant) {
-                foreach ($weekDays as $week_day) {
-                    foreach ($buildings as $building) {
-                        // Устанавливаем день недели только для типа "main"
-                        $currentWeekDay = $type === 'main' ? $week_day : null;
+        // Корпуса
+        $buildings = range(1, 6);
 
-                        // Проверяем на существование записи перед созданием
-                        $existingBell = Bell::where('variant', $variant)
-                            ->where('week_day', $currentWeekDay)
-                            ->where('building', $building)
-                            ->exists();
+        // Расписание звонков
+        $schedules = [
+            0 => [
+                ['period_from' => '08:00', 'period_to' => '08:55', 'has_break' => false],
+            ],
+            1 => [
+                ['period_from' => '09:00', 'period_to' => '09:45', 'has_break' => true, 'period_from_after' => '09:50', 'period_to_after' => '10:35'],
+            ],
+            2 => [
+                ['period_from' => '10:50', 'period_to' => '11:35', 'has_break' => true, 'period_from_after' => '11:40', 'period_to_after' => '12:25'],
+            ],
+            3 => [
+                ['period_from' => '12:45', 'period_to' => '13:30', 'has_break' => true, 'period_from_after' => '13:35', 'period_to_after' => '14:20'],
+            ],
+            4 => [
+                ['period_from' => '14:30', 'period_to' => '15:15', 'has_break' => true, 'period_from_after' => '15:20', 'period_to_after' => '16:05'],
+            ],
+            5 => [
+                ['period_from' => '16:15', 'period_to' => '17:00', 'has_break' => true, 'period_from_after' => '17:05', 'period_to_after' => '17:50'],
+            ],
+        ];
 
-                        if (!$existingBell) {
-                            Bell::create([
-                                'type' => $type,
-                                'variant' => $variant,
-                                'week_day' => $currentWeekDay,
-                                'building' => $building,
-                            ]);
-                        }
-                    }
-                }
+        // Создание звонков для каждого корпуса и каждого дня недели
+        foreach ($buildings as $building) {
+            foreach ($weekDays as $weekDay) {
+                // Создаем звонок
+                $bell = Bell::create([
+                    'type' => 'main',
+                    'week_day' => $weekDay,
+                    'date' => null,
+                    'building' => $building
+                ]);
 
-                // Для типа "changes", создаем записи без week_day
-                if ($type === 'changes') {
-                    foreach ($buildings as $building) {
-                        $existingBell = Bell::where('variant', $variant)
-                            ->whereNull('week_day')
-                            ->where('building', $building)
-                            ->exists();
-
-                        if (!$existingBell) {
-                            Bell::create([
-                                'type' => $type,
-                                'variant' => $variant,
-                                'week_day' => null,
-                                'building' => $building,
-                            ]);
-                        }
+                // Создание периодов для каждого звонка
+                foreach ($schedules as $index => $periods) {
+                    foreach ($periods as $period) {
+                        BellsPeriod::create([
+                            'bells_id' => $bell->id,
+                            'index' => $index,
+                            'has_break' => $period['has_break'],
+                            'period_from' => $period['period_from'],
+                            'period_to' => $period['period_to'],
+                            'period_from_after' => $period['has_break'] ? $period['period_from_after'] : null,
+                            'period_to_after' => $period['has_break'] ? $period['period_to_after'] : null,
+                        ]);
                     }
                 }
             }
         }
     }
-
-
-
 }

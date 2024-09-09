@@ -3,12 +3,12 @@ import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { computed } from 'vue';
 
-export function useBellsQuery(type, variant, building, weekDay?, date?) {
+export function useBellsQuery(type, building, weekDay?, date?) {
   const enabled = computed(() => {
     if (weekDay.value) {
       return (
         Boolean(type.value) ||
-        Boolean(variant.value) ||
+        // Boolean(variant.value) ||
         Boolean(weekDay.value) ||
         Boolean(building.value)
       );
@@ -16,7 +16,7 @@ export function useBellsQuery(type, variant, building, weekDay?, date?) {
     if (date.value) {
       return (
         Boolean(type.value) ||
-        Boolean(variant.value) ||
+        // Boolean(variant.value) ||
         Boolean(date.value) ||
         Boolean(building.value)
       );
@@ -33,19 +33,41 @@ export function useBellsQuery(type, variant, building, weekDay?, date?) {
     Основное: 'main',
     Изменения: 'changes',
   };
-  const variantValues = {
-    Обычный: 'normal',
-    Сокращенные: 'reduced',
-  };
+  // const variantValues = {
+  //   Обычный: 'normal',
+  //   Сокращенные: 'reduced',
+  // };
 
   return useQuery({
-    queryKey: ['bells', type, variant, weekDay, date, building],
+    queryKey: ['bells', type, weekDay, date, building],
     enabled: enabled,
     queryFn: useDebounceFn(
       async () =>
         (
           await axios.get(
-            `/api/bells?type=${typeValues[type.value]}&building=${building.value}&variant=${variantValues[variant.value]}${weekDayOrDate.value}`
+            `/api/bells?type=${typeValues[type.value]}&building=${building.value}${weekDayOrDate.value}`
+          )
+        ).data,
+      300
+    ),
+  });
+}
+
+export function usePublicBellsQuery(building, date) {
+  const enabled = computed(() => {
+    if (date.value) {
+      return Boolean(date.value) || Boolean(building.value);
+    }
+  });
+
+  return useQuery({
+    queryKey: ['bells', date, building],
+    enabled: enabled,
+    queryFn: useDebounceFn(
+      async () =>
+        (
+          await axios.get(
+            `/api/bells/public?building=${building.value}&date=${date.value}`
           )
         ).data,
       300
@@ -78,4 +100,26 @@ export function useStoreBell() {
     },
   });
   return storePeriodMutation;
+}
+export function useUpdateBellPeriod() {
+  const queryClient = useQueryClient();
+  let storePeriodMutation = useMutation({
+    mutationFn: ({ id, body }: any) =>
+      axios.patch(`/api/bells-periods/${id}`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells'] });
+    },
+  });
+  return storePeriodMutation;
+}
+
+export function useDestroyBellPeriod() {
+  const queryClient = useQueryClient();
+  let destroyPeriodMutation = useMutation({
+    mutationFn: (id: number) => axios.delete(`/api/bells-periods/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells'] });
+    },
+  });
+  return destroyPeriodMutation;
 }

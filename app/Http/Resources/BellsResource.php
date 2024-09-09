@@ -20,7 +20,7 @@ class BellsResource extends JsonResource
             'variant' => $this->variant,
             'date' => $this->date,
             'building' => $this->building,
-            'periods' => $this->periods,
+            'periods' => BellsPeriodResource::collection($this->periods),
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\BellsPeriodResource;
 use App\Models\BellsPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,14 +14,14 @@ class BellsPeriodController extends Controller
     public function index()
     {
         $periods = BellsPeriod::with('bells')->get();
-        return response()->json($periods);
+        return BellsPeriodResource::collection($periods);
     }
 
     // Получение конкретного периода звонка
     public function show($id)
     {
         $period = BellsPeriod::findOrFail($id);
-        return response()->json($period);
+        return new BellsPeriodResource($period);
     }
 
     // Создание нового периода звонка
@@ -41,7 +42,7 @@ class BellsPeriodController extends Controller
         }
 
         $period = BellsPeriod::create($request->all());
-        return response()->json($period, 201);
+        return new BellsPeriodResource($period);
     }
 
     // Обновление периода звонка
@@ -64,7 +65,7 @@ class BellsPeriodController extends Controller
         }
 
         $period->update($request->all());
-        return response()->json($period);
+        return new BellsPeriodResource($period);
     }
 
     // Удаление периода звонка

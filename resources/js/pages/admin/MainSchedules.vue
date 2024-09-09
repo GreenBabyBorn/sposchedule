@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ScheduleItem from '../components/MainScheduleItem.vue'
+import ScheduleItem from '../../components/MainScheduleItem.vue'
 import Select from 'primevue/select';
 import { computed, onMounted, ref, watch } from 'vue'
 import { useGroupsQuery } from '@/queries/groups';

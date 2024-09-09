@@ -12,18 +12,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Carbon;
+use App\Models\BellsPeriod;
 
 class BellController extends Controller
 {
-    // Получение всех расписаний звонков
     public function index(Request $request)
     {
-        $queryParams = $request->only(['type', 'variant', 'week_day', 'date', 'building']);
+        $queryParams = $request->only(['type', 'week_day', 'date', 'building']);
 
         // Валидация входных параметров
         $validator = Validator::make($queryParams, [
             'type' => 'required|string|in:main,changes',
-            'variant' => 'required|string',
+            // 'variant' => 'required|string',
             'week_day' => 'nullable|string',
             'date' => 'nullable|date',
             'building' => 'nullable|integer|between:1,6', // Валидация параметра building
@@ -35,7 +35,7 @@ class BellController extends Controller
 
         try {
             // Поиск записи на основе переданных параметров
-            $query = Bell::where('variant', $queryParams['variant']);
+            $query = Bell::query();
 
             // Добавляем фильтрацию по building, если он передан
             if (!empty($queryParams['building'])) {
@@ -78,7 +78,64 @@ class BellController extends Controller
         return new BellsResource($bells);
     }
 
+    public function publicBells(Request $request)
+    {
+        // Получаем параметры `building` и `date` из запроса
+        $building = $request->input('building');
+        $date = $request->input('date');
 
+        // Проверяем, что оба параметра переданы
+        if (!$building || !$date) {
+            return response()->json([
+                'message' => 'Необходимо указать building и date.',
+            ], 400);
+        }
+        $weekDayMapping = [
+            0 => 'ВС',
+            1 => 'ПН',
+            2 => 'ВТ',
+            3 => 'СР',
+            4 => 'ЧТ',
+            5 => 'ПТ',
+            6 => 'СБ',
+        ];
+        // Форматируем дату
+        try {
+            $parsedDate = Carbon::parse($date);
+            $formattedDate = $parsedDate->format('d.m.Y');
+            $weekDay = $weekDayMapping[$parsedDate->dayOfWeek];
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Неверный формат даты.',
+            ], 400);
+        }
+
+        // Ищем измененное расписание (type=changes)
+        $schedule = Bell::where('building', $building)
+                ->whereDate('date', $formattedDate)
+       ->where('type', 'changes')
+
+          ->first();
+
+        // Если измененное расписание не найдено, ищем основное расписание (type=main)
+        if (!$schedule) {
+            $schedule = Bell::where('building', $building)
+            ->where('type', 'main')
+              ->where('week_day', $weekDay)
+
+              ->first();
+        }
+
+        // Проверяем, есть ли записи
+        if (!$schedule) {
+            return response()->json([
+                'message' => 'Расписание не найдено для указанного здания и даты.',
+            ], 404);
+        }
+
+        // Возвращаем данные через Resource
+        return new BellsResource($schedule);
+    }
     // Получение конкретного расписания звонков
     public function show($id)
     {
@@ -91,7 +148,7 @@ class BellController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'type' => 'required|in:main,changes',
-            'variant' => 'required|in:normal,reduced',
+            // 'variant' => 'required|in:normal,reduced',
             'week_day' => 'nullable|string|max:2|required_if:type,main',
             'date' => 'nullable|date|required_if:type,changes',
             'building' => 'integer|between:1,6',

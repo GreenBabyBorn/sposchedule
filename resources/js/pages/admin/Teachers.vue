@@ -7,8 +7,8 @@ import MultiSelect from 'primevue/multiselect';
 import Button from 'primevue/button';
 import { useDateFormat } from '@vueuse/core'
 import { useToast } from 'primevue/usetoast';
-import { useTeachersQuery, useDestroyTeacher, useStoreTeacher, useUpdateTeacher, useStoreSubjectForTeacher, useDestroySubjectForTeacher } from '../queries/teachers'
-import { useSubjectsQuery, } from '../queries/subjects'
+import { useTeachersQuery, useDestroyTeacher, useStoreTeacher, useUpdateTeacher, useStoreSubjectForTeacher, useDestroySubjectForTeacher } from '../../queries/teachers'
+import { useSubjectsQuery, } from '../../queries/subjects'
 import Chip from 'primevue/chip';
 import { useQueryClient } from '@tanstack/vue-query';
 

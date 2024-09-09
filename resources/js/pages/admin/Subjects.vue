@@ -7,7 +7,7 @@ import Button from 'primevue/button';
 import { useDateFormat } from '@vueuse/core'
 import InputNumber from 'primevue/inputnumber';
 import { useToast } from 'primevue/usetoast';
-import { useSubjectsQuery, useDestroySubject, useStoreSubject, useUpdateSubject } from '../queries/subjects'
+import { useSubjectsQuery, useDestroySubject, useStoreSubject, useUpdateSubject } from '../../queries/subjects'
 import Textarea from 'primevue/textarea';
 import { FilterMatchMode } from '@primevue/core/api';
 

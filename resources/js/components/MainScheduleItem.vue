@@ -10,7 +10,7 @@ import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/les
 import { useToast } from 'primevue/usetoast';
 import { reactive, ref, toRef, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
-import Teachers from '@/pages/Teachers.vue';
+import Teachers from '@/pages/admin/Teachers.vue';
 
 const toast = useToast();
 

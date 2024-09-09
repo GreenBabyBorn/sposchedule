@@ -15,7 +15,7 @@ import Textarea from 'primevue/textarea';
 
 
 
-import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup, useDestroySemesterForGroup, useStoreSemesterForGroup } from '../queries/groups'
+import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup, useDestroySemesterForGroup, useStoreSemesterForGroup } from '../../queries/groups'
 import { useSemestersQuery } from '@/queries/semesters';
 import { useConfirm } from 'primevue/useconfirm';
 

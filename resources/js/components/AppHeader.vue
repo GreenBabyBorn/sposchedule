@@ -1,5 +1,7 @@
 <script setup lang="ts">
 
+import Button from 'primevue/button';
+
 </script>
 
 <template>
@@ -7,12 +9,13 @@
         <div class="max-w-screen-xl mx-auto px-4">
 
             <nav>
-                <ul class="flex gap-2 flex-wrap ">
-                    <li>
-                        <RouterLink class="" to="/">Главная</RouterLink>
+                <ul class="flex items-center justify-evenly gap-2  ">
+                    <li class="basis-1/2">
+                        <Button outlined severity="secondary" class="w-full" as="router-link" label="Пары" to="/" />
                     </li>
-                    <li>
-                        <RouterLink class="" to="/admin/schedules/main">Админ</RouterLink>
+                    <li class="basis-1/2">
+                        <Button outlined severity="secondary" class="w-full" as="router-link" label="Звонки"
+                            to="/bells" />
                     </li>
                 </ul>
             </nav>

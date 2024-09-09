@@ -4,15 +4,16 @@ import { RouteNamesEnum } from '@/router/router.types';
 import { AppLayoutsEnum } from '@/layouts/layouts.types';
 
 import HomeView from '../pages/Home.vue';
-import GroupsView from '../pages/Groups.vue';
-import SubjectsView from '../pages/Subjects.vue';
-import TeachersView from '../pages/Teachers.vue';
-import SchedulesView from '../pages/MainSchedules.vue';
-import SchedulesChanges from '../pages/ChangesSchedules.vue';
-import SemestersView from '../pages/Semesters.vue';
-import UserView from '../pages/User.vue';
+import BellsView from '../pages/Bells.vue';
+import GroupsView from '../pages/admin/Groups.vue';
+import SubjectsView from '../pages/admin/Subjects.vue';
+import TeachersView from '../pages/admin/Teachers.vue';
+import SchedulesView from '../pages/admin/MainSchedules.vue';
+import SchedulesChanges from '../pages/admin/ChangesSchedules.vue';
+import SemestersView from '../pages/admin/Semesters.vue';
+import UserView from '../pages/admin/User.vue';
 import AuthView from '../pages/Login.vue';
-import Bells from '../pages/Bells.vue';
+import Bells from '../pages/admin/Bells.vue';
 import NotFound from '../pages/NotFound.vue';
 import { useAuthStore } from '@/stores/auth';
 
@@ -28,7 +29,18 @@ const router = createRouter({
       path: '/:catchAll(.*)',
       redirect: '404',
     },
-    { path: '/', component: HomeView },
+    {
+      path: '/',
+      component: HomeView,
+      meta: {
+        layout: AppLayoutsEnum.public,
+      },
+    },
+    {
+      path: '/bells',
+      component: BellsView,
+      meta: { title: 'Звонки', layout: AppLayoutsEnum.public },
+    },
     {
       path: '/admin/login',
       name: RouteNamesEnum.auth,
