@@ -48,9 +48,7 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
                 <div class="flex flex-wrap gap-2 items-start w-full">
                     <Select title="Корпус" optionValue="value" v-model="building" :options="buildings"
                         option-label="label" placeholder="Корпус"></Select>
-
                 </div>
-
             </div>
             <div class="">
                 <div class="rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
@@ -73,15 +71,9 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
                                 <PublicRowPeriodBell :key="period.id" v-for="period in publicBells?.periods"
                                     :period="period">
                                 </PublicRowPeriodBell>
-
-
-
                             </tbody>
                         </table>
-
-
                     </div>
-
                 </div>
             </div>
         </div>

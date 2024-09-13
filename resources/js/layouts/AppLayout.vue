@@ -9,4 +9,4 @@ const route = useRoute();
   </component>
 </template>
 
-<style scoped></style>
+<style></style>

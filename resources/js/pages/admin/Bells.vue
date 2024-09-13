@@ -74,21 +74,27 @@ const building = ref(1)
 const buildings = ref([
     {
         value: 1,
+        label: '1 корпус',
     },
     {
         value: 2,
+        label: '2 корпус',
     },
     {
         value: 3,
+        label: '3 корпус',
     },
     {
         value: 4,
+        label: '4 корпус',
     },
     {
         value: 5,
+        label: '5 корпус',
     },
     {
         value: 6,
+        label: '6 корпус',
     },
 ])
 
@@ -198,7 +204,7 @@ const showAddNewBellPeriod = ref(false)
             <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <SelectButton :allowEmpty="false" v-model="type" :options="typeOptions" aria-labelledby="basic" />
                 <!-- <SelectButton :allowEmpty="false" v-model="variant" :options="variantOptions" aria-labelledby="basic" /> -->
-                <Select title="Корпус" optionValue="value" v-model="building" :options="buildings" option-label="value"
+                <Select title="Корпус" optionValue="value" v-model="building" :options="buildings" option-label="label"
                     placeholder="Корпус"></Select>
                 <Select option-value="value" v-if="typeState" v-model="weekDay" :options="weekDaysOptions"
                     optionLabel="label" placeholder="День недели" class="w-full md:w-56" />
@@ -234,7 +240,7 @@ const showAddNewBellPeriod = ref(false)
                                 :period="period">
                             </RowPeriodBell>
 
-                            <tr v-show="showAddNewBellPeriod" class="group bg-surface-800">
+                            <tr v-show="showAddNewBellPeriod" class="group dark:bg-surface-800">
                                 <td
                                     class="border-b border-surface-200 px-6 py-4  text-sm  group-last:border-none dark:border-surface-800 dark:text-surface-400">
                                     <div class="max-w-12">

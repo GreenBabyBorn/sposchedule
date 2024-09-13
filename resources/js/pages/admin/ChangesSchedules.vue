@@ -11,6 +11,7 @@ import { useRoute } from 'vue-router';
 import Select from 'primevue/select';
 import { useStorage } from '@vueuse/core'
 import ProgressSpinner from 'primevue/progressspinner';
+import Button from 'primevue/button';
 
 const route = useRoute()
 const scheduleStore = useScheduleStore();
@@ -114,6 +115,7 @@ onMounted(() => {
                 </DatePicker>
                 <Select class="basis-1/5" showClear v-model="course" :options="courses" option-label="course"
                     placeholder="Курс"></Select>
+                <a class="pi pi-print" target="_blank" title="На печать" :href="`/print/changes?date=${isoDate}`"></a>
 
 
             </div>

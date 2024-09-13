@@ -23,11 +23,11 @@ const lessons: any = toRef<any>(() => props.lessons)
                     props.group.name }}</span>
             <span>{{ props.week_type }}</span>
             <span :class="{
-                'border border-green-400 ': props.type
+                'text-green-400 ': props.type
                     !== 'main',
-                'border border-surface-400 ': props.type
+                'text-surface-400 ': props.type
                     === 'main'
-            }" class="text-sm text-right  py-1 px-2 rounded-lg dark:text-white/80">{{
+            }" class="text-sm text-right  py-1 px-2 rounded-lg ">{{
                 props.type
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
         </div>
@@ -75,7 +75,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                             <div class="flex flex-wrap px-2 justify-end" v-if="item.id">
                                 <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                     teacher.name
-                                }}</span>
+                                    }}</span>
                             </div>
                         </td>
                         <td v-if="!item.message">

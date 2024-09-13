@@ -63,15 +63,12 @@ export function usePublicBellsQuery(building, date) {
   return useQuery({
     queryKey: ['bells', date, building],
     enabled: enabled,
-    queryFn: useDebounceFn(
-      async () =>
-        (
-          await axios.get(
-            `/api/bells/public?building=${building.value}&date=${date.value}`
-          )
-        ).data,
-      300
-    ),
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/api/bells/public?building=${building.value}&date=${date.value}`
+        )
+      ).data,
   });
 }
 

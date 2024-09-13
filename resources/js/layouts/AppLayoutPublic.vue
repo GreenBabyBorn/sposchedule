@@ -7,7 +7,7 @@ import Toast from 'primevue/toast';
 <template>
   <Toast></Toast>
   <div class="page bg-surface-0 dark:text-surface-0 dark:bg-surface-950 min-h-screen">
-    <TheHeader></TheHeader>
+    <!-- <TheHeader></TheHeader> -->
     <main>
       <slot />
     </main>
@@ -16,8 +16,12 @@ import Toast from 'primevue/toast';
 
 </template>
 <style>
+body {
+  @apply bg-surface-200 dark:bg-surface-950;
+}
+
 .page {
   display: grid;
-  grid-template-rows: auto 1fr auto;
+  grid-template-rows: 1fr auto;
 }
 </style>

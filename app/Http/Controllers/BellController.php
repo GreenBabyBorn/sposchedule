@@ -102,7 +102,7 @@ class BellController extends Controller
         // Форматируем дату
         try {
             $parsedDate = Carbon::parse($date);
-            $formattedDate = $parsedDate->format('d.m.Y');
+            $formattedDate = $parsedDate->format('Y-m-d');
             $weekDay = $weekDayMapping[$parsedDate->dayOfWeek];
         } catch (\Exception $e) {
             return response()->json([

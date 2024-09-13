@@ -253,11 +253,11 @@ function handlenewLessonMessage() {
                     onLabel="Снять с публикации" offLabel="Опубликовать" />
             </div>
             <span :class="{
-                'border border-green-400 ': props.type
+                'text-green-400 ': props.type
                     !== 'main',
-                'border border-surface-400 ': props.type
+                'text-surface-400 ': props.type
                     === 'main'
-            }" class="text-sm text-right  py-1 px-2 rounded-lg dark:text-white/80">{{
+            }" class="text-sm text-right  py-1 px-2 rounded-lg ">{{
                 props.type
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
         </div>

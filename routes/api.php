@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\BellController;
 use App\Http\Controllers\BellsPeriodController;
 
+// Route::get('/schedules/changes/pdf', [ScheduleController::class, 'changesPDF']);
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
 Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
@@ -28,7 +29,7 @@ Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']
 Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
 
 
-
+// Доделать и раскидать только те маршруты, которые требуют аутентификации
 Route::get('/bells/public', [BellController::class, 'publicBells']);
 Route::apiResource('bells', BellController::class);
 Route::apiResource('bells-periods', BellsPeriodController::class);
@@ -59,7 +60,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('teachers', TeacherController::class)->except(['index', 'show']);
 
     Route::apiResource('semesters', SemesterController::class)->except(['index', 'show']);
-
-
-
 });

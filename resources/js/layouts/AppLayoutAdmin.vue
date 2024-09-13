@@ -22,3 +22,9 @@ const { isNavbarActive } = useAppStore();
     </main>
   </div>
 </template>
+
+<style>
+body {
+  @apply bg-surface-200 dark:bg-surface-950;
+}
+</style>

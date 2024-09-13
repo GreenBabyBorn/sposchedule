@@ -4,19 +4,19 @@ import axios from 'axios';
 import { computed } from 'vue';
 
 export function useMainSchedulesQuery(mainGroup, mainSemester) {
-  const enabled = computed(() => Boolean(mainGroup && mainSemester.value));
+  const enabled = computed(() =>
+    Boolean(mainGroup.value || mainSemester.value)
+  );
 
   return useQuery({
     enabled: enabled,
     queryKey: ['scheduleMain', mainGroup, mainSemester],
-    queryFn: useDebounceFn(async () => {
-      const res = (
+    queryFn: async () =>
+      (
         await axios.get(
           `/api/groups/${mainGroup.value.id}/semester/${mainSemester.value.id}/schedules/main/`
         )
-      ).data;
-      return res;
-    }, 300),
+      ).data,
   });
 }
 export function useStoreSchedule() {
@@ -94,14 +94,11 @@ export function usePublicSchedulesQuery(date, course, selectedGroup) {
     enabled: enabled,
     queryKey: ['scheduleChanges', date, course, selectedGroup],
     retry: 0,
-    queryFn: useDebounceFn(
-      async () =>
-        (
-          await axios.get(
-            `/api/schedules/public?date=${date.value}&course=${course.value || ''}&group=${selectedGroup.value || ''}`
-          )
-        ).data,
-      300
-    ),
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/api/schedules/public?date=${date.value}&course=${course.value || ''}&group=${selectedGroup.value || ''}`
+        )
+      ).data || [],
   });
 }

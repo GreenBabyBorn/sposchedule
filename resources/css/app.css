@@ -45,10 +45,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-surface-200 dark:bg-surface-950;
-}
-
 /* Primary and Surface Palettes */
 :root {
   --p-primary-50: #eff6ff; /* blue-50 */

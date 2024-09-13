@@ -15,6 +15,7 @@ import UserView from '../pages/admin/User.vue';
 import AuthView from '../pages/Login.vue';
 import Bells from '../pages/admin/Bells.vue';
 import NotFound from '../pages/NotFound.vue';
+import PrintView from '../pages/PrintChanges.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
@@ -24,6 +25,10 @@ const router = createRouter({
       path: '/404',
       name: 'NotFound',
       component: NotFound,
+      meta: {
+        layout: AppLayoutsEnum.public,
+        title: '404',
+      },
     },
     {
       path: '/:catchAll(.*)',
@@ -34,6 +39,13 @@ const router = createRouter({
       component: HomeView,
       meta: {
         layout: AppLayoutsEnum.public,
+      },
+    },
+    {
+      path: '/print/changes',
+      component: PrintView,
+      meta: {
+        layout: AppLayoutsEnum.default,
       },
     },
     {

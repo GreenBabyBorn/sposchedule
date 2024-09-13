@@ -20,9 +20,9 @@ const { setSchedules } = scheduleStore;
 // Используем useStorage для сохранения query параметров в localStorage
 const storedParams = useStorage('mainSchedules', { group: '', semester: '' });
 // Запросы данных
-const selectedMainGroup = computed(() => groups.value?.find((group) => group.name == selectedMainGroupName.value || {}))
+const selectedMainGroup = computed(() => groups.value?.find((group) => group.name == selectedMainGroupName.value))
 const semesters = computed(() => selectedMainGroup.value?.semesters);
-const { data: mainSchedules } = useMainSchedulesQuery(selectedMainGroup || null, selectedMainSemester);
+const { data: mainSchedules } = useMainSchedulesQuery(selectedMainGroup, selectedMainSemester);
 
 
 // Обновление query параметров в URL и localStorage
