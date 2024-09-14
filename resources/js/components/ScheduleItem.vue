@@ -70,8 +70,8 @@ const lessons: any = toRef<any>(() => props.lessons)
                         <td v-if="!item.message" class="p-1">
                             <div v-if="item.id"
                                 :class="{ 'border-b border-surface-200 dark:border-surface-700': item.teachers?.length }"
-                                class="flex justify-between flex-wrap items-center">
-                                <span class="text-base">{{ item.subject.name }}</span>
+                                class="flex justify-between gap-1 items-center">
+                                <span class="text-sm text-left ">{{ item.subject.name }}</span>
                                 <span>{{ item.cabinet }}</span>
 
 
@@ -81,7 +81,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 <div class="flex flex-wrap gap-1 justify-end" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <span>{{ item.building }} корпус</span>
                             </div>
@@ -138,7 +138,7 @@ const lessons: any = toRef<any>(() => props.lessons)
 
 .schedule-table th:first-child,
 .schedule-table td:first-child {
-    width: 5%;
+    width: 3%;
 }
 
 .schedule-table th:nth-child(2),
