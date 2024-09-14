@@ -31,8 +31,8 @@ const lessons: any = toRef<any>(() => props.lessons)
                 props.type
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
         </div>
-        <table v-if="lessons" class="schedule-table dark:bg-surface-900">
-            <thead>
+        <table v-if="lessons" class="schedule-table dark:bg-surface-900 bg-surface-50 rounded">
+            <!-- <thead>
                 <tr class="text-sm dark:bg-surface-950">
                     <th>
                         <div class="">№</div>
@@ -55,11 +55,11 @@ const lessons: any = toRef<any>(() => props.lessons)
                         <div class="">Кабинет</div>
                     </th>
                 </tr>
-            </thead>
+            </thead> -->
             <tbody>
                 <template v-for="item in lessons">
                     <tr class="">
-                        <td><span class="text-xl font-medium text-surface-800 dark:text-white/80">
+                        <td><span class="text-lg font-medium text-surface-800 dark:text-white/80">
                                 {{ item.index }}
                             </span></td>
                         <td v-if="item.message" colspan="3/1">
@@ -67,27 +67,24 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 <p>{{ item.message }}</p>
                             </div>
                         </td>
-                        <td v-if="!item.message">
-                            <div v-if="item.id" :class="{ 'border-b border-surface-700': item.teachers?.length }"
-                                class=" flex p-2"><span class="text-lg">{{
+                        <td v-if="!item.message" class="p-1">
+                            <div v-if="item.id"
+                                :class="{ 'border-b border-surface-200 dark:border-surface-700': item.teachers?.length }"
+                                class="flex justify-between flex-wrap items-center"><span class="text-base">{{
                                     item.subject.name }}</span>
-                            </div>
-                            <div class="flex flex-wrap px-2 justify-end" v-if="item.id">
-                                <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
-                                    teacher.name
+                                <div class="flex flex-wrap gap-1 justify-end" v-if="item.id">
+                                    <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
+                                        teacher.name
                                     }}</span>
-                            </div>
-                        </td>
-                        <td v-if="!item.message">
-                            <div class="table-subrow" v-if="item.id">
-                                <span>{{ item.building }}</span>
-                            </div>
-                        </td>
-                        <td v-if="!item.message">
+                                </div>
 
-                            <div class="table-subrow" v-if="item.id">
+                            </div>
+
+                            <div class="dark:text-surface-500 flex justify-between" v-if="item.id">
+                                <span>{{ item.building }} корпус</span>
                                 <span>{{ item.cabinet }}</span>
                             </div>
+
                         </td>
                     </tr>
                 </template>
@@ -121,7 +118,7 @@ const lessons: any = toRef<any>(() => props.lessons)
 
 .schedule-table th,
 .schedule-table td {
-    border: 1px solid var(--p-surface-600);
+    /* border: 1px solid var(--p-surface-600); */
     /* padding: 5px; */
     text-align: center;
 }
@@ -140,7 +137,7 @@ const lessons: any = toRef<any>(() => props.lessons)
 
 .schedule-table th:first-child,
 .schedule-table td:first-child {
-    width: 10%;
+    width: 5%;
 }
 
 .schedule-table th:nth-child(2),
@@ -148,7 +145,7 @@ const lessons: any = toRef<any>(() => props.lessons)
     width: 40%;
 }
 
-.schedule-table th:nth-child(3),
+/* .schedule-table th:nth-child(3),
 .schedule-table td:nth-child(3) {
     width: 15%;
 }
@@ -161,12 +158,12 @@ const lessons: any = toRef<any>(() => props.lessons)
 .schedule-table th:nth-child(5),
 .schedule-table td:nth-child(5) {
     width: 20%;
-}
+} */
 
 
 
 tbody tr {
-    border-bottom: 2px var(--p-surface-600) solid;
+    border-bottom: 1px var(--p-surface-500) solid;
     /* background: rgba(128, 128, 128, 0.243); */
 }
 
