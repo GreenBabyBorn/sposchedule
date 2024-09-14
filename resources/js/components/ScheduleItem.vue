@@ -70,19 +70,20 @@ const lessons: any = toRef<any>(() => props.lessons)
                         <td v-if="!item.message" class="p-1">
                             <div v-if="item.id"
                                 :class="{ 'border-b border-surface-200 dark:border-surface-700': item.teachers?.length }"
-                                class="flex justify-between flex-wrap items-center"><span class="text-base">{{
-                                    item.subject.name }}</span>
-                                <div class="flex flex-wrap gap-1 justify-end" v-if="item.id">
-                                    <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
-                                        teacher.name
-                                    }}</span>
-                                </div>
+                                class="flex justify-between flex-wrap items-center">
+                                <span class="text-base">{{ item.subject.name }}</span>
+                                <span>{{ item.cabinet }}</span>
+
 
                             </div>
 
                             <div class="dark:text-surface-500 flex justify-between" v-if="item.id">
+                                <div class="flex flex-wrap gap-1 justify-end" v-if="item.id">
+                                    <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
+                                        teacher.name
+                                        }}</span>
+                                </div>
                                 <span>{{ item.building }} корпус</span>
-                                <span>{{ item.cabinet }}</span>
                             </div>
 
                         </td>

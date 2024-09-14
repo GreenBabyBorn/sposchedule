@@ -152,8 +152,10 @@ async function addNewLesson() {
                 building: newLesson.ЧИСЛ.building,
                 cabinet: null,
             },
+            ЗНАМ: null
 
         });
+        addRowAddNewLessonState.value = false;
     }
 
 
@@ -171,6 +173,7 @@ async function createLesson(weekType, schedule_id, item?) {
     }
 
     try {
+        console.log(lessonData)
         await storeLesson({
             body: {
                 ...lessonData,

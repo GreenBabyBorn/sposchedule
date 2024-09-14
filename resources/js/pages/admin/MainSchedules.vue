@@ -78,8 +78,8 @@ onMounted(() => {
         </div>
         <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex flex-wrap  gap-2 items-center">
-                <Select filter v-model="selectedMainGroupName" :options="groups" optionValue="name" optionLabel="name"
-                    placeholder="Группа" class="w-full md:w-[10rem]" />
+                <Select :autoFilterFocus="true" filter v-model="selectedMainGroupName" :options="groups"
+                    optionValue="name" optionLabel="name" placeholder="Группа" class="w-full md:w-[10rem]" />
                 <Select v-model="selectedMainSemester" :options="semesters" optionLabel="name" placeholder="Семестр"
                     class="w-full md:w-[15rem]" />
 

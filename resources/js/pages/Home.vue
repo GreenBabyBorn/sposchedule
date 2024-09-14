@@ -155,8 +155,8 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
                             </template>
                         </DatePicker>
                     </div>
-                    <Select emptyFilterMessage="Группы не найдены" :disabled="Boolean(course)" filter showClear
-                        v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
+                    <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" :disabled="Boolean(course)"
+                        filter showClear v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
                         placeholder="Группа" class="w-full md:w-[10rem]" />
                     <Select :disabled="Boolean(selectedGroup)" class="" showClear v-model="course" :options="courses"
                         option-label="course" placeholder="Курс"></Select>
