@@ -77,13 +77,13 @@ const lessons: any = toRef<any>(() => props.lessons)
 
                             </div>
 
-                            <div class="dark:text-surface-500 flex justify-between" v-if="item.id">
+                            <div class="dark:text-surface-500 flex justify-between items-center" v-if="item.id">
                                 <div class="flex flex-wrap gap-1 justify-end" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
                                     }}</span>
                                 </div>
-                                <span>{{ item.building }} корпус</span>
+                                <span class="text-sm">{{ item.building }} корпус</span>
                             </div>
 
                         </td>
