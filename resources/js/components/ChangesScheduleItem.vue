@@ -338,12 +338,13 @@ function handlenewLessonMessage() {
                         </div>
                     </td>
                     <td v-show="!newLessonMessageState">
-                        <div class="table-subrow"><Select filter placeholder="Предмет" editable
+                        <div class="table-subrow"><Select :autoFilterFocus="true" filter placeholder="Предмет"
                                 v-model="newLesson.subject" class="w-full text-left" :options="subjects"
-                                optionLabel="name"></Select></div>
+                                optionLabel="name"></Select>
+                        </div>
                         <div class="table-subrow">
-                            <MultiSelect filter placeholder="Преподаватели" v-model="newLesson.teachers" class="w-full"
-                                :options="teachers" optionLabel="name">
+                            <MultiSelect :autoFilterFocus="true" filter placeholder="Преподаватели"
+                                v-model="newLesson.teachers" class="w-full" :options="teachers" optionLabel="name">
                             </MultiSelect>
                         </div>
                     </td>
@@ -364,8 +365,9 @@ function handlenewLessonMessage() {
                             <Button
                                 :disabled="!newLessonMessageState && (!newLesson.index || !newLesson.building || !newLesson.cabinet || !newLesson.subject) || newLessonMessageState && !newLesson.message"
                                 @click="addNewLesson()" text icon="pi pi-save" />
-                            <Button @click="handlenewLessonMessage" text
-                                :icon="`pi ${newLessonMessageState ? 'pi-table' : 'pi-comment'}`" />
+                            <Button @click="handlenewLessonMessage"
+                                :title="`${newLessonMessageState ? 'Переключиться на обычную пару' : 'Переключиться на комментарий'}`"
+                                text :icon="`pi ${newLessonMessageState ? 'pi-table' : 'pi-comment'}`" />
                         </div>
                     </td>
                 </tr>

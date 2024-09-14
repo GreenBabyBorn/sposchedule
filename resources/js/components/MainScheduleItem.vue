@@ -93,7 +93,7 @@ let newLesson = reactive<LessonWithWeekTypes>({
 });
 
 const { mutateAsync: storeSchedule, data: newSchedule } = useStoreSchedule();
-const { mutateAsync: storeLesson } = useStoreLesson();
+const { mutateAsync: storeLesson, isSuccess } = useStoreLesson();
 const { mutateAsync: destroyLesson } = useDestroyLesson();
 
 async function addOrUpdateSchedule() {
@@ -143,23 +143,29 @@ async function addNewLesson() {
             building: newLesson.ЗНАМ.building,
             cabinet: null,
         };
-    }
-    newLesson = reactive<LessonWithWeekTypes>({
-        index: Number(newLesson.index) + 1,
-        ЧИСЛ: {
-            subject: null,
-            teachers: [],
-            building: newLesson.ЧИСЛ.building,
-            cabinet: null,
-        },
+    } if (isSuccess.value) {
+        newLesson = reactive<LessonWithWeekTypes>({
+            index: Number(newLesson.index) + 1,
+            ЧИСЛ: {
+                subject: null,
+                teachers: [],
+                building: newLesson.ЧИСЛ.building,
+                cabinet: null,
+            },
 
-    });
+        });
+    }
+
 
 }
 
-async function createLesson(weekType, schedule_id) {
-    const lessonData = weekType === 'ЧИСЛ' || weekType === '' ? newLesson['ЧИСЛ'] : newLesson['ЗНАМ'];
+async function createLesson(weekType, schedule_id, item?) {
+    let lessonData = weekType === 'ЧИСЛ' || weekType === '' ? newLesson['ЧИСЛ'] : newLesson['ЗНАМ'];
+    if (item) {
+        lessonData = item[weekType];
+    }
     if (!lessonData || Object.keys(lessonData).length === 0) {
+
         showToast('Ошибка', 'Недозаполненно');
         return;
     }
@@ -170,7 +176,7 @@ async function createLesson(weekType, schedule_id) {
                 ...lessonData,
                 teachers: lessonData.teachers,
                 week_type: weekType,
-                index: newLesson.index,
+                index: !item ? newLesson.index : item.index,
                 subject_id: lessonData.subject?.id,
                 schedule_id: schedule_id,
             },
@@ -187,6 +193,7 @@ async function createLesson(weekType, schedule_id) {
 
     } catch (e) {
         showError(e);
+        return
     }
 }
 
@@ -195,6 +202,7 @@ async function removeLesson(id) {
         await destroyLesson({ id });
     } catch (e) {
         showError(e);
+        return
     }
 }
 
@@ -342,7 +350,7 @@ const hideAddNewLesson = ref(false)
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">
                                     <Button text
                                         :disabled="!item['ЧИСЛ'].cabinet || !item['ЧИСЛ'].building || !item['ЧИСЛ'].subject"
-                                        @click="createLesson('ЧИСЛ', item.schedule_id)" icon="pi pi-check"
+                                        @click="createLesson('ЧИСЛ', item.schedule_id, item)" icon="pi pi-check"
                                         v-if="!item['ЧИСЛ'].id"></Button>
 
                                     <Button text @click="removeLesson(item['ЧИСЛ'].id)" icon="pi pi-trash"
@@ -352,7 +360,7 @@ const hideAddNewLesson = ref(false)
                                 <div class="table-subrow" v-if="item['ЗНАМ']">
                                     <Button text
                                         :disabled="!item['ЗНАМ'].cabinet || !item['ЗНАМ'].building || !item['ЗНАМ'].subject"
-                                        @click="createLesson('ЗНАМ', item.schedule_id)" icon="pi pi-check"
+                                        @click="createLesson('ЗНАМ', item.schedule_id, item)" icon="pi pi-check"
                                         v-if="!item['ЗНАМ'].id"></Button>
 
                                     <Button text @click="removeLesson(item['ЗНАМ'].id)" icon="pi pi-trash"
@@ -367,21 +375,22 @@ const hideAddNewLesson = ref(false)
                             <InputText size="small" class="min-w-10 w-full text-center" v-model="newLesson.index" />
                         </td>
                         <td>
-                            <div class="table-subrow"><Select filter v-model="newLesson['ЧИСЛ'].subject"
-                                    class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
-                            <div v-if="newLesson['ЗНАМ']" class="table-subrow"><Select filter
-                                    v-model="newLesson['ЗНАМ'].subject" class="w-full text-left" :options="subjects"
+                            <div class="table-subrow"><Select :focusOnHover="false" :autoFilterFocus="true" filter
+                                    v-model="newLesson['ЧИСЛ'].subject" class="w-full text-left" :options="subjects"
                                     optionLabel="name"></Select></div>
+                            <div v-if="newLesson['ЗНАМ']" class="table-subrow"><Select :focusOnHover="false"
+                                    :autoFilterFocus="true" filter v-model="newLesson['ЗНАМ'].subject"
+                                    class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
                         </td>
                         <td>
                             <div class="table-subrow">
-                                <MultiSelect filter placeholder="Выберите преподавателя"
+                                <MultiSelect :autoFilterFocus="true" filter placeholder="Выберите преподавателя"
                                     v-model="newLesson['ЧИСЛ'].teachers" class="w-full" :options="teachers"
                                     optionLabel="name">
                                 </MultiSelect>
                             </div>
                             <div v-if="newLesson['ЗНАМ']" class="table-subrow">
-                                <MultiSelect filter placeholder="Выберите преподавателя"
+                                <MultiSelect :autoFilterFocus="true" filter placeholder="Выберите преподавателя"
                                     v-model="newLesson['ЗНАМ'].teachers" class="w-full" :options="teachers"
                                     optionLabel="name">
                                 </MultiSelect>
