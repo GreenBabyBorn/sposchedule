@@ -41,7 +41,6 @@ const coursesWithLabel = computed(() => {
 
 })
 
-
 const selectedCourse = computed(() => {
     return course.value;
 });

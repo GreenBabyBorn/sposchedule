@@ -26,12 +26,16 @@ const isoDate = computed(() => {
 });
 
 const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
+const coursesWithLabel = computed(() => {
+    return courses.value?.map(course => ({
+        label: `${course.course} курс`,
+        value: course.course
+    })) || [];
 
+})
 
 const selectedCourse = computed(() => {
-
-
-    return course.value?.course
+    return course.value
 });
 
 const { data: changesSchedules, isFetched, error, isError, isLoading } = useChangesSchedulesQuery(isoDate, selectedCourse);
@@ -78,11 +82,11 @@ onMounted(() => {
 
     if (route.query.course) {
         // Если курс есть в query параметрах, используем его
-        course.value = { course: Number(route.query.course as string) };
+        course.value = Number(route.query.course as string);
         localStorage.value.course = route.query.course as string; // Сохраняем в localStorage
     } else if (localStorage.value.course) {
         // Если курса нет в query, используем из localStorage
-        course.value = { course: localStorage.value.course };
+        course.value = localStorage.value.course;
     }
 
     // Синхронизация параметров в URL
@@ -113,8 +117,8 @@ onMounted(() => {
 
                     </template>
                 </DatePicker>
-                <Select class="basis-1/5" showClear v-model="course" :options="courses" option-label="course"
-                    placeholder="Курс"></Select>
+                <Select class="basis-1/5" showClear v-model="course" :options="coursesWithLabel" option-label="label"
+                    option-value="value" placeholder="Курс"></Select>
                 <a class="pi pi-print" target="_blank" title="На печать" :href="`/print/changes?date=${isoDate}`"></a>
 
 
