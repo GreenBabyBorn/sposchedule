@@ -17,7 +17,6 @@ import { usePublicBellsQuery } from '@/queries/bells';
 import PublicRowPeriodBell from '@/components/PublicRowPeriodBell.vue';
 import Divider from 'primevue/divider';
 import { useAuthStore } from '@/stores/auth';
-import Button from 'primevue/button';
 
 const route = useRoute();
 const scheduleStore = useSchedulePublicStore();
@@ -41,10 +40,9 @@ const coursesWithLabel = computed(() => {
     })) || [];
 
 })
-console.log(coursesWithLabel.value)
+
 
 const selectedCourse = computed(() => {
-    console.log(course.value)
     return course.value;
 });
 
@@ -93,10 +91,10 @@ onMounted(() => {
     }
 
     if (route.query.course) {
-        course.value = { course: Number(route.query.course as string) };
+        course.value = Number(route.query.course as string);
         localStorage.value.course = route.query.course as string;
     } else if (localStorage.value.course) {
-        course.value = { course: localStorage.value.course };
+        course.value = localStorage.value.course;
     }
 
     if (route.query.group) {
