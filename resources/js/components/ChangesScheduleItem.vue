@@ -40,7 +40,7 @@ const { mutateAsync: fromMainToChangesSchedule, data: newChanges } = useFromMain
 async function editLesson(item) {
     if (!item.id) return
     if (!item.message == (!item.cabinet || !item.building || !item.subject)) return
-
+    console.log(item)
     if (props.type === 'main') {
         try {
             await fromMainToChangesSchedule({
@@ -59,7 +59,7 @@ async function editLesson(item) {
             id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).id : item.id,
             body: {
                 ...item,
-                subject_id: item.subject.id,
+                subject_id: item.subject?.id,
                 id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).id : item.id,
                 schedule_id: props.type === 'main' ? newChanges.value.data.lessons.find(x => x.index === item.index).schedule_id : item.schedule_id,
             }

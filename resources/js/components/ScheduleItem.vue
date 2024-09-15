@@ -18,7 +18,7 @@ const lessons: any = toRef<any>(() => props.lessons)
 
 <template>
     <div class="schedule-item">
-        <div class="mb-4 flex flex-wrap  justify-between items-center"> <span
+        <div class="mb-2 flex flex-wrap  justify-between items-center"> <span
                 class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
                     props.group.name }}</span>
             <span>{{ props.week_type }}</span>
@@ -59,15 +59,15 @@ const lessons: any = toRef<any>(() => props.lessons)
             <tbody>
                 <template v-for="item in lessons">
                     <tr class="">
-                        <td><span class="text-lg font-medium text-surface-800 dark:text-white/80">
+                        <td class="p-2"><span class=" font-medium text-surface-800 dark:text-white/80">
                                 {{ item.index }}
                             </span></td>
-                        <td v-if="item.message" colspan="3/1">
+                        <td class="p-1" v-if="item.message" colspan="3/1">
                             <div class="table-subrow">
                                 <p>{{ item.message }}</p>
                             </div>
                         </td>
-                        <td v-if="!item.message" class="p-1">
+                        <td v-if="!item.message" class="pl-0 p-1">
                             <div v-if="item.id"
                                 :class="{ 'border-b border-surface-200 dark:border-surface-700': item.teachers?.length }"
                                 class="flex justify-between gap-1 items-center">
@@ -93,9 +93,7 @@ const lessons: any = toRef<any>(() => props.lessons)
             </tbody>
         </table>
         <div v-else class="flex justify-center items-center">
-            <span class="text-2xl">
-
-
+            <span class="text-xl">
                 Расписание не найдено
             </span>
         </div>
@@ -136,14 +134,15 @@ const lessons: any = toRef<any>(() => props.lessons)
     /* padding: 5px; */
 }
 
+
 .schedule-table th:first-child,
 .schedule-table td:first-child {
-    width: 3%;
+    width: 5%;
 }
 
 .schedule-table th:nth-child(2),
 .schedule-table td:nth-child(2) {
-    width: 40%;
+    width: 97%;
 }
 
 /* .schedule-table th:nth-child(3),

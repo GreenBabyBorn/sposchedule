@@ -16,6 +16,8 @@ import Skeleton from 'primevue/skeleton';
 import { usePublicBellsQuery } from '@/queries/bells';
 import PublicRowPeriodBell from '@/components/PublicRowPeriodBell.vue';
 import Divider from 'primevue/divider';
+import { useAuthStore } from '@/stores/auth';
+import Button from 'primevue/button';
 
 const route = useRoute();
 const scheduleStore = useSchedulePublicStore();
@@ -32,8 +34,18 @@ const isoDate = computed(() => {
 
 const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
 
+const coursesWithLabel = computed(() => {
+    return courses.value?.map(course => ({
+        label: `${course.course} курс`,
+        value: course.course
+    })) || [];
+
+})
+console.log(coursesWithLabel.value)
+
 const selectedCourse = computed(() => {
-    return course.value?.course;
+    console.log(course.value)
+    return course.value;
 });
 
 const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, selectedCourse, selectedGroup);
@@ -133,11 +145,31 @@ const formattedDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
 });
 
-const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
+const { data: publicBells, isFetched: isFetchedBells } = usePublicBellsQuery(building, formattedDate)
+
+
+
+const authStore = useAuthStore()
+const { user, isAuth } = storeToRefs(authStore)
+
+const reducedWeekDays = {
+    'понедельник': 'ПН',
+    'вторник': 'ВТ',
+    'среда': 'СР',
+    'четверг': 'ЧТ',
+    'пятница': 'ПТ',
+    'суббота': 'СБ',
+    'воскресенье': 'ВС',
+
+}
 </script>
 
 <template>
     <div class="max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
+        <RouterLink title="В панель управления" v-if="isAuth"
+            class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6  z-50"
+            to="/admin/schedules/changes"></RouterLink>
+        <!-- <Button label="В панель управления" /> -->
         <div class="flex flex-col gap-4">
             <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <div class="flex flex-wrap gap-2 items-start w-full">
@@ -146,9 +178,9 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
                             v-model="date">
                             <template #inputicon="slotProps">
                                 <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
-                                    <small>{{ useDateFormat(date, 'dddd', {
+                                    <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
                                         locales: 'ru-RU'
-                                    }).value.toUpperCase()
+                                    }).value]
                                         }}</small>
                                     <small>{{ schedulesChanges?.week_type }}</small>
                                 </div>
@@ -158,8 +190,9 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
                     <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" :disabled="Boolean(course)"
                         filter showClear v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
                         placeholder="Группа" class="w-full md:w-[10rem]" />
-                    <Select :disabled="Boolean(selectedGroup)" class="" showClear v-model="course" :options="courses"
-                        option-label="course" placeholder="Курс"></Select>
+                    <Select :disabled="Boolean(selectedGroup)" class="" showClear v-model="course"
+                        :options="coursesWithLabel" option-label="label" option-value="value"
+                        placeholder="Курс"></Select>
                 </div>
             </div>
             <!-- <ProgressSpinner v-show="isLoading" /> -->
@@ -189,7 +222,9 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
                 </div>
             </div>
             <div class="">
-                <h2 class="text-2xl text-center" v-if="!publicBells">На эту дату расписание звонков не найдено :(</h2>
+                <h2 class="text-2xl text-center" v-if="!publicBells && isFetchedBells">На эту дату расписание звонков не
+                    найдено
+                </h2>
                 <div v-if="publicBells"
                     class="rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
                     <div class="overflow-x-auto">
@@ -239,7 +274,7 @@ const { data: publicBells } = usePublicBellsQuery(building, formattedDate)
 @media screen and (max-width: 768px) {
     .schedule {
         /* min-width: 440px; */
-        flex: 0 1 calc(100% - 10px);
+        flex: 1 1 calc(100% - 10px);
 
     }
 }
