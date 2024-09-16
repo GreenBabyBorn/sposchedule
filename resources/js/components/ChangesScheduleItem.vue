@@ -123,7 +123,7 @@ async function addNewLesson() {
                     group_id: props.group.id,
                     semester_id: props.semester.id,
                     type: 'changes',
-                    view_mode: 'table',
+                    // view_mode: 'table',
                     date: props.date,
                 },
             });

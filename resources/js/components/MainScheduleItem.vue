@@ -107,7 +107,7 @@ async function addOrUpdateSchedule() {
                     semester_id: semester.value.id,
                     type: 'main',
                     week_day: weekDay.value,
-                    view_mode: 'table',
+                    // view_mode: 'table',
                 },
             });
         } catch (e) {

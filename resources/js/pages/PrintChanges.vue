@@ -68,6 +68,21 @@ watch([isFetchedAfterMount, isSuccess], async () => {
 
     }
 });
+
+const monthDeclensions = {
+    'январь': 'января',
+    'февраль': 'февраля',
+    'март': 'марта',
+    'апрель': 'апреля',
+    'май': 'мая',
+    'июнь': 'июня',
+    'июль': 'июля',
+    'август': 'августа',
+    'сентябрь': 'сентября',
+    'октябрь': 'октября',
+    'ноябрь': 'ноября',
+    'декабрь': 'декабря'
+};
 </script>
 
 <template>
@@ -86,9 +101,15 @@ watch([isFetchedAfterMount, isSuccess], async () => {
                 <h1>ИЗМЕНЕНИЯ В РАСПИСАНИИ ЗАНЯТИЙ (1-5 корпус)</h1>
                 <h2 class="italic uppercase">НА {{ dayNamesWithPreposition[useDateFormat(date, 'dddd', {
                     locales: 'ru-RU'
-                }).value] }} {{ useDateFormat(date, 'DD YYYY', {
+                }).value] }} {{ `${useDateFormat(date, 'DD', {
                         locales: 'ru-RU'
-                    }) }} года
+                    }).value} ${monthDeclensions[useDateFormat(date, 'MMMM', {
+                        locales: 'ru-RU'
+                    }).value]} ${useDateFormat(date, 'YYYY', {
+                        locales: 'ru-RU'
+                    }).value}`
+
+                    }} года
                     ({{ changesSchedules?.week_type === 'ЗНАМ' ? 'знаменатель' : 'числитель' }})</h2>
 
             </div>
