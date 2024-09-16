@@ -158,7 +158,7 @@ router.beforeEach(async (to, from, next) => {
       await authStore.fetchUser();
     } catch (error) {
       // Если произошла ошибка при загрузке данных пользователя, перенаправляем на страницу входа
-      authStore.logout();
+      // authStore.logout();
       return next('/admin/login');
     }
   }

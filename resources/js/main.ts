@@ -13,7 +13,6 @@ import type { AxiosError } from 'axios';
 import axios from 'axios';
 import ConfirmationService from 'primevue/confirmationservice';
 
-
 declare module '@tanstack/vue-query' {
   interface Register {
     defaultError: AxiosError;
@@ -38,7 +37,7 @@ axios.interceptors.response.use(
       console.log(error);
       // Если ошибка 401, перенаправляем пользователя на страницу входа
       localStorage.removeItem('token');
-      router.push('/admin/login');
+      // router.push('/admin/login');
     }
 
     // Возвращаем отклоненное обещание, чтобы остальные обработчики тоже могли обрабатывать ошибку
@@ -47,8 +46,6 @@ axios.interceptors.response.use(
 );
 
 const pinia = createPinia();
-
-
 
 createApp(App)
   .use(pinia)

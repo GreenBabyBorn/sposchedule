@@ -183,12 +183,13 @@ const reducedWeekDays = {
                             </template>
                         </DatePicker>
                     </div>
-                    <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" :disabled="Boolean(course)"
-                        filter showClear v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
+                    <Select title="Корпус" optionValue="value" v-model="building" :options="buildings"
+                        option-label="label" placeholder="Корпус"></Select>
+                    <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
+                        option-value="value" placeholder="Курс"></Select>
+                    <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
+                        v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
                         placeholder="Группа" class="w-full md:w-[10rem]" />
-                    <Select :disabled="Boolean(selectedGroup)" class="" showClear v-model="course"
-                        :options="coursesWithLabel" option-label="label" option-value="value"
-                        placeholder="Курс"></Select>
                 </div>
             </div>
             <!-- <ProgressSpinner v-show="isLoading" /> -->
@@ -207,16 +208,13 @@ const reducedWeekDays = {
                 </ScheduleItem>
             </div>
         </div>
-        <Divider>
-        </Divider>
         <div class="flex flex-col gap-4">
-            <!-- <h1 class="text-2xl font-bold text-center ">Звонки</h1> -->
-            <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
+            <h1 class="text-2xl font-bold text-center ">Звонки</h1>
+            <!-- <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
                 <div class="flex flex-wrap gap-2 items-start w-full">
-                    <Select title="Корпус" optionValue="value" v-model="building" :options="buildings"
-                        option-label="label" placeholder="Корпус"></Select>
+                    
                 </div>
-            </div>
+            </div> -->
             <div class="">
                 <h2 class="text-2xl text-center" v-if="!publicBells && isFetchedBells">На эту дату расписание звонков не
                     найдено
