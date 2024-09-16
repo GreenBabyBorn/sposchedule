@@ -15,7 +15,7 @@ class Schedule extends Model
         'date',
         'type',
         'week_day',
-        'view_mode',
+        // 'view_mode',
         'message',
         'published'
     ];

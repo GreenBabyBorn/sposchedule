@@ -20,7 +20,7 @@ class ScheduleResource extends JsonResource
             'type' => $this->type,
             // 'week_type' => $this->week_type,
             'week_day' => $this->week_day,
-            'view_mode' => $this->view_mode,
+            // 'view_mode' => $this->view_mode,
             'semester' => new SemesterResource($this->semester),
             'message' => $this->when($this->message !== null, $this->message),
             'group' => new GroupResource($this->group),

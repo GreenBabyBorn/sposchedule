@@ -42,11 +42,8 @@ class UpdateScheduleRequest extends FormRequest
                 'required_if:type,main',
                 Rule::in(['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']),
             ],
-            'view_mode' => [
 
-                Rule::in(['table', 'message']),
-            ],
-            'message' => 'required_if:view_mode,message|string',
+
         ];
     }
 
@@ -101,8 +98,6 @@ class UpdateScheduleRequest extends FormRequest
             'week_day.required' => 'Поле "День недели" обязательно для заполнения.',
             'week_day.in' => 'Поле "День недели" должно содержать одно из значений: ПН, ВТ, СР, ЧТ, ПТ, СБ, ВС.',
             'week_day.required_if' => 'Поле "День недели" обязательно, когда тип расписания равен "main".',
-            'view_mode.required' => 'Поле "Режим просмотра" обязательно для заполнения.',
-            'view_mode.in' => 'Поле "Режим просмотра" должно содержать одно из значений: table, message.',
             'message.string' => 'Поле "Сообщение" должно быть строкой.',
             'message.required_if' => 'Поле "Сообщение" обязательно, когда режим отображения равен "message".',
         ];
