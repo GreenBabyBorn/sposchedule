@@ -11,6 +11,7 @@ import { useTeachersQuery, useDestroyTeacher, useStoreTeacher, useUpdateTeacher,
 import { useSubjectsQuery, } from '../../queries/subjects'
 import Chip from 'primevue/chip';
 import { useQueryClient } from '@tanstack/vue-query';
+import { FilterMatchMode } from '@primevue/core/api';
 
 const { data: teachers } = useTeachersQuery()
 
@@ -108,6 +109,12 @@ const addTeacher = async () => {
 }
 
 const { data: subjects } = useSubjectsQuery()
+
+const filters = ref({
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
+
+});
 </script>
 
 <template>
@@ -125,7 +132,7 @@ const { data: subjects } = useSubjectsQuery()
             </form>
         </div>
         <div class="">
-            <DataTable paginator :rows="10" :loading="isUpdated || isDestroyed || isStored"
+            <DataTable v-model:filters="filters" paginator :rows="10" :loading="isUpdated || isDestroyed || isStored"
                 v-model:selection="selectedTeachers" v-model:editingRows="editingRows" :value="teachers" editMode="row"
                 dataKey="id" @row-edit-save="onRowEditSave" :pt="{
                     table: { style: 'min-width: 50rem' }
@@ -134,7 +141,7 @@ const { data: subjects } = useSubjectsQuery()
                     <div class="flex justify-between">
                         <Button severity="danger" :disabled="!selectedTeachers.length || !teachers.length" type="button"
                             icon="pi pi-trash" label="Удалить" outlined @click="deleteTeachers" />
-
+                        <InputText v-model="filters['global'].value" placeholder="Поиск" />
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
