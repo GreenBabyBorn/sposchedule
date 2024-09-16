@@ -115,7 +115,7 @@ watch(data, (newData) => {
     }
 });
 
-const newPeriod = ref({
+let newPeriod = ref({
     index: 0,
     period_from: '',
     period_to: '',
@@ -183,6 +183,15 @@ async function addPeriod() {
     }
     try {
         await storePeriod(bodyBellPeriod.value)
+        newPeriod = ref({
+            index: Number(newPeriod.value.index) + 1,
+            period_from: '',
+            period_to: '',
+            has_break: false,
+            period_from_after: null,
+            period_to_after: null
+        })
+
     }
     catch (e) {
         toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response?.data.message, life: 3000, closable: true });
