@@ -10,21 +10,21 @@
 }
 
 @font-face {
-  font-family: 'Rubik';
+  font-family: 'Rubik Medium';
   src: url('../fonts/Rubik/Rubik-Medium.ttf') format('truetype');
   font-weight: 500;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Rubik';
+  font-family: 'Rubik SemiBold';
   src: url('../fonts/Rubik/Rubik-SemiBold.ttf') format('truetype');
   font-weight: 600;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Rubik';
+  font-family: 'Rubik Bold';
   src: url('../fonts/Rubik/Rubik-Bold.ttf') format('truetype');
   font-weight: 700;
   font-style: normal;

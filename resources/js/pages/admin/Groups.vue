@@ -290,7 +290,7 @@ const building = ref()
                     table: { style: 'min-width: 50rem' }
                 }">
                 <template #header>
-                    <div class="flex justify-between">
+                    <div class="flex flex-wrap items-center gap-2  justify-between">
                         <Button severity="danger" :disabled="!selectedGroups.length || !groups.length" type="button"
                             icon="pi pi-trash" label="Удалить" outlined @click="confirmDelete" />
                         <InputText v-model="filters['global'].value" placeholder="Поиск" />
@@ -300,10 +300,14 @@ const building = ref()
                 <Column field="name" header="Название группы" style="width: 20%">
                 </Column>
                 <Column field="building" header="Корпус" style="width: 20%">
+                    <template #editor="{ data, field }">
+                        <Select v-model="data[field]" :options="buildings" option-label="name" option-value="name">
+                        </Select>
+                    </template>
                 </Column>
                 <Column field="specialization" header="Специальность" style="width: 20%">
                     <template #editor="{ data, field }">
-                        <InputText v-model="data[field]" />
+                        <InputText fluid v-model="data[field]" />
                     </template>
                 </Column>
                 <Column field="course" header="Курс" style="width: 10%">

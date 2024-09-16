@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useChangesSchedulesQuery } from '@/queries/schedules';
-import { useDateFormat } from '@vueuse/core';
+import { usePrintChangesSchedulesQuery } from '@/queries/schedules';
+import { useDateFormat, useStorage } from '@vueuse/core';
 import { computed, onMounted, ref, watch, onUpdated, nextTick } from 'vue';
 import { useRoute, } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
@@ -19,15 +19,31 @@ const isoDate = computed(() => {
 });
 
 
-const selectedCourse = ref()
-const { data: changesSchedules, isFetched, error, isError, isLoading, isSuccess, isFetchedAfterMount } = useChangesSchedulesQuery(isoDate, selectedCourse);
+// const selectedCourse = ref()
+const { data: changesSchedules, isFetched, error, isError, isLoading, isSuccess, isFetchedAfterMount } = usePrintChangesSchedulesQuery(isoDate);
 
-const blocks = computed(() => {
+const blocks1_5 = computed(() => {
     const chunkSize = 4; // Размер подмассива
     const result = [];
 
-    for (let i = 0; i < changesSchedules?.value?.schedules.length; i += chunkSize) {
-        const chunk = changesSchedules?.value?.schedules.slice(i, i + chunkSize);
+    for (let i = 0; i < changesSchedules?.value?.['1-5'].schedules.length; i += chunkSize) {
+        const chunk = changesSchedules?.value?.['1-5'].schedules.slice(i, i + chunkSize);
+
+        // Добавление пустых объектов, если подмассив меньше чем 4 элемента
+        while (chunk.length < chunkSize) {
+            chunk.push({}); // или chunk.push(null); в зависимости от того, что должно быть в пустых местах
+        }
+
+        result.push(chunk);
+    }
+
+    return result;
+}); const blocks6 = computed(() => {
+    const chunkSize = 4; // Размер подмассива
+    const result = [];
+
+    for (let i = 0; i < changesSchedules?.value?.['6'].schedules.length; i += chunkSize) {
+        const chunk = changesSchedules?.value?.['6'].schedules.slice(i, i + chunkSize);
 
         // Добавление пустых объектов, если подмассив меньше чем 4 элемента
         while (chunk.length < chunkSize) {
@@ -83,13 +99,18 @@ const monthDeclensions = {
     'ноябрь': 'ноября',
     'декабрь': 'декабря'
 };
+
+
+
+
 </script>
 
 <template>
     <div class="main">
         <div class="top">
             <div class="flex justify-between">
-                <div>Исполнитель: <span contenteditable class="underline">{{ user?.name }}</span></div>
+                <div>Исполнитель: <span contenteditable class="underline">{{ user?.name
+                        }}</span></div>
                 <div contenteditable class="text-right">
                     СОГЛАСОВАНО <br>
                     Зам. директора по УМР <br>
@@ -114,7 +135,89 @@ const monthDeclensions = {
 
             </div>
         </div>
-        <div :class="{ 'page-break': (index + 1) % 2 === 0 }" class="groups-row" v-for="block, index in blocks"
+        <div :class="{ 'page-break': (index + 1) % 2 === 0 }" class="groups-row" v-for="block, index in blocks1_5"
+            :key="block[0]?.group.name">
+            <div class=" bg-line"></div>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th v-for="(group, groupIndex) in block" :key="groupIndex" :colspan="groupIndex == 0 ? 2 : 2"
+                            class="group-header ">
+                            <div class="group-name">{{ group?.group?.name }}</div>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    <tr v-for="index in [0, 1, 2, 3, 4, 5, 6, 7]" :key="index">
+                        <!-- Колонки расписания для каждой группы -->
+                        <template v-for="(group, groupIndex) in block" :key="`row-${index}-group-${groupIndex}`">
+                            <td v-if="groupIndex == 0 || !groupIndex" class="index text-center" width="10px">{{ index }}
+                            </td>
+
+                            <td class="subject-name ">
+
+                                <template v-for="lesson in group?.schedule?.lessons">
+
+                                    <template v-if="lesson?.index === index">
+                                        <span class="">
+                                            {{ lesson?.subject?.name }}
+
+                                        </span>
+                                        <span class="font-bold">
+                                            {{ lesson?.message }}
+                                        </span>
+                                    </template>
+                                </template>
+                            </td>
+                            <td class="cabinet text-center">
+
+                                <template v-for="lesson in group?.schedule?.lessons">
+                                    <template v-if="lesson?.index === index">
+                                        {{ lesson?.cabinet }}
+                                    </template>
+                                </template>
+                            </td>
+                            <td v-if="groupIndex == 3" class="index text-center" width="10px">{{ index }}
+                            </td>
+                        </template>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="main">
+        <div class="top">
+            <div class="flex justify-between">
+                <div>Исполнитель: <span contenteditable class="underline">{{ user.name
+                        }}</span></div>
+                <div contenteditable class="text-right">
+                    СОГЛАСОВАНО <br>
+                    Зам. директора по УМР <br>
+                    _________ О.А. Толубаева
+                </div>
+            </div>
+
+            <div class="info">
+                <h1>ИЗМЕНЕНИЯ В РАСПИСАНИИ ЗАНЯТИЙ (6 корпус)</h1>
+                <h2 class="italic uppercase">НА {{ dayNamesWithPreposition[useDateFormat(date, 'dddd', {
+                    locales: 'ru-RU'
+                }).value] }} {{ `${useDateFormat(date, 'DD', {
+                        locales: 'ru-RU'
+                    }).value} ${monthDeclensions[useDateFormat(date, 'MMMM', {
+                        locales: 'ru-RU'
+                    }).value]} ${useDateFormat(date, 'YYYY', {
+                        locales: 'ru-RU'
+                    }).value}`
+
+                    }} года
+                    ({{ changesSchedules?.week_type === 'ЗНАМ' ? 'знаменатель' : 'числитель' }})</h2>
+
+            </div>
+        </div>
+        <div :class="{ 'page-break': (index + 1) % 2 === 0 }" class="groups-row" v-for="block, index in blocks6"
             :key="block[0]?.group.name">
             <div class=" bg-line"></div>
             <table class="w-full border-collapse">
@@ -180,6 +283,10 @@ const monthDeclensions = {
     .groups-row.page-break {
         page-break-after: always;
         /* Разрывать страницу после каждого второго блока */
+    }
+
+    .main {
+        page-break-after: always;
     }
 }
 

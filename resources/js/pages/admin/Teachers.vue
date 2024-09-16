@@ -138,7 +138,7 @@ const filters = ref({
                     table: { style: 'min-width: 50rem' }
                 }">
                 <template #header>
-                    <div class="flex justify-between">
+                    <div class="flex justify-between flex-wrap gap-2">
                         <Button severity="danger" :disabled="!selectedTeachers.length || !teachers.length" type="button"
                             icon="pi pi-trash" label="Удалить" outlined @click="deleteTeachers" />
                         <InputText v-model="filters['global'].value" placeholder="Поиск" />

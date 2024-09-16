@@ -17,7 +17,7 @@ Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
 Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
-
+Route::get('/schedules/changes/print', [ScheduleController::class, 'getScheduleByDatePrint']);
 Route::get('/groups/courses', [GroupController::class, 'getCourses']);
 Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
 Route::get('/schedules/changes', [ScheduleController::class, 'getScheduleByDate']);

@@ -27,19 +27,18 @@ class StoreScheduleRequest extends FormRequest
     {
         return [
             'group_id' => ['required', 'exists:groups,id',
-            // function ($attribute, $value, $fail) {
-            //     if ($this->type === 'main') {
-            //         $exists = \App\Models\Schedule::where('group_id', $this->group_id)
-            //             ->where('type', $this->type)
-            //             ->where('week_type', $this->week_type)
-            //             ->where('week_day', $this->week_day)
-            //             ->exists();
+            function ($attribute, $value, $fail) {
+                if ($this->type === 'main') {
+                    $exists = \App\Models\Schedule::where('group_id', $this->group_id)
+                        ->where('type', $this->type)
+                        ->where('week_day', $this->week_day)
+                        ->exists();
 
-            //         if ($exists) {
-            //             $fail('Для данной группы уже существует расписание с таким типом, типом недели и днем недели.');
-            //         }
-            //     }
-            // },
+                    if ($exists) {
+                        $fail('Для данной группы уже существует расписание с таким типом недели и днем недели.');
+                    }
+                }
+            },
         ],
             'date' => [
                 'nullable',
@@ -91,6 +90,8 @@ class StoreScheduleRequest extends FormRequest
             if(!$week_type) {
                 return;
             }
+
+
         });
     }
 

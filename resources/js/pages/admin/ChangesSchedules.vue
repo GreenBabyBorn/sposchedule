@@ -112,9 +112,10 @@ const reducedWeekDays = {
             <h1 class="text-2xl">Расписание изменений
             </h1>
         </div>
-        <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
-            <div class="flex gap-2 items-center">
-                <DatePicker showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy" v-model="date">
+        <div class="flex  items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
+            <div class="flex gap-2 items-center flex-wrap">
+                <DatePicker class="shrink-0" showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
+                    v-model="date">
                     <template #inputicon="slotProps">
                         <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
                             <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
@@ -127,7 +128,8 @@ const reducedWeekDays = {
                 </DatePicker>
                 <Select class="basis-1/5" showClear v-model="course" :options="coursesWithLabel" option-label="label"
                     option-value="value" placeholder="Курс"></Select>
-                <a class="pi pi-print" target="_blank" title="На печать" :href="`/print/changes?date=${isoDate}`"></a>
+                <a class="pi pi-print relative items-center inline-flex text-center align-bottom justify-center leading-[normal] px-3 py-2 rounded-md text-primary-contrast bg-primary border border-primary focus:outline-none focus:outline-offset-0 focus:ring-1 hover:bg-primary-emphasis hover:border-primary-emphasis focus:ring-primary transition duration-200 ease-in-out cursor-pointer overflow-hidden select-none"
+                    target="_blank" title="На печать" :href="`/print/changes?date=${isoDate}`"></a>
 
 
             </div>

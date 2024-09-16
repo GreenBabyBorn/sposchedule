@@ -11,7 +11,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Rubik', ...defaultTheme.fontFamily.sans],
+        sans: ['Rubik', 'Rubik Medium', ...defaultTheme.fontFamily.sans],
       },
     },
   },

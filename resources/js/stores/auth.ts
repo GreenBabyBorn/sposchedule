@@ -7,7 +7,6 @@ export const useAuthStore = defineStore('useAuthStore', () => {
   const user = ref(null);
   const token = ref(localStorage.getItem('token') || null);
 
-  // Устанавливаем токен в заголовок Axios
   if (token.value) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
   }
@@ -35,18 +34,16 @@ export const useAuthStore = defineStore('useAuthStore', () => {
   };
 
   const fetchUser = async () => {
-    if (token.value) {
-      try {
-        const response = await axios.get('/api/user');
-        user.value = response.data;
-      } catch (e) {
-        console.log('Статус', e.response.status);
-        if (e.response.status === 401) {
-          console.log(user.value);
-          localStorage.removeItem('token');
-          await router.push('/admin/login');
-          return;
-        }
+    try {
+      const response = await axios.get('/api/user');
+      user.value = response.data;
+    } catch (e) {
+      console.log('Статус', e.response.status);
+      if (e.response.status === 401) {
+        console.log(user.value);
+        localStorage.removeItem('token');
+        await router.push('/admin/login');
+        return;
       }
     }
   };

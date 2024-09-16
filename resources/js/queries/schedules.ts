@@ -46,6 +46,18 @@ export function useChangesSchedulesQuery(date, course) {
   });
 }
 
+export function usePrintChangesSchedulesQuery(date) {
+  const enabled = computed(() => Boolean(date.value));
+
+  return useQuery({
+    enabled: enabled,
+    queryKey: ['PrintScheduleChanges', date],
+    retry: 0,
+    queryFn: async () =>
+      (await axios.get(`/api/schedules/changes/print?date=${date.value}`)).data,
+  });
+}
+
 export function useStoreScheduleChange() {
   const queryClient = useQueryClient();
   let updateSemesterMutation = useMutation({
