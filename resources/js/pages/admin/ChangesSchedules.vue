@@ -114,7 +114,6 @@ onMounted(() => {
                                 }}</small>
                             <small>{{ schedulesChanges?.week_type }}</small>
                         </div>
-
                     </template>
                 </DatePicker>
                 <Select class="basis-1/5" showClear v-model="course" :options="coursesWithLabel" option-label="label"

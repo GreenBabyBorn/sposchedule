@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -18,6 +17,10 @@ return new class extends Migration
             $table->string('index');
             $table->string('specialization');
             $table->string('name')->unique();
+            $table->string('building')->nullable();  // Поле для внешнего ключа
+
+            // Настраиваем внешний ключ, связывающий building_name с полем name в таблице buildings
+            $table->foreign('building')->references('name')->on('buildings');
             $table->timestamps();
         });
 

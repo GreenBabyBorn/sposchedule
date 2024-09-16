@@ -26,6 +26,7 @@ class StoreGroupRequest extends FormRequest
             'course' => 'required|integer',
             'index' => 'required|string|max:255',
             'specialization' => 'required|string|max:255',
+            'building' => 'string|max:255|nullable',
             'semesters' => 'required|array',
             'semesters.*.id' => 'required|integer|exists:semesters,id',
         ];

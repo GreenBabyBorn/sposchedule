@@ -10,14 +10,11 @@ import { useToast } from 'primevue/usetoast';
 import Chip from 'primevue/chip';
 import MultiSelect from 'primevue/multiselect';
 import { FilterMatchMode } from '@primevue/core/api';
-
 import Textarea from 'primevue/textarea';
-
-
-
 import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup, useDestroySemesterForGroup, useStoreSemesterForGroup } from '../../queries/groups'
 import { useSemestersQuery } from '@/queries/semesters';
 import { useConfirm } from 'primevue/useconfirm';
+import { useBuildingsQuery } from '@/queries/buildings';
 
 const { data: groups } = useGroupsQuery()
 
@@ -130,6 +127,7 @@ const addGroup = async () => {
                 course: newGroupName.value.split('-')[1][0],
                 index: newGroupName.value.split('-')[1].slice(1),
                 semesters: selectedSemesters.value,
+                building: building.value
             }
         )
     }
@@ -257,6 +255,8 @@ const parseAndSendGroups = async () => {
     selectedSemesters.value = [];
 };
 
+const { data: buildings } = useBuildingsQuery()
+const building = ref()
 </script>
 
 <template>
@@ -270,6 +270,8 @@ const parseAndSendGroups = async () => {
                 <InputText :invalid="newGroupError" placeholder="Пример: ИС-401" v-model="newGroupName"></InputText>
                 <MultiSelect v-model="selectedSemesters" display="chip" :options="semesters" optionLabel="name" filter
                     placeholder="Выбрать семестры" :maxSelectedLabels="3" class="" />
+                <Select v-model="building" option-label="name" option-value="name" :options="buildings"
+                    placeholder="Корпус"></Select>
                 <Button type="submit" @click.prevent="addGroup" :disabled="!newGroupName">Добавить группу</Button>
                 <Button icon="pi pi-file-import" outlined type="submit"
                     @click.prevent="importGroupsState = !importGroupsState" label="Импорт"></Button>
@@ -296,6 +298,8 @@ const parseAndSendGroups = async () => {
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                 <Column field="name" header="Название группы" style="width: 20%">
+                </Column>
+                <Column field="building" header="Корпус" style="width: 20%">
                 </Column>
                 <Column field="specialization" header="Специальность" style="width: 20%">
                     <template #editor="{ data, field }">

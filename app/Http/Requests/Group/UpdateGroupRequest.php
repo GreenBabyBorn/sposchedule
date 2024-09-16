@@ -18,6 +18,7 @@ class UpdateGroupRequest extends FormRequest
             'course' => 'nullable|integer',
             'index' => 'nullable|string|max:255',
             'specialization' => 'nullable|string|max:255',
+            'building' => 'string|max:255',
         ];
     }
 
@@ -52,16 +53,16 @@ class UpdateGroupRequest extends FormRequest
 
     // protected function getValidatorInstance()
     // {
-        
-        // $validator = parent::getValidatorInstance();
 
-        // $validator->after(function ($validator) {
-        //     $name = $this->safe()->specialization . "-" . $this->safe()->course . $this->safe()->index;
-        //     if (Group::where('name', $name)->exists()) {
-        //         $validator->errors()->add('name', 'Группа с таким именем уже существует.');
-        //     }
-        // });
+    // $validator = parent::getValidatorInstance();
 
-        // return $validator;
+    // $validator->after(function ($validator) {
+    //     $name = $this->safe()->specialization . "-" . $this->safe()->course . $this->safe()->index;
+    //     if (Group::where('name', $name)->exists()) {
+    //         $validator->errors()->add('name', 'Группа с таким именем уже существует.');
+    //     }
+    // });
+
+    // return $validator;
     // }
 }

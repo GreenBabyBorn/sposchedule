@@ -11,13 +11,13 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BellController;
 use App\Http\Controllers\BellsPeriodController;
+use App\Http\Controllers\BuildingController;
 
-// Route::get('/schedules/changes/pdf', [ScheduleController::class, 'changesPDF']);
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
 Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
-// Маршруты, защищенные Sanctum
+
 Route::get('/groups/courses', [GroupController::class, 'getCourses']);
 Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
 Route::get('/schedules/changes', [ScheduleController::class, 'getScheduleByDate']);
@@ -28,12 +28,16 @@ Route::apiResource('subjects', SubjectController::class)->only(['index', 'show']
 Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']);
 Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
 
-
-// Доделать и раскидать только те маршруты, которые требуют аутентификации
+/**
+ * TODO: Доделать и раскидать только те маршруты, которые требуют аутентификации
+ */
 Route::get('/bells/public', [BellController::class, 'publicBells']);
 Route::apiResource('bells', BellController::class);
 Route::apiResource('bells-periods', BellsPeriodController::class);
 
+Route::apiResource('buildings', BuildingController::class)->parameters([
+    'buildings' => 'name'
+]);
 
 // Маршруты, требующие аутентификации
 Route::middleware('auth:sanctum')->group(function () {

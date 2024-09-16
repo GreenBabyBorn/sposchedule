@@ -20,6 +20,7 @@ class GroupResource extends JsonResource
             'index' => $this->index,
             'specialization' => $this->specialization,
             'name' => $this->name,
+            'building' => $this->building,
             'semesters' => SemesterResource::collection($this->semesters),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

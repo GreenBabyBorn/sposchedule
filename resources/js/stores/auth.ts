@@ -43,7 +43,7 @@ export const useAuthStore = defineStore('useAuthStore', () => {
         // if (e.response.status === 401) {
         console.log(user.value);
         localStorage.removeItem('token');
-        router.push('/admin/login');
+        await router.push('/admin/login');
         return;
         // }
       }

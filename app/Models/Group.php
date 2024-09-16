@@ -15,7 +15,13 @@ class Group extends Model
         'index',
         'specialization',
         'name',
+        'building'
     ];
+
+    public function building()
+    {
+        return $this->belongsTo(Building::class, 'building', 'name');
+    }
 
     public function schedules()
     {
