@@ -91,10 +91,19 @@ onMounted(() => {
 
     // Синхронизация параметров в URL
     updateQueryParams();
+
 }
 )
 
-
+const reducedWeekDays = {
+    'понедельник': 'ПН',
+    'вторник': 'ВТ',
+    'среда': 'СР',
+    'четверг': 'ЧТ',
+    'пятница': 'ПТ',
+    'суббота': 'СБ',
+    'воскресенье': 'ВС',
+}
 </script>
 
 <template>
@@ -108,9 +117,9 @@ onMounted(() => {
                 <DatePicker showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy" v-model="date">
                     <template #inputicon="slotProps">
                         <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
-                            <small>{{ useDateFormat(date, 'dddd', {
+                            <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
                                 locales: 'ru-RU'
-                            }).value.toUpperCase()
+                            }).value]
                                 }}</small>
                             <small>{{ schedulesChanges?.week_type }}</small>
                         </div>
