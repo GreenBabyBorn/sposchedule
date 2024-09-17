@@ -222,7 +222,7 @@ const reducedWeekDays = {
                 <div v-if="publicBells"
                     class="rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
                     <div class="overflow-x-auto">
-                        <table class="min-w-full border-collapse">
+                        <table class="min-w-full border-collapse table-auto     ">
                             <thead>
                                 <tr>
                                     <th
