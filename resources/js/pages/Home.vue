@@ -17,6 +17,7 @@ import { usePublicBellsQuery } from '@/queries/bells';
 import PublicRowPeriodBell from '@/components/PublicRowPeriodBell.vue';
 import Divider from 'primevue/divider';
 import { useAuthStore } from '@/stores/auth';
+import { useBuildingsQuery } from '@/queries/buildings';
 
 const route = useRoute();
 const scheduleStore = useSchedulePublicStore();
@@ -24,14 +25,14 @@ const { course, date, queryParams, schedulesChanges, selectedGroup } = storeToRe
 const { setSchedulesChanges } = scheduleStore;
 
 const localStorage = useStorage('publicSchedules', {
-    date: '', course: '', group: ''
+    date: '', course: '', group: '', building: ''
 });
 
 const isoDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
 });
 
-const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
+
 
 const coursesWithLabel = computed(() => {
     return courses.value?.map(course => ({
@@ -45,19 +46,58 @@ const selectedCourse = computed(() => {
     return course.value;
 });
 
-const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, selectedCourse, selectedGroup);
+const building = ref('')
+const { data: buildingsFethed } = useBuildingsQuery()
+const buildings = computed(() => {
+    return buildingsFethed.value?.map(building => ({
+        value: building.name,
+        label: `${building.name} корпус`,
+    })) || [];
+})
+
+const { data: courses, isFetched: coursesFetched } = useCoursesQuery(building);
+// const buildings = ref([
+//     {
+//         value: 1,
+//         label: '1 корпус',
+//     },
+//     {
+//         value: 2,
+//         label: '2 корпус',
+//     },
+//     {
+//         value: 3,
+//         label: '3 корпус',
+//     },
+//     {
+//         value: 4,
+//         label: '4 корпус',
+//     },
+//     {
+//         value: 5,
+//         label: '5 корпус',
+//     },
+//     {
+//         value: 6,
+//         label: '6 корпус',
+//     },
+// ])
+
+const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
 
 const updateQueryParams = () => {
     router.replace({
         query: {
             ...route.query,
             date: isoDate.value || null,
+            building: building.value || null,
             course: selectedCourse.value || null,
             group: selectedGroup.value || null,
         },
     });
 
     // if (isoDate.value) localStorage.value.date = isoDate.value;
+    localStorage.value.building = building.value;
     localStorage.value.course = selectedCourse.value;
     localStorage.value.group = selectedGroup.value;
 };
@@ -68,7 +108,7 @@ watch(changesSchedules, (newData) => {
     }
 });
 
-watch([isoDate, selectedCourse, selectedGroup], updateQueryParams, { deep: true });
+watch([isoDate, selectedCourse, selectedGroup, building], updateQueryParams, { deep: true });
 
 onMounted(() => {
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
@@ -89,6 +129,13 @@ onMounted(() => {
         date.value = new Date();
     }
 
+    if (route.query.building) {
+        building.value = route.query.building as string;
+        localStorage.value.building = route.query.building as string;
+    } else if (localStorage.value.building) {
+        building.value = localStorage.value.building;
+    }
+
     if (route.query.course) {
         course.value = Number(route.query.course as string);
         localStorage.value.course = route.query.course as string;
@@ -107,36 +154,8 @@ onMounted(() => {
     updateQueryParams();
 });
 
-const { data: groups } = useGroupsQuery(selectedGroup);
+const { data: groups } = useGroupsQuery(selectedGroup, building, course);
 
-
-const building = ref(1)
-const buildings = ref([
-    {
-        value: 1,
-        label: '1 корпус',
-    },
-    {
-        value: 2,
-        label: '2 корпус',
-    },
-    {
-        value: 3,
-        label: '3 корпус',
-    },
-    {
-        value: 4,
-        label: '4 корпус',
-    },
-    {
-        value: 5,
-        label: '5 корпус',
-    },
-    {
-        value: 6,
-        label: '6 корпус',
-    },
-])
 
 const formattedDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
@@ -183,8 +202,8 @@ const reducedWeekDays = {
                             </template>
                         </DatePicker>
                     </div>
-                    <Select title="Корпус" optionValue="value" v-model="building" :options="buildings"
-                        option-label="label" placeholder="Корпус"></Select>
+                    <Select title="Корпус" showClear v-model="building" :options="buildings" option-label="label"
+                        option-value="value" placeholder="Корпус"></Select>
                     <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
                         option-value="value" placeholder="Курс"></Select>
                     <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
@@ -216,13 +235,15 @@ const reducedWeekDays = {
                 </div>
             </div> -->
             <div class="">
-                <h2 class="text-2xl text-center" v-if="!publicBells && isFetchedBells">На эту дату расписание звонков не
+                <h2 class="text-xl text-center text-red-300" v-if="!building">Необходимо выбрать корпус</h2>
+                <h2 class="text-2xl text-center" v-else-if="!publicBells && isFetchedBells">На эту дату расписание
+                    звонков не
                     найдено
                 </h2>
-                <div v-if="publicBells"
-                    class="rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border-collapse table-auto     ">
+                <div v-if="publicBells" class="flex justify-center items-center ">
+                    <div
+                        class="overflow-x-auto rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
+                        <table class="min-w-full border-collapse table-auto">
                             <thead>
                                 <tr>
                                     <th

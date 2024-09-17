@@ -356,6 +356,10 @@ class ScheduleController extends Controller
 
         // $groups = Group::all();
         $groupsQuery = Group::query();
+        $building = $request->input('building');
+        if($building) {
+            $groupsQuery->where('building', $building);
+        }
         $course = $request->input('course');
         if($course) {
             $groupsQuery->where('course', $course);

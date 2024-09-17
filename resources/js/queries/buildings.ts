@@ -4,9 +4,6 @@ import axios from 'axios';
 import { computed } from 'vue';
 
 export function useBuildingsQuery(name?) {
-  const enabled = computed(() => {
-    return Boolean(name?.value);
-  });
   return useQuery({
     queryKey: ['buildings'],
     queryFn: useDebounceFn(

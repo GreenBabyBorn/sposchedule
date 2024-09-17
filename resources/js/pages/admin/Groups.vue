@@ -16,9 +16,9 @@ import { useSemestersQuery } from '@/queries/semesters';
 import { useConfirm } from 'primevue/useconfirm';
 import { useBuildingsQuery } from '@/queries/buildings';
 
-const { data: groups } = useGroupsQuery()
 
 const toast = useToast();
+const { data: groups } = useGroupsQuery()
 
 const newGroupName = ref('')
 const newGroupError = ref(false)

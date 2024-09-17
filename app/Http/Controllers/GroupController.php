@@ -25,6 +25,9 @@ class GroupController extends Controller
         // Начинаем с запроса к модели Group
         $query = Group::query();
 
+        if ($request->has(key: 'building')) {
+            $query->where('building', $request->input('building'));
+        }
         // Фильтрация по course
         if ($request->has('course')) {
             $query->where('course', $request->input('course'));
@@ -129,9 +132,15 @@ class GroupController extends Controller
         return response()->json(['message' => 'Семестр отвязан от группы.', "semester" => $semester ]);
     }
 
-    public function getCourses()
+    public function getCourses(Request $request)
     {
-        $courses = Group::select('course')->distinct()->orderBy('course', 'asc')->get();
+        $building = $request->query('building');
+        $coursesQuery = Group::select('course')->distinct()->orderBy('course', 'asc');
+        if ($building) {
+            $coursesQuery->where('building', $building);
+        }
+        $courses = $coursesQuery->get();
+
         return $courses;
     }
 

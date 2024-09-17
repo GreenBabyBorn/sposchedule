@@ -92,24 +92,27 @@ export function useUpdateSchedule() {
   return updateSemesterMutation;
 }
 
-export function useCoursesQuery() {
+export function useCoursesQuery(building) {
+  const enabled = computed(() => Boolean(building.value));
   return useQuery({
-    queryKey: ['courses'],
-    queryFn: async () => (await axios.get(`/api/groups/courses`)).data,
+    enabled,
+    queryKey: ['courses', building],
+    queryFn: async () =>
+      (await axios.get(`/api/groups/courses?building=${building.value}`)).data,
   });
 }
 
-export function usePublicSchedulesQuery(date, course, selectedGroup) {
+export function usePublicSchedulesQuery(date, building, course, selectedGroup) {
   const enabled = computed(() => Boolean(date.value));
 
   return useQuery({
     enabled: enabled,
-    queryKey: ['scheduleChanges', date, course, selectedGroup],
+    queryKey: ['scheduleChanges', date, building, course, selectedGroup],
     retry: 0,
     queryFn: async () =>
       (
         await axios.get(
-          `/api/schedules/public?date=${date.value}&course=${course.value || ''}&group=${selectedGroup.value || ''}`
+          `/api/schedules/public?date=${date.value}&course=${course.value || ''}&group=${selectedGroup.value || ''}&building=${building.value}`
         )
       ).data || [],
   });

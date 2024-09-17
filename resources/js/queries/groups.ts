@@ -3,17 +3,22 @@ import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { computed } from 'vue';
 
-export function useGroupsQuery(name?) {
+export function useGroupsQuery(name?, building?, course?) {
   const enabled = computed(() => {
-    return Boolean(name?.value);
+    return Boolean(name?.value || building?.value || course?.value || true);
   });
+
   return useQuery({
-    queryKey: ['groups'],
-    // enabled: true || enabled,
-    queryFn: useDebounceFn(
-      async () => (await axios.get(`/api/groups`)).data,
-      300
-    ),
+    enabled: enabled,
+    queryKey: ['groups', name, building, course],
+    queryFn: async () => {
+      const queryParams = new URLSearchParams();
+      if (name?.value) queryParams.append('name', name.value);
+      if (building?.value) queryParams.append('building', building.value);
+      if (course?.value) queryParams.append('course', course.value);
+
+      return (await axios.get(`/api/groups?${queryParams.toString()}`)).data;
+    },
   });
 }
 

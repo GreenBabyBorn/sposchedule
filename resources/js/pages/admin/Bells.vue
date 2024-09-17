@@ -302,7 +302,7 @@ const showAddNewBellPeriod = ref(false)
             <div class="mt-2 flex items-center justify-center">
                 <Button label="Новый звонок" title="Открыть форму для добавления звонка" size="small" outlined
                     severity="secondary" class="w-full" @click="showAddNewBellPeriod = !showAddNewBellPeriod"
-                    :class="{ 'pi pi-angle-down': !showAddNewBellPeriod, 'pi pi-angle-up': showAddNewBellPeriod }"></Button>
+                    :icon="{ 'pi pi-angle-down': !showAddNewBellPeriod, 'pi pi-angle-up': showAddNewBellPeriod }"></Button>
             </div>
         </div>
     </div>
