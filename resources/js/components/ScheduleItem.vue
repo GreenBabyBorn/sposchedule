@@ -71,7 +71,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                             <div v-if="item.id"
                                 :class="{ 'border-b border-surface-200 dark:border-surface-700': item.teachers?.length }"
                                 class="flex justify-between gap-1 items-center">
-                                <span class="text-sm text-left ">{{ item.subject.name }}</span>
+                                <span class="text-sm text-left ">{{ item.subject_name }}</span>
                                 <span>{{ item.cabinet }}</span>
 
 
@@ -81,7 +81,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 <div class="flex flex-wrap gap-1 justify-end" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <span class="text-sm">{{ item.building }} корпус</span>
                             </div>

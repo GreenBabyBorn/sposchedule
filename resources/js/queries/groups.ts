@@ -21,6 +21,25 @@ export function useGroupsQuery(name?, building?, course?) {
     },
   });
 }
+export function useGroupsPublicQuery(name?, building?, course?) {
+  const enabled = computed(() => {
+    return Boolean(name?.value || building?.value || course?.value || true);
+  });
+
+  return useQuery({
+    enabled: enabled,
+    queryKey: ['groups', name, building, course],
+    queryFn: async () => {
+      const queryParams = new URLSearchParams();
+      if (name?.value) queryParams.append('name', name.value);
+      if (building?.value) queryParams.append('building', building.value);
+      if (course?.value) queryParams.append('course', course.value);
+
+      return (await axios.get(`/api/groups/public?${queryParams.toString()}`))
+        .data;
+    },
+  });
+}
 
 export function useStoreGroup() {
   const queryClient = useQueryClient();

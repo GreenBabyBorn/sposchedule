@@ -54,21 +54,18 @@ export function useBellsQuery(type, building, weekDay?, date?) {
 }
 
 export function usePublicBellsQuery(building, date) {
-  const enabled = computed(() => {
-    if (date.value) {
-      return Boolean(date.value) || Boolean(building.value);
-    }
-  });
+  const enabled = computed(() => Boolean(date?.value && building?.value));
 
   return useQuery({
     queryKey: ['bells', date, building],
     enabled: enabled,
-    queryFn: async () =>
-      (
-        await axios.get(
-          `/api/bells/public?building=${building.value}&date=${date.value}`
-        )
-      ).data,
+    queryFn: async () => {
+      const queryParams = new URLSearchParams();
+      if (building?.value) queryParams.append('building', building.value);
+      if (date?.value) queryParams.append('date', date.value);
+      return (await axios.get(`/api/bells/public?${queryParams.toString()}`))
+        .data;
+    },
   });
 }
 

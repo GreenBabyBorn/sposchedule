@@ -8,6 +8,7 @@ use App\Http\Requests\Group\UpdateGroupRequest;
 use App\Http\Requests\Group\AttachSemesterRequest;
 use App\Http\Requests\Group\DetachSemesterRequest;
 use App\Http\Resources\GroupResource;
+use App\Http\Resources\SkinnyGroup;
 use App\Http\Resources\LessonResource;
 use App\Http\Resources\ScheduleResource;
 use App\Models\Group;
@@ -64,6 +65,52 @@ class GroupController extends Controller
 
         // Возвращаем коллекцию через GroupResource
         return GroupResource::collection($groups);
+    }
+
+    public function indexPublic(Request $request)
+    {
+        // Начинаем с запроса к модели Group
+        $query = Group::query();
+
+        if ($request->has(key: 'building')) {
+            $query->where('building', $request->input('building'));
+        }
+        // Фильтрация по course
+        if ($request->has('course')) {
+            $query->where('course', $request->input('course'));
+        }
+
+        // Фильтрация по index
+        if ($request->has('index')) {
+            $query->where('index', $request->input('index'));
+        }
+
+        // Фильтрация по specialization
+        if ($request->has('specialization')) {
+            $query->where('specialization', $request->input('specialization'));
+        }
+
+        // Фильтрация по name (конкатенация specialization, course и index)
+        if ($request->has('name')) {
+            $name = $request->input('name');
+            $query->where('name', 'LIKE', "%{$name}%");
+        }
+
+        // Сортировка
+        $orderField = $request->input('order_field', 'id'); // Поле для сортировки, по умолчанию id
+        $orderDirection = $request->input('order_direction', 'desc'); // Направление сортировки, по умолчанию
+
+        // Проверка на допустимые значения для сортировки
+        if (in_array($orderField, ['id', 'course', 'index', 'specialization', 'name']) &&
+            in_array($orderDirection, ['asc', 'desc'])) {
+            $query->orderBy($orderField, $orderDirection);
+        }
+
+        // Получаем отфильтрованные группы
+        $groups = $query->get();
+
+        // Возвращаем коллекцию через GroupResource
+        return SkinnyGroup::collection($groups);
     }
 
     /**

@@ -92,19 +92,25 @@ export function useUpdateSchedule() {
   return updateSemesterMutation;
 }
 
-export function useCoursesQuery(building) {
-  const enabled = computed(() => Boolean(building.value));
+export function useCoursesQuery(building?) {
+  // Условие enabled всегда true, если building не передается, или true если building задан
+  const enabled = computed(() => Boolean(building?.value || true));
+
   return useQuery({
     enabled,
     queryKey: ['courses', building],
-    queryFn: async () =>
-      (await axios.get(`/api/groups/courses?building=${building.value}`)).data,
+    queryFn: async () => {
+      // Формируем параметры запроса в зависимости от наличия building
+      const queryParams = building?.value ? `?building=${building.value}` : '';
+
+      // Выполняем запрос с параметрами или без них
+      return (await axios.get(`/api/groups/courses${queryParams}`)).data;
+    },
   });
 }
-
 export function usePublicSchedulesQuery(date, building, course, selectedGroup) {
   // Условие enabled проверяет только наличие параметра date
-  const enabled = computed(() => Boolean(date?.value));
+  const enabled = computed(() => Boolean(date?.value || building?.value));
 
   return useQuery({
     enabled: enabled,

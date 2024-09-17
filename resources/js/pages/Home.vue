@@ -9,7 +9,7 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import Select from 'primevue/select';
 import { useStorage } from '@vueuse/core';
-import { useGroupsQuery } from '@/queries/groups';
+import { useGroupsPublicQuery, useGroupsQuery } from '@/queries/groups';
 import { useSchedulePublicStore } from '@/stores/schedulePublic';
 import Skeleton from 'primevue/skeleton';
 import { usePublicBellsQuery } from '@/queries/bells';
@@ -152,7 +152,7 @@ onMounted(() => {
     updateQueryParams();
 });
 
-const { data: groups } = useGroupsQuery(selectedGroup, building, course);
+const { data: groups } = useGroupsPublicQuery(selectedGroup, building, course);
 
 
 const formattedDate = computed(() => {

@@ -14,6 +14,7 @@ use App\Models\Group;
 use App\Models\Lesson;
 use App\Models\Semester;
 use App\Http\Resources\SemesterResource;
+use App\Http\Resources\SkinnyLessonResource;
 
 class ScheduleController extends Controller
 {
@@ -434,7 +435,7 @@ class ScheduleController extends Controller
                         'type' => $mainSchedule->type,
 
                         // 'semester' => $mainSchedule->semester,
-                        'lessons' => LessonResource::collection(Lesson::where('schedule_id', $mainSchedule->id)->where(function ($query) use ($weekType) {
+                        'lessons' => SkinnyLessonResource::collection(Lesson::where('schedule_id', $mainSchedule->id)->where(function ($query) use ($weekType) {
                             $query->where('week_type', $weekType)
                                   ->orWhereNull('week_type');
                         })
@@ -453,7 +454,7 @@ class ScheduleController extends Controller
                     'type' => $change->type,
                     'published' => $change->published,
                     // 'semester' => $change->semester,
-                    'lessons' => LessonResource::collection(Lesson::where('schedule_id', $change->id)
+                    'lessons' => SkinnyLessonResource::collection(Lesson::where('schedule_id', $change->id)
                         ->orderBy('index')
                         ->get()),
                 ];
@@ -465,12 +466,12 @@ class ScheduleController extends Controller
 
             array_push($finalSchedules['schedules'], [
 
-                'semester' => new SemesterResource($group->semesters->filter(function ($semester) use ($carbonDate) {
-                    $start = Carbon::parse($semester->start);
-                    $end = Carbon::parse($semester->end);
+                // 'semester' => new SemesterResource($group->semesters->filter(function ($semester) use ($carbonDate) {
+                //     $start = Carbon::parse($semester->start);
+                //     $end = Carbon::parse($semester->end);
 
-                    return $carbonDate->between($start, $end);
-                })->first()),
+                //     return $carbonDate->between($start, $end);
+                // })->first()),
                 'group' => new SkinnyGroup($group),
                 'schedule' => $groupSchedule
             ]);
