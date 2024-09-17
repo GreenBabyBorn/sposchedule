@@ -46,7 +46,7 @@ const selectedCourse = computed(() => {
     return course.value;
 });
 
-const building = ref('')
+const building = ref(null)
 const { data: buildingsFethed } = useBuildingsQuery()
 const buildings = computed(() => {
     return buildingsFethed.value?.map(building => ({
@@ -219,6 +219,8 @@ const reducedWeekDays = {
                     <Skeleton height="10rem">
                     </Skeleton>
                 </div>
+                <span v-else-if="isFetched && !schedulesChanges.schedules.length" class="text-2xl text-center">Группы не
+                    найдены</span>
                 <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
                 <ScheduleItem v-else class="schedule" v-for="item in schedulesChanges?.schedules" :date="isoDate"
                     :schedule="item.schedule" :semester="item.semester" :type="item.schedule.type" :group="item.group"
