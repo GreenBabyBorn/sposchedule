@@ -9,13 +9,11 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import Select from 'primevue/select';
 import { useStorage } from '@vueuse/core';
-import ProgressSpinner from 'primevue/progressspinner';
 import { useGroupsQuery } from '@/queries/groups';
 import { useSchedulePublicStore } from '@/stores/schedulePublic';
 import Skeleton from 'primevue/skeleton';
 import { usePublicBellsQuery } from '@/queries/bells';
 import PublicRowPeriodBell from '@/components/PublicRowPeriodBell.vue';
-import Divider from 'primevue/divider';
 import { useAuthStore } from '@/stores/auth';
 import { useBuildingsQuery } from '@/queries/buildings';
 

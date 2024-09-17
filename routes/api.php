@@ -17,6 +17,9 @@ Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
 Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
+Route::get('/bells/public', [BellController::class, 'publicBells']);
+Route::apiResource('bells', BellController::class)->only(['index', 'show']);
+Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
 Route::get('/schedules/changes/print', [ScheduleController::class, 'getScheduleByDatePrint']);
 Route::get('/groups/courses', [GroupController::class, 'getCourses']);
 Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
@@ -28,13 +31,6 @@ Route::apiResource('subjects', SubjectController::class)->only(['index', 'show']
 Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']);
 Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
 
-/**
- * TODO: Доделать и раскидать только те маршруты, которые требуют аутентификации
- */
-Route::get('/bells/public', [BellController::class, 'publicBells']);
-Route::apiResource('bells', BellController::class);
-Route::apiResource('bells-periods', BellsPeriodController::class);
-
 Route::apiResource('buildings', BuildingController::class)->parameters([
     'buildings' => 'name'
 ]);
@@ -45,6 +41,9 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::apiResource('bells', BellController::class)->except(['index', 'show']);
+    Route::apiResource('bells-periods', BellsPeriodController::class)->except(['index', 'show']);
 
     Route::post('/groups/{group}/semesters', [GroupController::class, 'attachSemester'])->where(['semester' => '[0-9]+']);
     Route::delete('/groups/{group}/semesters', [GroupController::class, 'detachSemester'])->where(['semester' => '[0-9]+']);
