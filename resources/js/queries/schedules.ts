@@ -114,6 +114,7 @@ export function usePublicSchedulesQuery(date, building, course, selectedGroup) {
 
   return useQuery({
     enabled: enabled,
+
     queryKey: ['scheduleChanges', date, building, course, selectedGroup],
     retry: 0,
     queryFn: async () => {
