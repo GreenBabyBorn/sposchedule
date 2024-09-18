@@ -12,7 +12,8 @@ export const useSchedulePublicStore = defineStore(
 
     const schedulesChanges = ref();
 
-    const date = ref(new Date());
+    // const date = ref(new Date());
+    const date = ref(null);
     const course = ref(null);
 
     function setSchedules(scheduless) {
