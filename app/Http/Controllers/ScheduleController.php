@@ -449,7 +449,7 @@ class ScheduleController extends Controller
             // Теперь заменяем или дополняем слоты изменениями (changes)
             foreach ($groupChanges as $change) {
                 $groupSchedule = [
-                    'id' => $change->id,
+                    // 'id' => $change->id,
                     'week_type' => $change->week_type,
                     'type' => $change->type,
                     'published' => $change->published,
