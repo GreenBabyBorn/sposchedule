@@ -9,4 +9,8 @@ const route = useRoute();
   </component>
 </template>
 
-<style></style>
+<style>
+body {
+  @apply bg-white dark:bg-surface-950;
+}
+</style>

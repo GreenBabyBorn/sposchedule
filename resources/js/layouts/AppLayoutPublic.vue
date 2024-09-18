@@ -16,10 +16,6 @@ import Toast from 'primevue/toast';
 
 </template>
 <style>
-body {
-  @apply bg-surface-200 dark:bg-surface-950;
-}
-
 .page {
   display: grid;
   grid-template-rows: 1fr auto;
