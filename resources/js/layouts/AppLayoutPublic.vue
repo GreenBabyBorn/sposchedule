@@ -20,4 +20,8 @@ import Toast from 'primevue/toast';
   display: grid;
   grid-template-rows: 1fr auto;
 }
+
+body {
+  @apply bg-white dark:bg-surface-950;
+}
 </style>
