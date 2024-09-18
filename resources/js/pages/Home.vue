@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import DatePicker from 'primevue/datepicker';
 import ScheduleItem from '@/components/ScheduleItem.vue';
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useCoursesQuery, usePublicSchedulesQuery } from '@/queries/schedules';
 import { useDateFormat } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
@@ -175,41 +175,67 @@ const reducedWeekDays = {
     'суббота': 'СБ',
     'воскресенье': 'ВС',
 }
+
+const headerRef = ref(null);
+const headerHeight = ref(0);
+
+const updateHeaderHeight = () => {
+    if (headerRef.value) {
+        headerHeight.value = headerRef.value.offsetHeight;
+    }
+};
+
+// Используем ResizeObserver для отслеживания изменений размеров header
+let resizeObserver = null;
+
+onMounted(() => {
+    resizeObserver = new ResizeObserver(updateHeaderHeight);
+    if (headerRef.value) {
+        resizeObserver.observe(headerRef.value);
+        // Обновляем высоту при первой загрузке
+        updateHeaderHeight();
+    }
+});
+
+onBeforeUnmount(() => {
+    if (resizeObserver && headerRef.value) {
+        resizeObserver.unobserve(headerRef.value);
+    }
+});
 </script>
 
 <template>
     <div class="max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
         <RouterLink title="В панель управления" v-if="isAuth"
-            class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6  z-50"
+            class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
             to="/admin/schedules/changes"></RouterLink>
-        <!-- <Button label="В панель управления" /> -->
-        <div class="flex flex-col gap-4">
-            <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <div class="flex flex-wrap gap-2 items-start w-full">
-                    <div class="flex flex-col md:w-auto w-full">
-                        <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
-                            v-model="date">
-                            <template #inputicon="slotProps">
-                                <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
-                                    <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
-                                        locales: 'ru-RU'
-                                    }).value]
-                                        }}</small>
-                                    <small>{{ schedulesChanges?.week_type }}</small>
-                                </div>
-                            </template>
-                        </DatePicker>
-                    </div>
-                    <Select title="Корпус" showClear v-model="building" :options="buildings" option-label="label"
-                        option-value="value" placeholder="Корпус"></Select>
-                    <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
-                        option-value="value" placeholder="Курс"></Select>
-                    <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
-                        v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
-                        placeholder="Группа" class="w-full md:w-[10rem]" />
+        <div ref="headerRef"
+            class="fixed  z-50 top-0 left-0 right-0 flex items-center justify-between gap-4 p-4 dark:bg-surface-800">
+            <div class="flex max-w-screen-xl mx-auto flex-wrap gap-2 items-start w-full">
+                <div class="flex flex-col md:w-auto w-full">
+                    <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
+                        v-model="date">
+                        <template #inputicon="slotProps">
+                            <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
+                                <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
+                                    locales: 'ru-RU'
+                                }).value]
+                                    }}</small>
+                                <small>{{ schedulesChanges?.week_type }}</small>
+                            </div>
+                        </template>
+                    </DatePicker>
                 </div>
+                <Select title="Корпус" showClear v-model="building" :options="buildings" option-label="label"
+                    option-value="value" placeholder="Корпус"></Select>
+                <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
+                    option-value="value" placeholder="Курс"></Select>
+                <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
+                    v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name" placeholder="Группа"
+                    class="w-full md:w-[10rem]" />
             </div>
-            <!-- <ProgressSpinner v-show="isLoading" /> -->
+        </div>
+        <div :style="{ marginTop: `${headerHeight + 10}px` }" class="flex flex-col gap-4">
             <div class="schedules">
                 <div v-if="isLoading" v-for="item in 32" class="schedule">
                     <Skeleton height="2rem" class="mb-4">
@@ -229,11 +255,6 @@ const reducedWeekDays = {
         </div>
         <div class="flex flex-col gap-4">
             <h1 class="text-2xl font-bold text-center ">Звонки</h1>
-            <!-- <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <div class="flex flex-wrap gap-2 items-start w-full">
-                    
-                </div>
-            </div> -->
             <div class="">
                 <h2 class="text-xl text-center text-red-300" v-if="!building">Необходимо выбрать корпус</h2>
                 <h2 class="text-2xl text-center" v-else-if="!publicBells && isFetchedBells">На эту дату расписание
@@ -272,31 +293,12 @@ const reducedWeekDays = {
 
 <style scoped>
 .schedules {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    /* display: flex;
+    flex-wrap: wrap; */
     row-gap: 2rem;
     column-gap: 10px;
-    justify-content: space-between;
-
+    /* justify-content: space-between; */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
 }
-
-.schedule {
-    /* min-width: 440px; */
-    flex: 0 1 calc(25% - 10px);
-
-}
-
-@media screen and (max-width: 768px) {
-    .schedule {
-        /* min-width: 440px; */
-        flex: 1 1 calc(100% - 10px);
-
-    }
-}
-
-/* @media screen and (max-width: 480px) {
-    .schedule {
-        flex: 0 1 calc(100% - 10px);
-    }
-} */
 </style>
