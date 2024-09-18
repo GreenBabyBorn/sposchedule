@@ -256,9 +256,9 @@ onBeforeUnmount(() => {
                     найдены</span>
                 <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
                 <ScheduleItem v-else class="schedule" v-for="item in schedulesChanges?.schedules" :date="isoDate"
-                    :schedule="item.schedule" :semester="item.semester" :type="item.schedule.type"
-                    :group_name="item.group_name" :lessons="item?.schedule?.lessons" :week_type="item.week_type"
-                    :published="item?.schedule.published">
+                    :schedule="item?.schedule" :semester="item?.semester" :type="item?.schedule?.type"
+                    :group_name="item.group_name" :lessons="item?.schedule?.lessons" :week_type="item?.week_type"
+                    :published="item?.schedule?.published">
                 </ScheduleItem>
             </div>
         </div>

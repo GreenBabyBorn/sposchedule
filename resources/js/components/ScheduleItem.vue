@@ -1,18 +1,16 @@
 <script setup lang="ts">
-import { useToast } from 'primevue/usetoast';
 import { toRef } from 'vue';
 
-const toast = useToast();
 const props = defineProps({
     group_name: { required: true, type: String },
     date: { required: false },
     week_type: { required: false },
     type: { required: true },
-    semester: { required: false, type: Object },
+    semester: { required: false, type: [Object, null] }, // разрешаем Object или null
     lessons: { required: true },
-    schedule: { required: true, type: Object },
+    schedule: { required: true, type: [Object, null] }, // разрешаем Object или null
     published: { required: false, type: Boolean },
-})
+});
 const lessons: any = toRef<any>(() => props.lessons)
 </script>
 
