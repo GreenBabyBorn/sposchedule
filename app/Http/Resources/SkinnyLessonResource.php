@@ -22,7 +22,7 @@ class SkinnyLessonResource extends JsonResource
             'subject_name' => $this->subject->name,
             'teachers' => SkinnyTeacherResource::collection($this->teachers),
             'building' => $this->building,
-            // 'week_type' => $this->week_type,
+            'week_type' => $this->week_type,
             'message' => $this->message,
         ];
     }
