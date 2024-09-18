@@ -16,7 +16,7 @@ class SkinnyLessonResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'schedule_id' => $this->schedule_id,
+            // 'schedule_id' => $this->schedule_id,
             'index' => $this->index,
             'cabinet' => $this->cabinet,
             'subject_name' => $this->subject->name,

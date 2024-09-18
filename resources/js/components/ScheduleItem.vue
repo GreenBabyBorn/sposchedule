@@ -4,7 +4,7 @@ import { toRef } from 'vue';
 
 const toast = useToast();
 const props = defineProps({
-    group: { required: true, type: Object },
+    group_name: { required: true, type: String },
     date: { required: false },
     week_type: { required: false },
     type: { required: true },
@@ -20,7 +20,7 @@ const lessons: any = toRef<any>(() => props.lessons)
     <div class="schedule-item">
         <div class="mb-2 flex flex-wrap  justify-between items-center"> <span
                 class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
-                    props.group.name }}</span>
+                    props.group_name }}</span>
             <span>{{ props.week_type }}</span>
             <span :class="{
                 'text-green-400 ': props.type
@@ -81,7 +81,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 <div class="flex flex-wrap gap-1 justify-start" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
                                 <span class="text-sm">{{ item.building }} корпус</span>
                             </div>

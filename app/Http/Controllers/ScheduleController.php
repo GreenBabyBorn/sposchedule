@@ -472,7 +472,9 @@ class ScheduleController extends Controller
 
                 //     return $carbonDate->between($start, $end);
                 // })->first()),
-                'group' => new SkinnyGroup($group),
+
+                // 'group' => new SkinnyGroup($group),
+                'group_name' => $group->name,
                 'schedule' => $groupSchedule
             ]);
 
