@@ -210,8 +210,8 @@ onBeforeUnmount(() => {
             class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
             to="/admin/schedules/changes"></RouterLink>
         <div ref="headerRef"
-            class="fixed  z-50 top-0 left-0 right-0 flex items-center justify-between gap-4 p-4 dark:bg-surface-800">
-            <div class="flex max-w-screen-xl mx-auto flex-wrap gap-2 items-start w-full">
+            class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex items-center justify-between gap-4 p-4 dark:bg-surface-800">
+            <div class="flex  flex-wrap gap-2 items-start w-full">
                 <div class="flex flex-col md:w-auto w-full">
                     <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
                         v-model="date">
