@@ -418,7 +418,7 @@ class ScheduleController extends Controller
             $finalSchedules['schedules'][] = [
                 'group_name' => $group->name,
                 'schedule' => $groupSchedule ? [
-                    'id' => $groupSchedule->id,
+                    // 'id' => $groupSchedule->id,
                     'week_day' => $groupSchedule->week_day,
                     'type' => $groupSchedule->type,
                     'lessons' => SkinnyLessonResource::collection($groupSchedule->lessons)
@@ -433,6 +433,4 @@ class ScheduleController extends Controller
 
         return response()->json($finalSchedules);
     }
-
-
 }
