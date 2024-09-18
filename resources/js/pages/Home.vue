@@ -299,11 +299,15 @@ onBeforeUnmount(() => {
 <style scoped>
 .schedules {
     display: grid;
-    /* display: flex;
-    flex-wrap: wrap; */
     row-gap: 2rem;
     column-gap: 10px;
-    /* justify-content: space-between; */
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.schedules>*:only-child {
+    justify-self: center;
+    /* Центрирование */
+    width: 300px;
+    /* Установите минимальную или фиксированную ширину */
 }
 </style>
