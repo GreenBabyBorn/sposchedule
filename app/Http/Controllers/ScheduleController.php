@@ -15,6 +15,7 @@ use App\Models\Lesson;
 use App\Models\Semester;
 use App\Http\Resources\SemesterResource;
 use App\Http\Resources\SkinnyLessonResource;
+use Illuminate\Support\Facades\Cache;
 
 class ScheduleController extends Controller
 {
@@ -333,6 +334,7 @@ class ScheduleController extends Controller
         // Возвращаем финальное расписание
         return response()->json($finalSchedules);
     }
+
     public function getPublicSchedules(Request $request)
     {
         // Получаем дату из запроса и преобразуем её в объект Carbon
@@ -366,8 +368,9 @@ class ScheduleController extends Controller
 
         // Получаем семестр, соответствующий указанной дате
         $semester = Semester::where('start', '<=', $carbonDate)
-            ->where('end', '>=', $carbonDate)
-            ->first();
+                ->where('end', '>=', $carbonDate)
+                ->first();
+
 
         if (!$semester) {
             return response()->json([
