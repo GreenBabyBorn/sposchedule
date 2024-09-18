@@ -15,14 +15,14 @@ class SkinnyLessonResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            // 'id' => $this->id,
             // 'schedule_id' => $this->schedule_id,
             'index' => $this->index,
             'cabinet' => $this->cabinet,
             'subject_name' => $this->subject->name,
             'teachers' => SkinnyTeacherResource::collection($this->teachers),
             'building' => $this->building,
-            'week_type' => $this->week_type,
+            // 'week_type' => $this->week_type,
             'message' => $this->message,
         ];
     }
