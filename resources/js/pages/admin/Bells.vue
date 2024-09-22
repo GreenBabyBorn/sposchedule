@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SelectButton from 'primevue/selectbutton';
 import Select from 'primevue/select';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import DatePicker from 'primevue/datepicker';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
@@ -71,8 +71,9 @@ const weekDaysOptions = ref([
 const date = ref(new Date())
 
 
-const building = ref(1)
 const { data: buildingsFethed } = useBuildingsQuery()
+const building = ref('')
+
 const buildings = computed(() => {
     return buildingsFethed.value?.map(building => ({
         value: building.name,
@@ -116,8 +117,11 @@ const { data, isSuccess } = useBellsQuery(type, building, weekDay, formattedDate
 const bellsStore = useBellsStore()
 const { bells } = storeToRefs(bellsStore)
 const { setBells } = bellsStore
-
+watch(buildingsFethed, () => {
+    building.value = buildingsFethed.value?.[0].name
+})
 watch(data, (newData) => {
+
     if (newData) {
         setBells(newData);
     }

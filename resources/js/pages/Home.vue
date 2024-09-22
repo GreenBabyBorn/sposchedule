@@ -108,14 +108,15 @@ watch(changesSchedules, (newData) => {
     }
 });
 
-const queryString = ref('')
+const queryString = ref()
 
 
 watch(() => route.query, () => {
-    const filteredQuery = Object.fromEntries(
-        Object.entries(route.query).filter(([key, value]) => value !== null && value !== undefined)
-    );
-    queryString.value = new URLSearchParams(filteredQuery as any).toString()
+    queryString.value = route.query as any
+    // const filteredQuery = Object.fromEntries(
+    //     Object.entries(route?.query).filter(([key, value]) => value !== null && value !== undefined)
+    // );
+    // queryString.value = new URLSearchParams(filteredQuery as any).toString()
 })
 // const queryString = new URLSearchParams(filteredQuery as any).toString();
 watch([isoDate, selectedCourse, selectedGroup, building], () => {
@@ -129,16 +130,16 @@ watch([isoDate, selectedCourse, selectedGroup, building], () => {
 watch(building, () => {
     course.value = null
     selectedGroup.value = null
-})
+}, { flush: 'sync' })
 watch(course, () => {
     selectedGroup.value = null
-})
+}, { flush: 'sync' })
 
 onMounted(() => {
-    const filteredQuery = Object.fromEntries(
-        Object.entries(route.query).filter(([key, value]) => value !== null && value !== undefined)
-    );
-    queryString.value = new URLSearchParams(filteredQuery as any).toString()
+    // const filteredQuery = Object.fromEntries(
+    //     Object.entries(route.query).filter(([key, value]) => value !== null && value !== undefined)
+    // );
+    // queryString.value = new URLSearchParams(filteredQuery as any).toString()
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
 
     if (route.query.date && dateRegex.test(route.query.date as string)) {
@@ -240,9 +241,9 @@ onBeforeUnmount(() => {
 
 <template>
     <div class="max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
-        <a title="В панель управления" v-if="isAuth"
+        <RouterLink replace title="В панель управления" v-if="isAuth"
             class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
-            :href="`/admin/schedules/changes?${queryString}`"></a>
+            :to="{ path: '/admin/schedules/changes', query: queryString }"></RouterLink>
         <div ref="headerRef"
             class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex items-center justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
             <div class="flex  flex-wrap gap-2 items-start w-full">
@@ -270,7 +271,7 @@ onBeforeUnmount(() => {
             </div>
         </div>
         <div :style="{ marginTop: `${headerHeight + 10}px` }" class="flex flex-col gap-4">
-            <div class="schedules">
+            <div class="">
                 <div v-if="isLoading" v-for="item in 32" class="schedule">
                     <Skeleton height="2rem" class="mb-4">
                     </Skeleton>
@@ -283,11 +284,14 @@ onBeforeUnmount(() => {
                     не
                     найдены...</span>
                 <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
-                <ScheduleItem v-else class="schedule" v-for="item in schedulesChanges?.schedules" :date="isoDate"
-                    :schedule="item?.schedule" :semester="item?.semester" :type="item?.schedule?.type"
-                    :group_name="item.group_name" :lessons="item?.schedule?.lessons" :week_type="item?.week_type"
-                    :published="item?.schedule?.published">
-                </ScheduleItem>
+                <div v-else-if="schedulesChanges?.schedules" class="schedules">
+                    <ScheduleItem class="schedule" v-for="item in schedulesChanges?.schedules" :key="item?.id"
+                        :date="isoDate" :schedule="item?.schedule" :semester="item?.semester"
+                        :type="item?.schedule?.type" :group_name="item?.group_name" :lessons="item?.schedule?.lessons"
+                        :week_type="item?.week_type" :published="item?.schedule?.published">
+                    </ScheduleItem>
+                </div>
+
             </div>
         </div>
         <div class="flex flex-col gap-2">

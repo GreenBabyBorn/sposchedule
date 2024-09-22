@@ -73,8 +73,13 @@ const updateQueryParams = () => {
     // localStorage.value.course = selectedCourse.value; 2
 };
 
+let initialized = ref(false);
 
-watch([isoDate, building, selectedCourse, selectedGroup], updateQueryParams, { deep: true });
+watch([isoDate, building, selectedCourse, selectedGroup], () => {
+    if (initialized.value) {
+        updateQueryParams()
+    }
+}, { deep: true });
 
 onMounted(() => {
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
@@ -103,7 +108,7 @@ onMounted(() => {
     }
 
     if (route.query.group) {
-        selectedGroup.value = route.query.group;
+        selectedGroup.value = route.query.group as string;
     }
 
     if (route.query.building) {
@@ -115,8 +120,8 @@ onMounted(() => {
     // }
 
     // Синхронизация параметров в URL
+    initialized.value = true;
     updateQueryParams();
-
 })
 
 const reducedWeekDays = {
@@ -141,12 +146,16 @@ const buildings = computed(() => {
 })
 
 watch(building, () => {
-    course.value = null
-    selectedGroup.value = null
-})
+    if (initialized.value) {
+        course.value = null
+        selectedGroup.value = null
+    }
+}, { flush: 'sync' })
 watch(course, () => {
-    selectedGroup.value = null
-})
+    if (initialized.value) {
+        selectedGroup.value = null
+    }
+}, { flush: 'sync' })
 const { data: changesSchedules, isFetched, error, isError, isLoading } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
 
 watch(changesSchedules, (newData) => {

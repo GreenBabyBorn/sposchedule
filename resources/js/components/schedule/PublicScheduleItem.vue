@@ -2,7 +2,7 @@
 import { toRef } from 'vue';
 
 const props = defineProps({
-    group_name: { required: true, type: [String, null] },
+    group_name: { required: true, type: [String, null], default: null },
     date: { required: false },
     week_type: { required: false },
     type: { required: true },

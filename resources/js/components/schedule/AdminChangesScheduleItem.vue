@@ -21,7 +21,7 @@ import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
 
 const toast = useToast();
 const props = defineProps({
-    group: { required: true, type: Object },
+    group: { required: false, type: [Object, null], default: null },
     date: { required: false },
     week_type: { required: false },
     type: { required: true },
