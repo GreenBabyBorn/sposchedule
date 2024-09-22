@@ -8,17 +8,17 @@ export const useAppStore = defineStore('useAppStore', () => {
     sidebarState.value = !sidebarState.value;
   }
 
-  const user = ref();
+  // const user = ref();
 
-  async function fetchUser() {
-    const user = (await axios.get('/api/user')).data;
-    user.value = user;
-  }
+  // async function fetchUser() {
+  //   const user = (await axios.get('/api/user')).data;
+  //   user.value = user;
+  // }
 
-  const isAuth = computed(() => {
-    return user.value;
-  });
+  // const isAuth = computed(() => {
+  //   return user.value;
+  // });
 
   const isNavbarActive = computed(() => sidebarState);
-  return { isNavbarActive, onSidebarToggle, isAuth };
+  return { isNavbarActive, onSidebarToggle };
 });

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import DatePicker from 'primevue/datepicker';
-import ScheduleItem from '@/components/ScheduleItem.vue';
+import ScheduleItem from '@/components/schedule/PublicScheduleItem.vue';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useCoursesQuery, usePublicSchedulesQuery } from '@/queries/schedules';
 import { useDateFormat } from '@vueuse/core';
@@ -13,7 +13,7 @@ import { useGroupsPublicQuery, useGroupsQuery } from '@/queries/groups';
 import { useSchedulePublicStore } from '@/stores/schedulePublic';
 import Skeleton from 'primevue/skeleton';
 import { usePublicBellsQuery } from '@/queries/bells';
-import PublicRowPeriodBell from '@/components/PublicRowPeriodBell.vue';
+import PublicRowPeriodBell from '@/components/bells/PublicRowPeriodBell.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBuildingsQuery } from '@/queries/buildings';
 
@@ -100,13 +100,31 @@ const updateQueryParams = () => {
     localStorage.value.group = selectedGroup.value;
 };
 
+// console.log(route.query)
+
 watch(changesSchedules, (newData) => {
     if (newData) {
         setSchedulesChanges(newData);
     }
 });
 
-watch([isoDate, selectedCourse, selectedGroup, building], updateQueryParams, { deep: true });
+const queryString = ref('')
+
+
+watch(() => route.query, () => {
+    const filteredQuery = Object.fromEntries(
+        Object.entries(route.query).filter(([key, value]) => value !== null && value !== undefined)
+    );
+    queryString.value = new URLSearchParams(filteredQuery as any).toString()
+})
+// const queryString = new URLSearchParams(filteredQuery as any).toString();
+watch([isoDate, selectedCourse, selectedGroup, building], () => {
+    updateQueryParams();
+
+}, { deep: true });
+
+
+
 
 watch(building, () => {
     course.value = null
@@ -117,6 +135,10 @@ watch(course, () => {
 })
 
 onMounted(() => {
+    const filteredQuery = Object.fromEntries(
+        Object.entries(route.query).filter(([key, value]) => value !== null && value !== undefined)
+    );
+    queryString.value = new URLSearchParams(filteredQuery as any).toString()
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
 
     if (route.query.date && dateRegex.test(route.query.date as string)) {
@@ -210,13 +232,17 @@ onBeforeUnmount(() => {
         resizeObserver.unobserve(headerRef.value);
     }
 });
+
+
+
+
 </script>
 
 <template>
     <div class="max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
-        <RouterLink title="В панель управления" v-if="isAuth"
+        <a title="В панель управления" v-if="isAuth"
             class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
-            to="/admin/schedules/changes"></RouterLink>
+            :href="`/admin/schedules/changes?${queryString}`"></a>
         <div ref="headerRef"
             class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex items-center justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
             <div class="flex  flex-wrap gap-2 items-start w-full">
@@ -252,8 +278,10 @@ onBeforeUnmount(() => {
                     </Skeleton>
                 </div>
                 <span v-else-if="isFetched && !schedulesChanges?.schedules.length" class="text-2xl text-center">Группы
+                    на
+                    выбранную дату
                     не
-                    найдены</span>
+                    найдены...</span>
                 <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
                 <ScheduleItem v-else class="schedule" v-for="item in schedulesChanges?.schedules" :date="isoDate"
                     :schedule="item?.schedule" :semester="item?.semester" :type="item?.schedule?.type"
@@ -262,31 +290,30 @@ onBeforeUnmount(() => {
                 </ScheduleItem>
             </div>
         </div>
-        <div class="flex flex-col gap-4">
-            <h1 class="text-2xl font-bold text-center ">Звонки</h1>
+        <div class="flex flex-col gap-2">
+            <h1 class="text-2xl font-bold text-center py-2  ">Звонки</h1>
             <div class="">
                 <h2 class="text-xl text-center text-red-300" v-if="!building">Необходимо выбрать корпус</h2>
-                <h2 class="text-2xl text-center" v-else-if="!publicBells && isFetchedBells">На эту дату расписание
+                <h2 class="text-2xl text-center " v-else-if="!publicBells && isFetchedBells">На эту дату расписание
                     звонков не
                     найдено
                 </h2>
                 <div v-if="publicBells" class="flex justify-center items-center ">
-                    <div
-                        class="overflow-x-auto rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
+                    <div class="overflow-x-auto rounded-md">
                         <table class="min-w-full border-collapse table-auto">
-                            <thead>
+                            <!-- <thead>
                                 <tr>
                                     <th
                                         class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
-                                        №</th>
+                                        № пары</th>
                                     <th
                                         class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
-                                        Начало</th>
+                                        График</th>
                                     <th
                                         class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
                                         Конец</th>
                                 </tr>
-                            </thead>
+                            </thead> -->
                             <tbody>
                                 <PublicRowPeriodBell :key="period.id" v-for="period in publicBells?.periods"
                                     :period="period">

@@ -13,7 +13,7 @@ return new class () extends Migration {
         Schema::create('buildings', function (Blueprint $table) {
             // Устанавливаем поле name как первичный ключ
             $table->string('name')->primary();
-            $table->string('location');  // Местоположение корпуса
+            $table->string('location')->nullable();  // Местоположение корпуса
             $table->timestamps();
         });
     }

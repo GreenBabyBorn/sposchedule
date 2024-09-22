@@ -30,20 +30,47 @@ export function useStoreSchedule() {
   return updateSemesterMutation;
 }
 
-export function useChangesSchedulesQuery(date, course) {
-  const enabled = computed(() => Boolean(date.value));
+export function useChangesSchedulesQuery(
+  date,
+  building,
+  course,
+  selectedGroup
+) {
+  const enabled = computed(() => Boolean(date?.value || building?.value));
 
   return useQuery({
     enabled: enabled,
-    queryKey: ['scheduleChanges', date, course],
+
+    queryKey: ['scheduleChanges', date, building, course, selectedGroup],
     retry: 0,
-    queryFn: async () =>
-      (
-        await axios.get(
-          `/api/schedules/changes?date=${date.value}&course=${course.value || ''}`
-        )
-      ).data,
+    queryFn: async () => {
+      // Формируем параметры запроса в зависимости от их наличия
+      const queryParams = new URLSearchParams();
+      if (date?.value) queryParams.append('date', date.value);
+      if (building?.value) queryParams.append('building', building.value);
+      if (course?.value) queryParams.append('course', course.value);
+      if (selectedGroup?.value)
+        queryParams.append('group', selectedGroup.value);
+
+      // Выполняем запрос с параметрами
+      return (
+        (await axios.get(`/api/schedules/changes?${queryParams.toString()}`))
+          .data || []
+      );
+    },
   });
+  // return useQuery({
+  //   enabled: enabled,
+  //   queryKey: ['scheduleChanges', date, course],
+  //   retry: 0,
+  //   // staleTime: 300000,
+  //   queryFn: async () =>
+  //     (
+  //       await axios.get(
+  //         `/api/schedules/changes?date=${date.value}&course=${course.value || ''}`
+  //       )
+  //     ).data,
+  // });
 }
 
 export function usePrintChangesSchedulesQuery(date) {

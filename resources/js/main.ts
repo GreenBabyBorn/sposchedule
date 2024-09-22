@@ -1,17 +1,17 @@
 import '../css/app.css';
-import router from './router';
+import axios from 'axios';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
+import router from './router';
 import PrimeVue from 'primevue/config';
 import Aura from './presets/Aura';
 import App from './App.vue';
-import ToastService from 'primevue/toastservice';
-import { VueQueryPlugin, QueryClient } from '@tanstack/vue-query';
-import { locale } from './locale';
 import '@tanstack/vue-query';
-import type { AxiosError } from 'axios';
-import axios from 'axios';
+import ToastService from 'primevue/toastservice';
+import { VueQueryPlugin } from '@tanstack/vue-query';
+import { locale } from './locale';
 import ConfirmationService from 'primevue/confirmationservice';
+import type { AxiosError } from 'axios';
 
 declare module '@tanstack/vue-query' {
   interface Register {
@@ -48,14 +48,15 @@ axios.interceptors.response.use(
 const pinia = createPinia();
 
 createApp(App)
-  .use(pinia)
-  .use(VueQueryPlugin)
-  .use(ToastService)
+  .use(pinia) // Глобальное хранилище
+  .use(router) // Регистрация маршрутизации
+  .use(VueQueryPlugin) // Плагин для данных
   .use(PrimeVue, {
+    // Компоненты UI с настройками
     unstyled: true,
     pt: Aura,
     locale,
   })
-  .use(ConfirmationService)
-  .use(router)
+  .use(ToastService) // Зависит от PrimeVue
+  .use(ConfirmationService) // Зависит от PrimeVue
   .mount('#app');

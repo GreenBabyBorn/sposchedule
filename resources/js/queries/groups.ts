@@ -11,6 +11,7 @@ export function useGroupsQuery(name?, building?, course?) {
   return useQuery({
     enabled: enabled,
     queryKey: ['groups', name, building, course],
+    staleTime: 300000,
     queryFn: async () => {
       const queryParams = new URLSearchParams();
       if (name?.value) queryParams.append('name', name.value);
@@ -71,7 +72,7 @@ export function useDestroyGroup() {
   let destroyGroupMutation = useMutation({
     mutationFn: id => axios.delete(`/api/groups/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['groups'], exact: true });
+      queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
   });
   return destroyGroupMutation;

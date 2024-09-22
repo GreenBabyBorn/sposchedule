@@ -19,4 +19,5 @@ export enum RouteNamesEnum {
   user = 'user',
   auth = 'auth',
   bells = 'bells',
+  buildings = 'buildings',
 }

@@ -3,7 +3,7 @@ import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { computed } from 'vue';
 
-export function useBuildingsQuery(name?) {
+export function useBuildingsQuery() {
   return useQuery({
     queryKey: ['buildings'],
     queryFn: useDebounceFn(
@@ -11,4 +11,38 @@ export function useBuildingsQuery(name?) {
       300
     ),
   });
+}
+
+export function useStoreBuilding() {
+  const queryClient = useQueryClient();
+  let storeBuildingMutation = useMutation({
+    mutationFn: (body: object) => axios.post('/api/buildings', body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['buildings'] });
+    },
+  });
+  return storeBuildingMutation;
+}
+
+export function useUpdateBuilding() {
+  const queryClient = useQueryClient();
+  let updateuildingMutation = useMutation({
+    mutationFn: ({ name, body }: any) =>
+      axios.patch(`/api/buildings/${name}`, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['buildings'] });
+    },
+  });
+  return updateuildingMutation;
+}
+
+export function useDestroyBuilding() {
+  const queryClient = useQueryClient();
+  let destroyuildingMutation = useMutation({
+    mutationFn: name => axios.delete(`/api/buildings/${name}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['buildings'] });
+    },
+  });
+  return destroyuildingMutation;
 }

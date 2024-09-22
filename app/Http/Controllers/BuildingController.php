@@ -10,7 +10,7 @@ class BuildingController extends Controller
     // Получение всех корпусов
     public function index()
     {
-        return Building::all();
+        return Building::orderBy('name', )->get();
     }
 
     // Создание нового корпуса
@@ -18,7 +18,7 @@ class BuildingController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:buildings,name',
-            'location' => 'required|string|max:255',
+            'location' => 'string|max:255',
         ]);
 
         $building = Building::create($validatedData);

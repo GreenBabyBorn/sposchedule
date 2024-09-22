@@ -432,7 +432,8 @@ const hideAddNewLesson = ref(false)
             </table>
             <div class="mt-2 flex items-center justify-center">
                 <Button label="Новая пара" title="Открыть форму для добавления пары" size="small" outlined
-                    severity="secondary" class="w-full" @click="hideAddNewLesson = !hideAddNewLesson"
+                    severity="secondary" class="w-full text-surface-800 dark:text-white/80"
+                    @click="hideAddNewLesson = !hideAddNewLesson"
                     :icon="!hideAddNewLesson ? 'pi pi-angle-down' : 'pi pi-angle-up'"></Button>
             </div>
         </div>

@@ -2,7 +2,7 @@
 import { toRef } from 'vue';
 
 const props = defineProps({
-    group_name: { required: true, type: String },
+    group_name: { required: true, type: [String, null] },
     date: { required: false },
     week_type: { required: false },
     type: { required: true },
@@ -55,7 +55,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                 </tr>
             </thead> -->
             <tbody>
-                <template v-for="item in lessons">
+                <template :key="item.index" v-for="item in lessons">
                     <tr class="">
                         <td class="p-2"><span class=" font-medium text-surface-800 dark:text-white/80">
                                 {{ item.index }}

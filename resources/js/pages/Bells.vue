@@ -3,7 +3,7 @@ import { usePublicBellsQuery } from '@/queries/bells';
 import { useDateFormat } from '@vueuse/core';
 import Select from 'primevue/select';
 import { computed, ref, watch } from 'vue';
-import PublicRowPeriodBell from '@/components/PublicRowPeriodBell.vue';
+import PublicRowPeriodBell from '@/components/bells/PublicRowPeriodBell.vue';
 
 const building = ref(1)
 const buildings = ref([

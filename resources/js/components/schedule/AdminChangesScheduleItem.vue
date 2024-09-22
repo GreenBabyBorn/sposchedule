@@ -1,16 +1,23 @@
 <script setup lang="ts">
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
 import MultiSelect from 'primevue/multiselect';
+
 import Select from 'primevue/select';
-import { useSubjectsQuery } from '@/queries/subjects';
-import { useTeachersQuery } from '@/queries/teachers';
+
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import Button from 'primevue/button';
+
+
+// import { useSubjectsQuery } from '@/queries/subjects';
+// import { useTeachersQuery } from '@/queries/teachers';
 import { useFromMainToChangesSchedule, useStoreSchedule, useStoreScheduleChange, useUpdateSchedule } from '@/queries/schedules';
 import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/lessons';
 import { useToast } from 'primevue/usetoast';
-import { reactive, ref, toRef, watch } from 'vue';
+import { onUpdated, reactive, ref, toRef, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
-import Textarea from 'primevue/textarea';
+
+
+import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
 
 const toast = useToast();
 const props = defineProps({
@@ -22,25 +29,31 @@ const props = defineProps({
     lessons: { required: true },
     schedule: { required: true, type: Object },
     published: { required: false, type: Boolean },
+    teachers: { required: true },
+    subjects: { required: true }
 })
 const lessons: any = toRef<any>(() => props.lessons)
+const teachers: any = toRef<any>(() => props.teachers)
+const subjects: any = toRef<any>(() => props.subjects)
+
+// const {  teachers, subjects } = toRef<any>(props).value
+// const lessons: any = ref(props.lessons)
+// const teachers: any = ref(props.teachers)
+// const subjects: any = ref(props.subjects)
+
 const published = ref(props.published)
 
 watch(() => props.published, (newValue) => {
     published.value = newValue
 })
 
-const { data: subjects } = useSubjectsQuery()
-const { data: teachers } = useTeachersQuery()
-
 const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson()
-
 
 const { mutateAsync: fromMainToChangesSchedule, data: newChanges } = useFromMainToChangesSchedule()
 async function editLesson(item) {
     if (!item.id) return
-    if (!item.message == (!item.cabinet || !item.building || !item.subject)) return
-    console.log(item)
+    if (!item.message == (!item.building || !item.subject)) return
+    // console.log(item)
     if (props.type === 'main') {
         try {
             await fromMainToChangesSchedule({
@@ -240,25 +253,26 @@ function handlenewLessonMessage() {
         })
     }
 }
+
 </script>
 
 <template>
     <div class="schedule-item">
         <div class="p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center"> <span
                 class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
-                    props.group.name }}</span>
-            <span>{{ props.week_type }}</span>
+                    props?.group?.name }}</span>
+            <span>{{ props?.week_type }}</span>
             <div v-if="props.type !== 'main'" class="">
                 <ToggleButton @change="handlePublished" :disabled="!lessons" v-model="published" class="text-sm" fluid
                     onLabel="Снять с публикации" offLabel="Опубликовать" />
             </div>
             <span :class="{
-                'text-green-400 ': props.type
+                'text-green-400 ': props?.type
                     !== 'main',
-                'text-surface-400 ': props.type
+                'text-surface-400 ': props?.type
                     === 'main'
             }" class="text-sm text-right  py-1 px-2 rounded-lg ">{{
-                props.type
+                props?.type
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
         </div>
         <table class="schedule-table dark:bg-surface-900">
@@ -283,49 +297,13 @@ function handlenewLessonMessage() {
                 </tr>
             </thead>
             <tbody>
-                <template v-for="item in lessons">
-                    <tr>
-                        <td><span class="text-xl font-medium text-surface-800 dark:text-white/80">
-                                {{ item.index }}
-                            </span></td>
-                        <td v-show="item.message" colspan="3/1">
-                            <div class="table-subrow">
-                                <Textarea @change="editLesson(item)" v-model="item.message"
-                                    placeholder="Введите сообщение для группы" class="w-full"></Textarea>
-                            </div>
-                        </td>
-                        <td v-show="!item.message">
-                            <div v-if="item.id" class="table-subrow"><Select filter @change="editLesson(item)"
-                                    v-model="item.subject" class="w-full text-left" :options="subjects"
-                                    optionLabel="name"></Select>
-                            </div>
-                            <div class="table-subrow" v-if="item.id">
-                                <MultiSelect placeholder="Выберите преподавателя" @change="editLesson(item)"
-                                    v-model="item.teachers" class="w-full" :options="teachers" optionLabel="name">
-                                </MultiSelect>
-                            </div>
-                        </td>
-                        <td v-show="!item.message">
-                            <div class="table-subrow" v-if="item.id">
-                                <InputText class="w-full" @change="editLesson(item)" v-model="item.building" />
-                            </div>
-                        </td>
-                        <td v-show="!item.message">
-                            <div class="table-subrow" v-if="item.id">
-                                <InputText class="w-full" @change="editLesson(item)" v-model="item.cabinet" />
-                            </div>
-                        </td>
-                        <td>
-                            <div class="table-subrow" v-if="item.id">
-                                <Button text :disabled="!item.cabinet || !item.building || !item.subject"
-                                    icon="pi pi-check" v-if="!item.id" />
-
-                                <Button text @click="removeLesson(item.id)" icon="pi pi-trash" severity="danger"
-                                    v-if="item.id" />
-                            </div>
-                        </td>
-                    </tr>
+                <template :key="lesson.id" v-for="lesson in lessons">
+                    <AdminChangesScheduleItemRow :subjects="subjects" :teachers="teachers" @removeLesson="removeLesson"
+                        @editLesson="editLesson" :lesson="lesson" />
                 </template>
+
+
+
                 <tr v-show="hideAddNewLesson">
                     <td>
                         <InputText size="small" class="w-full text-center" v-model="newLesson.index" />
@@ -334,18 +312,18 @@ function handlenewLessonMessage() {
                     <td v-show="newLessonMessageState" colspan="3/1">
                         <div class="table-subrow">
                             <Textarea v-model="newLesson.message" placeholder="Введите сообщение для группы"
-                                class="w-full"></Textarea>
+                                class="w-full" />
                         </div>
                     </td>
                     <td v-show="!newLessonMessageState">
                         <div class="table-subrow"><Select :autoFilterFocus="true" filter placeholder="Предмет"
                                 v-model="newLesson.subject" class="w-full text-left" :options="subjects"
-                                optionLabel="name"></Select>
+                                optionLabel="name" />
                         </div>
                         <div class="table-subrow">
                             <MultiSelect :autoFilterFocus="true" filter placeholder="Преподаватели"
-                                v-model="newLesson.teachers" class="w-full" :options="teachers" optionLabel="name">
-                            </MultiSelect>
+                                v-model="newLesson.teachers" class="w-full" :options="teachers" optionLabel="name" />
+
                         </div>
                     </td>
 
@@ -363,7 +341,7 @@ function handlenewLessonMessage() {
                     <td>
                         <div class="table-subrow">
                             <Button
-                                :disabled="!newLessonMessageState && (!newLesson.index || !newLesson.building || !newLesson.cabinet || !newLesson.subject) || newLessonMessageState && !newLesson.message"
+                                :disabled="!newLessonMessageState && (!newLesson.index || !newLesson.building || !newLesson.subject) || newLessonMessageState && !newLesson.message"
                                 @click="addNewLesson()" text icon="pi pi-save" />
                             <Button @click="handlenewLessonMessage"
                                 :title="`${newLessonMessageState ? 'Переключиться на обычную пару' : 'Переключиться на комментарий'}`"
@@ -371,14 +349,13 @@ function handlenewLessonMessage() {
                         </div>
                     </td>
                 </tr>
-
             </tbody>
         </table>
         <div class="mt-2 flex items-center justify-center">
             <Button label="Новая пара" title="Открыть форму для добавления пары" size="small" outlined
-                severity="secondary" class="w-full" @click="hideAddNewLesson = !hideAddNewLesson"
+                severity="secondary" class="w-full text-surface-800 dark:text-white/80"
+                @click="hideAddNewLesson = !hideAddNewLesson"
                 :icon="!hideAddNewLesson ? 'pi pi-angle-down' : 'pi pi-angle-up'"></Button>
-
         </div>
     </div>
 </template>

@@ -145,7 +145,7 @@ const addGroup = async () => {
 const confirm = useConfirm();
 
 
-const { mutateAsync: destroySubject, isPending: isDestroyed } = useDestroyGroup()
+const { mutateAsync: destroyGroup, isPending: isDestroyed } = useDestroyGroup()
 
 
 const confirmDelete = () => {
@@ -177,7 +177,7 @@ const deleteGroups = async () => {
 
     for (let i = 0; i < selectedGroups.value.length; i++) {
         try {
-            await destroySubject(selectedGroups.value[i].id)
+            await destroyGroup(selectedGroups.value[i].id)
         }
         catch (e) {
             toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });

@@ -10,9 +10,10 @@ import Button from 'primevue/button';
 import { useCoursesQuery } from '@/queries/schedules';
 import { useDateFormat } from '@vueuse/core';
 import { useToast } from 'primevue/usetoast';
-import RowPeriodBell from '../../components/RowPeriodBell.vue';
+import RowPeriodBell from '../../components/bells/AdminRowPeriodBell.vue';
 import { useBellsStore } from '@/stores/bells';
 import { storeToRefs } from 'pinia';
+import { useBuildingsQuery } from '@/queries/buildings';
 
 
 const toast = useToast();
@@ -71,32 +72,39 @@ const date = ref(new Date())
 
 
 const building = ref(1)
-const buildings = ref([
-    {
-        value: 1,
-        label: '1 корпус',
-    },
-    {
-        value: 2,
-        label: '2 корпус',
-    },
-    {
-        value: 3,
-        label: '3 корпус',
-    },
-    {
-        value: 4,
-        label: '4 корпус',
-    },
-    {
-        value: 5,
-        label: '5 корпус',
-    },
-    {
-        value: 6,
-        label: '6 корпус',
-    },
-])
+const { data: buildingsFethed } = useBuildingsQuery()
+const buildings = computed(() => {
+    return buildingsFethed.value?.map(building => ({
+        value: building.name,
+        label: `${building.name} корпус`,
+    })) || [];
+})
+// const buildings = ref([
+//     {
+//         value: 1,
+//         label: '1 корпус',
+//     },
+//     {
+//         value: 2,
+//         label: '2 корпус',
+//     },
+//     {
+//         value: 3,
+//         label: '3 корпус',
+//     },
+//     {
+//         value: 4,
+//         label: '4 корпус',
+//     },
+//     {
+//         value: 5,
+//         label: '5 корпус',
+//     },
+//     {
+//         value: 6,
+//         label: '6 корпус',
+//     },
+// ])
 
 
 const formattedDate = computed(() => {
@@ -302,7 +310,7 @@ const showAddNewBellPeriod = ref(false)
             <div class="mt-2 flex items-center justify-center">
                 <Button label="Новый звонок" title="Открыть форму для добавления звонка" size="small" outlined
                     severity="secondary" class="w-full" @click="showAddNewBellPeriod = !showAddNewBellPeriod"
-                    :icon="{ 'pi pi-angle-down': !showAddNewBellPeriod, 'pi pi-angle-up': showAddNewBellPeriod }"></Button>
+                    :icon="!showAddNewBellPeriod ? 'pi pi-angle-down' : 'pi pi-angle-up'"></Button>
             </div>
         </div>
     </div>

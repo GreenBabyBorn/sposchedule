@@ -11,6 +11,7 @@ import TeachersView from '../pages/admin/Teachers.vue';
 import SchedulesView from '../pages/admin/MainSchedules.vue';
 import SchedulesChanges from '../pages/admin/ChangesSchedules.vue';
 import SemestersView from '../pages/admin/Semesters.vue';
+import BuildingsView from '../pages/admin/Buildings.vue';
 import UserView from '../pages/admin/User.vue';
 import AuthView from '../pages/Login.vue';
 import Bells from '../pages/admin/Bells.vue';
@@ -48,11 +49,11 @@ const router = createRouter({
         layout: AppLayoutsEnum.default,
       },
     },
-    {
-      path: '/bells',
-      component: BellsView,
-      meta: { title: 'Звонки', layout: AppLayoutsEnum.public },
-    },
+    // {
+    //   path: '/bells',
+    //   component: BellsView,
+    //   meta: { title: 'Звонки', layout: AppLayoutsEnum.public },
+    // },
     {
       path: '/admin/login',
       name: RouteNamesEnum.auth,
@@ -132,6 +133,15 @@ const router = createRouter({
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Семестры',
+      },
+    },
+    {
+      path: '/admin/buildings',
+      name: RouteNamesEnum.buildings,
+      component: BuildingsView,
+      meta: {
+        layout: AppLayoutsEnum.admin,
+        title: 'Корпуса',
       },
     },
   ],

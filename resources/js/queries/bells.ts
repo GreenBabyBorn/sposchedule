@@ -59,6 +59,7 @@ export function usePublicBellsQuery(building, date) {
   return useQuery({
     queryKey: ['bells', date, building],
     enabled: enabled,
+    retry: 0,
     queryFn: async () => {
       const queryParams = new URLSearchParams();
       if (building?.value) queryParams.append('building', building.value);

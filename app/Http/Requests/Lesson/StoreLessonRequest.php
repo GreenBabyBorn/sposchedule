@@ -45,7 +45,7 @@ class StoreLessonRequest extends FormRequest
             $rules = [
                 'subject_id' => 'required|exists:subjects,id',
                 'schedule_id' => 'required|exists:schedules,id',
-                'cabinet' => 'required|string|max:255',
+                'cabinet' => 'string|max:255',
                 'week_type' => ['nullable', Rule::in(['ЧИСЛ', 'ЗНАМ'])],
                 'index' => [
                     'required',
