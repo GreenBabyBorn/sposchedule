@@ -233,20 +233,16 @@ onBeforeUnmount(() => {
         resizeObserver.unobserve(headerRef.value);
     }
 });
-
-
-
-
 </script>
 
 <template>
     <div class="max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
         <RouterLink replace title="В панель управления" v-if="isAuth"
-            class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
+            class=" pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
             :to="{ path: '/admin/schedules/changes', query: queryString }"></RouterLink>
         <div ref="headerRef"
-            class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex items-center justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
-            <div class="flex  flex-wrap gap-2 items-start w-full">
+            class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap items-center justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
+            <div class="flex  flex-wrap gap-2 items-start">
                 <div class="flex flex-col md:w-auto w-full">
                     <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
                         v-model="date">
@@ -268,10 +264,19 @@ onBeforeUnmount(() => {
                 <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
                     v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name" placeholder="Группа"
                     class="w-full md:w-[10rem]" />
+
             </div>
+            <div class="flex  flex-col">
+                <span class="text-xs text-surface-400 leading-none text-nowrap">Последние обновление</span>
+                <time title="Последние обновление" class="text-sm text-right text-surface-400"
+                    :datetime="schedulesChanges?.last_updated">{{
+                        useDateFormat(schedulesChanges?.last_updated,
+                            'DD.MM.YYYY HH:mm') }}</time>
+            </div>
+
         </div>
         <div :style="{ marginTop: `${headerHeight + 10}px` }" class="flex flex-col gap-4">
-            <div class="">
+            <div class="schedules">
                 <div v-if="isLoading" v-for="item in 32" class="schedule">
                     <Skeleton height="2rem" class="mb-4">
                     </Skeleton>
@@ -284,13 +289,13 @@ onBeforeUnmount(() => {
                     не
                     найдены...</span>
                 <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
-                <div v-else-if="schedulesChanges?.schedules" class="schedules">
+                <template v-else-if="schedulesChanges?.schedules">
                     <ScheduleItem class="schedule" v-for="item in schedulesChanges?.schedules" :key="item?.id"
                         :date="isoDate" :schedule="item?.schedule" :semester="item?.semester"
                         :type="item?.schedule?.type" :group_name="item?.group_name" :lessons="item?.schedule?.lessons"
                         :week_type="item?.week_type" :published="item?.schedule?.published">
                     </ScheduleItem>
-                </div>
+                </template>
 
             </div>
         </div>

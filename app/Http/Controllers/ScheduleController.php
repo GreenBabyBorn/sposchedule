@@ -600,6 +600,135 @@ class ScheduleController extends Controller
 
     //     return response()->json($finalSchedules);
     // }
+    // public function getPublicSchedules(Request $request)
+    // {
+    //     // Получаем дату и преобразуем её в объект Carbon
+    //     $date = $request->input('date');
+    //     $carbonDate = Carbon::parse($date);
+
+    //     // Получаем день недели
+    //     $weekDayMapping = [
+    //         0 => 'ВС',
+    //         1 => 'ПН',
+    //         2 => 'ВТ',
+    //         3 => 'СР',
+    //         4 => 'ЧТ',
+    //         5 => 'ПТ',
+    //         6 => 'СБ',
+    //     ];
+    //     $weekDay = $weekDayMapping[$carbonDate->dayOfWeek];
+
+    //     // Получаем семестр для указанной даты
+    //     $semester = DB::table('semesters')
+    //         ->where('start', '<=', $carbonDate)
+    //         ->where('end', '>=', $carbonDate)
+    //         ->first();
+
+    //     if (!$semester) {
+    //         return response()->json([
+    //             'error' => 404,
+    //             'message' => 'Семестра на данную дату не найдено'
+    //         ], 404);
+    //     }
+
+    //     // Рассчитываем номер недели и тип недели
+    //     $semesterStart = Carbon::parse($semester->start);
+    //     $weekNumber = $semesterStart->diffInWeeks($carbonDate);
+    //     $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
+
+    //     // Основной SQL-запрос
+    //     $query = "
+    //         SELECT g.name as group_name,
+    //                s.id as schedule_id, s.week_day, s.type,
+    //                json_agg(
+    //                    json_build_object(
+    //                        'id', l.id,
+    //                        'index', l.index,
+    //                        'subject_name', subj.name,
+    //                        'week_type', l.week_type,
+    //                        'cabinet', l.cabinet,
+    //                        'building', l.building,
+    //                        'teachers', (
+    //                            SELECT json_agg(
+    //                                json_build_object(
+    //                                    'id', t.id,
+    //                                    'name', t.name
+    //                                )
+    //                            )
+    //                            FROM lesson_teacher lt
+    //                            JOIN teachers t ON lt.teacher_id = t.id
+    //                            WHERE lt.lesson_id = l.id
+    //                        )
+    //                    )
+    //                ) as lessons
+    //         FROM groups g
+    //         LEFT JOIN schedules s ON g.id = s.group_id
+    //         LEFT JOIN lessons l ON s.id = l.schedule_id
+    //         LEFT JOIN subjects subj ON l.subject_id = subj.id
+    //         WHERE s.published = true
+    //         AND (
+    //             (s.type = 'changes' AND s.date = :date)
+    //             OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
+    //         )
+    //     ";
+
+    //     // Массив параметров для SQL-запроса
+    //     $params = [
+    //         'date' => $carbonDate->toDateString(),
+    //         'week_day' => $weekDay,
+    //         'semester_id' => $semester->id,
+    //     ];
+
+    //     // Добавляем фильтры, если они присутствуют
+    //     if ($building = $request->input('building')) {
+    //         $query .= " AND g.building = :building ";
+    //         $params['building'] = $building;
+    //     }
+    //     if ($course = $request->input('course')) {
+    //         $query .= " AND g.course = :course ";
+    //         $params['course'] = $course;
+    //     }
+    //     if ($groupName = $request->input('group')) {
+    //         $query .= " AND g.name LIKE :group_name ";
+    //         $params['group_name'] = "%{$groupName}%";
+    //     }
+
+    //     // Завершаем запрос
+    //     $query .= "GROUP BY g.name, s.id ORDER BY s.type DESC";
+
+    //     // Выполняем SQL-запрос
+    //     $schedules = DB::select($query, $params);
+
+    //     // Преобразуем JSON в массив и возвращаем результат
+    //     $finalSchedules = [
+    //         'week_type' => $weekType,
+    //         'schedules' => []
+    //     ];
+
+    //     foreach ($schedules as $schedule) {
+    //         $schedule->lessons = json_decode($schedule->lessons, true);
+    //         usort($schedule->lessons, function ($a, $b) {
+    //             return $a['index'] <=> $b['index'];
+    //         });
+    //         // Добавляем расписание в результат
+    //         $finalSchedules['schedules'][] = [
+    //             'group_name' => $schedule->group_name,
+    //             'schedule' => [
+    //                 'week_day' => $schedule->week_day,
+    //                 'type' => $schedule->type,
+    //                 'lessons' => $schedule->lessons
+    //             ]
+    //         ];
+    //     }
+
+    //     // Сортировка расписаний с данными выше пустых
+    //     usort($finalSchedules['schedules'], function ($a, $b) {
+    //         return !empty($b['schedule']) <=> !empty($a['schedule']);
+    //     });
+
+    //     // Возвращаем результат
+    //     return response()->json($finalSchedules);
+    // }
     public function getPublicSchedules(Request $request)
     {
         // Получаем дату и преобразуем её в объект Carbon
@@ -638,39 +767,39 @@ class ScheduleController extends Controller
 
         // Основной SQL-запрос
         $query = "
-            SELECT g.name as group_name, 
-                   s.id as schedule_id, s.week_day, s.type, 
-                   json_agg(
-                       json_build_object(
-                           'id', l.id, 
-                           'index', l.index, 
-                           'subject_name', subj.name, 
-                           'week_type', l.week_type, 
-                           'cabinet', l.cabinet,
-                           'building', l.building,
-                           'teachers', (
-                               SELECT json_agg(
-                                   json_build_object(
-                                       'id', t.id, 
-                                       'name', t.name
-                                   )
+        SELECT g.name as group_name, 
+               s.id as schedule_id, s.week_day, s.type, s.updated_at,
+               json_agg(
+                   json_build_object(
+                       'id', l.id, 
+                       'index', l.index, 
+                       'subject_name', subj.name, 
+                       'week_type', l.week_type, 
+                       'cabinet', l.cabinet,
+                       'building', l.building,
+                       'teachers', (
+                           SELECT json_agg(
+                               json_build_object(
+                                   'id', t.id, 
+                                   'name', t.name
                                )
-                               FROM lesson_teacher lt
-                               JOIN teachers t ON lt.teacher_id = t.id
-                               WHERE lt.lesson_id = l.id
                            )
+                           FROM lesson_teacher lt
+                           JOIN teachers t ON lt.teacher_id = t.id
+                           WHERE lt.lesson_id = l.id
                        )
-                   ) as lessons
-            FROM groups g
-            LEFT JOIN schedules s ON g.id = s.group_id
-            LEFT JOIN lessons l ON s.id = l.schedule_id
-            LEFT JOIN subjects subj ON l.subject_id = subj.id
-            WHERE s.published = true
-            AND (
-                (s.type = 'changes' AND s.date = :date)
-                OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
-            )
-        ";
+                   )
+               ) as lessons
+        FROM groups g
+        LEFT JOIN schedules s ON g.id = s.group_id
+        LEFT JOIN lessons l ON s.id = l.schedule_id
+        LEFT JOIN subjects subj ON l.subject_id = subj.id
+        WHERE s.published = true
+        AND (
+            (s.type = 'changes' AND s.date = :date)
+            OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
+        )
+    ";
 
         // Массив параметров для SQL-запроса
         $params = [
@@ -702,6 +831,7 @@ class ScheduleController extends Controller
         // Преобразуем JSON в массив и возвращаем результат
         $finalSchedules = [
             'week_type' => $weekType,
+            'last_updated' => null, // инициализируем
             'schedules' => []
         ];
 
@@ -710,6 +840,12 @@ class ScheduleController extends Controller
             usort($schedule->lessons, function ($a, $b) {
                 return $a['index'] <=> $b['index'];
             });
+
+            // Обновляем last_updated
+            if (is_null($finalSchedules['last_updated']) || $schedule->updated_at > $finalSchedules['last_updated']) {
+                $finalSchedules['last_updated'] = $schedule->updated_at;
+            }
+
             // Добавляем расписание в результат
             $finalSchedules['schedules'][] = [
                 'group_name' => $schedule->group_name,
@@ -721,6 +857,16 @@ class ScheduleController extends Controller
             ];
         }
 
+
+        usort($finalSchedules['schedules'], function ($a, $b) {
+            if($a['schedule']['type'] === 'changes' && $b['schedule']['type'] !== 'changes') {
+                return -1;
+            } elseif($a['schedule']['type'] !== 'changes' && $b['schedule']['type'] === 'changes') {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
         // Сортировка расписаний с данными выше пустых
         usort($finalSchedules['schedules'], function ($a, $b) {
             return !empty($b['schedule']) <=> !empty($a['schedule']);
@@ -729,4 +875,5 @@ class ScheduleController extends Controller
         // Возвращаем результат
         return response()->json($finalSchedules);
     }
+
 }
