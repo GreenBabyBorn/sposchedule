@@ -266,7 +266,7 @@ onBeforeUnmount(() => {
                     class="w-full md:w-[10rem]" />
 
             </div>
-            <div class="flex  flex-col">
+            <div v-if="schedulesChanges?.last_updated" class="flex  flex-col">
                 <span class="text-xs text-surface-400 leading-none text-nowrap">Последние обновление</span>
                 <time title="Последние обновление" class="text-sm text-right text-surface-400"
                     :datetime="schedulesChanges?.last_updated">{{
