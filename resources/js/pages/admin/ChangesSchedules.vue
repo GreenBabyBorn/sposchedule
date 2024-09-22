@@ -62,8 +62,8 @@ const updateQueryParams = () => {
         query: {
             ...route.query,
             date: isoDate.value || null,
-            course: selectedCourse.value || null,
             building: building.value || null,
+            course: selectedCourse.value || null,
             group: selectedGroup.value || null,
         },
     });
@@ -73,13 +73,37 @@ const updateQueryParams = () => {
     // localStorage.value.course = selectedCourse.value; 2
 };
 
-let initialized = ref(false);
+const { data: changesSchedules, isFetched, error, isError, isLoading } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
+
+
+
+watch(changesSchedules, (newData) => {
+
+    if (newData) {
+        setSchedulesChanges(newData);
+    }
+},
+    { deep: true }
+);
 
 watch([isoDate, building, selectedCourse, selectedGroup], () => {
-    if (initialized.value) {
-        updateQueryParams()
-    }
+
+    updateQueryParams()
+
 }, { deep: true });
+
+watch(building, () => {
+
+    course.value = null
+    selectedGroup.value = null
+
+}, { flush: 'sync' })
+
+watch(course, () => {
+
+    selectedGroup.value = null
+
+}, { flush: 'sync' })
 
 onMounted(() => {
     const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
@@ -100,7 +124,9 @@ onMounted(() => {
         // Если нет даты ни в query, ни в localStorage, используем текущую дату
         date.value = new Date();
     }
-
+    if (route.query.building) {
+        building.value = route.query.building as string;
+    }
     if (route.query.course) {
         // Если курс есть в query параметрах, используем его
         course.value = Number(route.query.course as string);
@@ -111,16 +137,14 @@ onMounted(() => {
         selectedGroup.value = route.query.group as string;
     }
 
-    if (route.query.building) {
-        building.value = route.query.building as string;
-    }
+
     // else if (localStorage.value.course) {
     //     // Если курса нет в query, используем из localStorage
     //     // course.value = localStorage.value.course;
     // }
 
     // Синхронизация параметров в URL
-    initialized.value = true;
+
     updateQueryParams();
 })
 
@@ -145,27 +169,6 @@ const buildings = computed(() => {
     })) || [];
 })
 
-watch(building, () => {
-    if (initialized.value) {
-        course.value = null
-        selectedGroup.value = null
-    }
-}, { flush: 'sync' })
-watch(course, () => {
-    if (initialized.value) {
-        selectedGroup.value = null
-    }
-}, { flush: 'sync' })
-const { data: changesSchedules, isFetched, error, isError, isLoading } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
-
-watch(changesSchedules, (newData) => {
-
-    if (newData) {
-        setSchedulesChanges(newData);
-    }
-},
-    { deep: true }
-);
 
 </script>
 
