@@ -58,7 +58,8 @@ const lessons: any = toRef<any>(() => props.lessons)
                 <template :key="item.index" v-for="item in lessons">
                     <tr class="">
                         <td class="p-2"><span class=" font-medium text-surface-800 dark:text-white/80">
-                                {{ item.index }}
+                                {{ `${item.index}${item.week_type === 'ЗНАМ' || item.week_type === 'ЧИСЛ' ? '*' :
+                                    ''}` }}
                             </span></td>
                         <td class="p-1" v-if="item.message" colspan="3/1">
                             <div class="table-subrow">
@@ -79,7 +80,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 <div class="flex flex-wrap gap-1 justify-start" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <span class="text-sm">{{ item.building }} корпус</span>
                             </div>

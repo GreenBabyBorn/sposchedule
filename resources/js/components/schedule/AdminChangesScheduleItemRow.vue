@@ -59,8 +59,7 @@ const editLesson = (lesson: any) => {
         </td>
         <td v-show="!lesson.message">
             <div v-if="lesson.id" class="table-subrow">
-                <!-- <input type="text" class="w-full text-slate-950" @change="editLesson(lesson)"
-                    v-model="lesson.building" /> -->
+
                 <InputText class="w-full" @change="editLesson(lesson)" v-model="lesson.building" />
             </div>
         </td>
