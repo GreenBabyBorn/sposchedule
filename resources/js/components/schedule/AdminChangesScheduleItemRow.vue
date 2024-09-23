@@ -40,8 +40,8 @@ const editLesson = (lesson: any) => {
             </span></td>
         <td v-show="lesson?.message" colspan="3/1">
             <div class="table-subrow">
-                <!-- <Textarea @change="editLesson(lesson)" v-model="lesson.message"
-                    placeholder="Введите сообщение для группы" class="w-full" /> -->
+                <Textarea @change="editLesson(lesson)" v-model="lesson.message"
+                    placeholder="Введите сообщение для группы" class="w-full" />
             </div>
         </td>
         <td v-if="!lesson?.message">

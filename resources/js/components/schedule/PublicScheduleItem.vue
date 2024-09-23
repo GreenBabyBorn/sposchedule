@@ -56,10 +56,12 @@ const lessons: any = toRef<any>(() => props.lessons)
             </thead> -->
             <tbody>
                 <template :key="item.index" v-for="item in lessons">
-                    <tr class="">
-                        <td class="p-2"><span class=" font-medium text-surface-800 dark:text-white/80">
-                                {{ `${item.index}${item.week_type === 'ЗНАМ' || item.week_type === 'ЧИСЛ' ? '*' :
-                                    ''}` }}
+                    <tr>
+                        <td class="p-2"><span class=" text-surface-800 dark:text-white/80">
+                                {{ item.index }}<span v-if="item.week_type === 'ЗНАМ' || item.week_type
+                                    === 'ЧИСЛ'" class="absolute text-sm">{{ item.week_type === 'ЗНАМ' || item.week_type
+                                        === 'ЧИСЛ' ? '*' :
+                                        '' }}</span>
                             </span></td>
                         <td class="p-1" v-if="item.message" colspan="3/1">
                             <div class="table-subrow">
