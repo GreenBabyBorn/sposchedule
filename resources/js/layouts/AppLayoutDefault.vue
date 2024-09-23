@@ -8,11 +8,6 @@ import Toast from 'primevue/toast';
   <slot />
 </template>
 <style>
-.page {
-  display: grid;
-  grid-template-rows: 1fr auto;
-}
-
 body {
   @apply bg-white dark:bg-surface-950;
 }

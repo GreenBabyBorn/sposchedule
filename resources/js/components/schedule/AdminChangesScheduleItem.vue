@@ -258,10 +258,12 @@ const isEdit = ref(false)
 
 <template>
     <div class="schedule-item">
-        <div class="p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center"> <span
-                @click="isEdit = !isEdit"
-                class="cursor-pointer text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
-                    props?.group?.name }}</span>
+        <div class="p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center">
+            <Button title="Редактировать" severity="secondary" @click="isEdit = !isEdit" text
+                icon="pi pi-pen-to-square"></Button>
+            <!-- <button class="pi pi-pen-to-square"></button> -->
+            <span class=" text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
+                props?.group?.name }}</span>
             <span>{{ props?.week_type }}</span>
             <div v-if="props.type !== 'main'" class="">
                 <ToggleButton @change="handlePublished" :disabled="!lessons" v-model="published" class="text-sm" fluid

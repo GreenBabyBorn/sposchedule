@@ -3,7 +3,7 @@ import DatePicker from 'primevue/datepicker';
 import ScheduleItem from '@/components/schedule/PublicScheduleItem.vue';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { useCoursesQuery, usePublicSchedulesQuery } from '@/queries/schedules';
-import { useDateFormat } from '@vueuse/core';
+import { useDateFormat, useDebounceFn } from '@vueuse/core';
 import { storeToRefs } from 'pinia';
 import router from '@/router';
 import { useRoute } from 'vue-router';
@@ -16,6 +16,7 @@ import { usePublicBellsQuery } from '@/queries/bells';
 import PublicRowPeriodBell from '@/components/bells/PublicRowPeriodBell.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBuildingsQuery } from '@/queries/buildings';
+import InputText from 'primevue/inputtext';
 
 const route = useRoute();
 const scheduleStore = useSchedulePublicStore();
@@ -30,7 +31,12 @@ const isoDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
 });
 
+const cabinet = ref('')
+const searchedCabinet = ref('')
 
+const debouncedCabinetFn = useDebounceFn(() => {
+    searchedCabinet.value = cabinet.value
+}, 500, { maxWait: 1000 })
 
 const coursesWithLabel = computed(() => {
     return courses.value?.map(course => ({
@@ -81,7 +87,7 @@ const { data: courses, isFetched: coursesFetched } = useCoursesQuery(building);
 //     },
 // ])
 
-const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
+const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup, searchedCabinet);
 
 const updateQueryParams = () => {
     router.replace({
@@ -264,6 +270,7 @@ onBeforeUnmount(() => {
                 <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
                     v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name" placeholder="Группа"
                     class="w-full md:w-[10rem]" />
+                <InputText @input="debouncedCabinetFn" v-model="cabinet" placeholder="Поиск по кабинету"></InputText>
 
             </div>
             <div v-if="schedulesChanges?.last_updated"

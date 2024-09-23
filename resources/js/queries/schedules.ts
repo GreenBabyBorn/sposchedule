@@ -135,14 +135,27 @@ export function useCoursesQuery(building?) {
     },
   });
 }
-export function usePublicSchedulesQuery(date, building, course, selectedGroup) {
+export function usePublicSchedulesQuery(
+  date,
+  building,
+  course,
+  selectedGroup,
+  searchedCabinet
+) {
   // Условие enabled проверяет только наличие параметра date
   const enabled = computed(() => Boolean(date?.value || building?.value));
 
   return useQuery({
     enabled: enabled,
 
-    queryKey: ['scheduleChanges', date, building, course, selectedGroup],
+    queryKey: [
+      'scheduleChanges',
+      date,
+      building,
+      course,
+      selectedGroup,
+      searchedCabinet,
+    ],
     retry: 0,
     queryFn: async () => {
       // Формируем параметры запроса в зависимости от их наличия
@@ -150,6 +163,8 @@ export function usePublicSchedulesQuery(date, building, course, selectedGroup) {
       if (date?.value) queryParams.append('date', date.value);
       if (building?.value) queryParams.append('building', building.value);
       if (course?.value) queryParams.append('course', course.value);
+      if (searchedCabinet?.value)
+        queryParams.append('cabinet', searchedCabinet.value);
       if (selectedGroup?.value)
         queryParams.append('group', selectedGroup.value);
 

@@ -8,8 +8,8 @@ import BellsView from '../pages/Bells.vue';
 import GroupsView from '../pages/admin/Groups.vue';
 import SubjectsView from '../pages/admin/Subjects.vue';
 import TeachersView from '../pages/admin/Teachers.vue';
-import SchedulesView from '../pages/admin/MainSchedules.vue';
-import SchedulesChanges from '../pages/admin/ChangesSchedules.vue';
+import SchedulesMainView from '../pages/admin/MainSchedules.vue';
+import SchedulesChangesView from '../pages/admin/ChangesSchedules.vue';
 import SemestersView from '../pages/admin/Semesters.vue';
 import BuildingsView from '../pages/admin/Buildings.vue';
 import UserView from '../pages/admin/User.vue';
@@ -46,7 +46,7 @@ const router = createRouter({
       path: '/print/changes',
       component: PrintView,
       meta: {
-        layout: AppLayoutsEnum.default,
+        layout: AppLayoutsEnum.empty,
       },
     },
     // {
@@ -93,7 +93,7 @@ const router = createRouter({
     {
       path: '/admin/schedules/main',
       name: RouteNamesEnum.schedules,
-      component: SchedulesView,
+      component: SchedulesMainView,
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Основное расписание',
@@ -102,7 +102,7 @@ const router = createRouter({
     {
       path: '/admin/schedules/changes',
       name: RouteNamesEnum.schedulesChanges,
-      component: SchedulesChanges,
+      component: SchedulesChangesView,
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Расписание',

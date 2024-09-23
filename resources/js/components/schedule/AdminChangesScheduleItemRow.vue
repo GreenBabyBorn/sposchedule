@@ -51,15 +51,15 @@ const editLesson = (lesson: any) => {
         <td v-if="!lesson?.message">
             <div v-if="lesson.subject" class="table-subrow">
                 <span v-if="!isEdit">{{ lesson.subject.name }}</span>
-                <Select v-else filter @change="editLesson(lesson)" v-model="lesson.subject" class="w-full text-left"
+                <Select v-model="lesson.subject" v-else filter @change="editLesson(lesson)" class="w-full text-left"
                     :options="subjects" option-label="name" />
             </div>
             <div v-if="lesson.teachers" class="table-subrow">
                 <div class="" v-if="!isEdit">
                     <span v-for="teacher in lesson.teachers">{{ teacher.name }}</span>
                 </div>
-                <MultiSelect v-else placeholder="Выберите преподавателя" @change="editLesson(lesson)"
-                    v-model="lesson.teachers" :options="teachers" class="w-full" option-label="name" />
+                <MultiSelect v-model="lesson.teachers" v-else placeholder="Выберите преподавателя"
+                    @change="editLesson(lesson)" :options="teachers" class="w-full" option-label="name" />
             </div>
         </td>
         <td v-show="!lesson.message">
@@ -77,8 +77,8 @@ const editLesson = (lesson: any) => {
         <td v-if="isEdit">
             <div class="table-subrow">
 
-                <Button text :disabled="!lesson?.cabinet || !lesson?.building || !lesson?.subject" icon="pi pi-check"
-                    v-if="!lesson?.id && isEdit" />
+                <!-- <Button text :disabled="!lesson?.cabinet || !lesson?.building || !lesson?.subject" icon="pi pi-check"
+                    v-if="!lesson?.id && isEdit" /> -->
 
                 <Button text @click="removeLesson(lesson?.id)" icon="pi pi-trash" severity="danger"
                     v-if="lesson?.id && isEdit" />
