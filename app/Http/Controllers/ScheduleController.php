@@ -837,7 +837,18 @@ class ScheduleController extends Controller
 
         foreach ($schedules as $schedule) {
             $schedule->lessons = json_decode($schedule->lessons, true);
-            usort($schedule->lessons, function ($a, $b) {
+
+            // Фильтруем пары по текущему типу недели (ЧИСЛ или ЗНАМ)
+            $filteredLessons = [];
+            foreach ($schedule->lessons as $lesson) {
+                // Если тип недели совпадает с текущим или занятие проводится каждую неделю
+                if ($lesson['week_type'] === $weekType || $lesson['week_type'] === null) {
+                    $filteredLessons[] = $lesson;
+                }
+            }
+
+            // Сортируем занятия по индексу
+            usort($filteredLessons, function ($a, $b) {
                 return $a['index'] <=> $b['index'];
             });
 
@@ -852,7 +863,7 @@ class ScheduleController extends Controller
                 'schedule' => [
                     'week_day' => $schedule->week_day,
                     'type' => $schedule->type,
-                    'lessons' => $schedule->lessons
+                    'lessons' => $filteredLessons // Используем отфильтрованные занятия
                 ]
             ];
         }

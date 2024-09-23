@@ -11,7 +11,7 @@ export function useGroupsQuery(name?, building?, course?) {
   return useQuery({
     enabled: enabled,
     queryKey: ['groups', name, building, course],
-    staleTime: 300000,
+    // staleTime: 300000,
     queryFn: async () => {
       const queryParams = new URLSearchParams();
       if (name?.value) queryParams.append('name', name.value);

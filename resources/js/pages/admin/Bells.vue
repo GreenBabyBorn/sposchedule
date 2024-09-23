@@ -72,7 +72,7 @@ const date = ref(new Date())
 
 
 const { data: buildingsFethed } = useBuildingsQuery()
-const building = ref('')
+const building = ref(null)
 
 const buildings = computed(() => {
     return buildingsFethed.value?.map(building => ({
@@ -117,6 +117,11 @@ const { data, isSuccess } = useBellsQuery(type, building, weekDay, formattedDate
 const bellsStore = useBellsStore()
 const { bells } = storeToRefs(bellsStore)
 const { setBells } = bellsStore
+
+onMounted(() => {
+    building.value = buildingsFethed.value?.[0].name
+})
+
 watch(buildingsFethed, () => {
     building.value = buildingsFethed.value?.[0].name
 })

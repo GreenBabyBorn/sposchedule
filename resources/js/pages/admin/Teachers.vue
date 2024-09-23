@@ -146,12 +146,12 @@ const filters = ref({
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
-                <Column field="name" header="ФИО" style="width: 10%">
+                <Column field="name" header="ФИО">
                     <template #editor="{ data, field }">
                         <InputText class="w-full" v-model="data[field]" />
                     </template>
                 </Column>
-                <Column field="subjects" header="Предметы" style="width: 10%">
+                <Column field="subjects" header="Предметы">
                     <template #body="slotProps">
                         <div class="flex gap-2 flex-wrap">
                             <Chip v-for="subject in slotProps.data.subjects" :label="subject.name" />

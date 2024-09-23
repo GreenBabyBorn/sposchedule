@@ -125,23 +125,23 @@ const minDate = ref(new Date());
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="years" header="Учебный год" style="width: 20%">
+                <Column field="years" header="Учебный год">
                     <template #editor="{ data, field }">
                         <InputText v-model="data[field]" />
                     </template>
                 </Column>
-                <Column field="index" header="Семестр" style="width: 5%">
+                <Column field="index" header="Семестр">
                     <template #editor="{ data, field }">
                         <InputNumber v-model="data[field]" inputId="minmax-buttons" mode="decimal" showButtons :min="0"
                             :max="100" fluid />
                     </template>
                 </Column>
-                <Column field="start" header="Начало семестра" style="width: 20%">
+                <Column field="start" header="Начало семестра">
                     <template #body="slotProps">
                         {{ useDateFormat(slotProps.data.start, 'DD.MM.YY') }}
                     </template>
                 </Column>
-                <Column field="end" header="Конец семестра" style="width: 20%">
+                <Column field="end" header="Конец семестра">
                     <template #body="slotProps">
                         {{ useDateFormat(slotProps.data.end, 'DD.MM.YY') }}
                     </template>

@@ -148,13 +148,13 @@ const filters = ref({
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="name" header="Название предмета" style="width: 40%">
+                <Column field="name" header="Название предмета">
                     <template #editor="{ data, field }">
                         <InputText v-model="data[field]" />
                     </template>
                 </Column>
 
-                <Column field="updated_at" header="Дата изменения" style="width: 20%">
+                <Column field="updated_at" header="Дата изменения">
                     <template #body="slotProps">
                         {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}
                     </template>

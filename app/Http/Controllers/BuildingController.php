@@ -18,7 +18,7 @@ class BuildingController extends Controller
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255|unique:buildings,name',
-            'location' => 'string|max:255',
+            'location' => 'nullable|string|max:255',
         ]);
 
         $building = Building::create($validatedData);
