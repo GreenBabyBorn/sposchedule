@@ -266,8 +266,9 @@ onBeforeUnmount(() => {
                     class="w-full md:w-[10rem]" />
 
             </div>
-            <div v-if="schedulesChanges?.last_updated" class="flex  flex-col">
-                <span class="text-xs text-surface-400 leading-none text-nowrap">Последние обновление</span>
+            <div v-if="schedulesChanges?.last_updated"
+                class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap">
+                <span class="text-xs text-surface-400 leading-none text-nowrap">Последние обновление:</span>
                 <time title="Последние обновление" class="text-sm text-right text-surface-400"
                     :datetime="schedulesChanges?.last_updated">{{
                         useDateFormat(schedulesChanges?.last_updated,
@@ -349,5 +350,14 @@ onBeforeUnmount(() => {
     /* Центрирование */
     width: 300px;
     /* Установите минимальную или фиксированную ширину */
+}
+
+@media screen and (max-width: 768px) {
+    .schedules>*:only-child {
+        justify-self: center;
+        /* Центрирование */
+        width: 100%;
+        /* Установите минимальную или фиксированную ширину */
+    }
 }
 </style>
