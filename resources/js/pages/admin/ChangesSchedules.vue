@@ -73,7 +73,7 @@ const updateQueryParams = () => {
     // localStorage.value.course = selectedCourse.value; 2
 };
 
-const { data: changesSchedules, isFetched, error, isError, isLoading } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
+const { data: changesSchedules, isFetchedAfterMount, error, isError, isLoading } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
 
 
 
@@ -209,11 +209,13 @@ const buildings = computed(() => {
                 <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
             </span>
 
+
             <ChangesScheduleItem :key="index" :subjects="subjects" :teachers="teachers" class="schedule"
                 v-for="(item, index) in schedulesChanges?.schedules" :date="isoDate" :schedule="item?.schedule"
                 :semester="item?.semester" :type="item?.schedule?.type" :group="item?.group"
                 :lessons="item?.schedule?.lessons" :week_type="item?.week_type" :published="item?.schedule?.published">
             </ChangesScheduleItem>
+
         </div>
     </div>
 </template>

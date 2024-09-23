@@ -253,13 +253,14 @@ function handlenewLessonMessage() {
         })
     }
 }
-
+const isEdit = ref(false)
 </script>
 
 <template>
     <div class="schedule-item">
         <div class="p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center"> <span
-                class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
+                @click="isEdit = !isEdit"
+                class="cursor-pointer text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
                     props?.group?.name }}</span>
             <span>{{ props?.week_type }}</span>
             <div v-if="props.type !== 'main'" class="">
@@ -291,20 +292,20 @@ function handlenewLessonMessage() {
                     <th>
                         <div class="">Кабинет</div>
                     </th>
-                    <th>
+                    <th v-if="isEdit">
                         <div class="">Действия</div>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <template :key="lesson.id" v-for="lesson in lessons">
-                    <AdminChangesScheduleItemRow :subjects="subjects" :teachers="teachers" @removeLesson="removeLesson"
-                        @editLesson="editLesson" :lesson="lesson" />
+                    <AdminChangesScheduleItemRow :isEdit="isEdit" :subjects="subjects" :teachers="teachers"
+                        @removeLesson="removeLesson" @editLesson="editLesson" :lesson="lesson" />
                 </template>
 
 
 
-                <tr v-show="hideAddNewLesson">
+                <tr v-if="hideAddNewLesson">
                     <td>
                         <InputText size="small" class="w-full text-center" v-model="newLesson.index" />
                     </td>
@@ -351,7 +352,7 @@ function handlenewLessonMessage() {
                 </tr>
             </tbody>
         </table>
-        <div class="mt-2 flex items-center justify-center">
+        <div v-if="isEdit" class="mt-2 flex items-center justify-center">
             <Button label="Новая пара" title="Открыть форму для добавления пары" size="small" outlined
                 severity="secondary" class="w-full text-surface-800 dark:text-white/80"
                 @click="hideAddNewLesson = !hideAddNewLesson"
@@ -432,6 +433,6 @@ tbody tr:last-child {
 tbody>tr:last-child {
 
     /* border-top: 2px rgb(0, 153, 255) solid; */
-    background: rgba(255, 255, 255, 0.062);
+    /* background: rgba(255, 255, 255, 0.062); */
 }
 </style>
