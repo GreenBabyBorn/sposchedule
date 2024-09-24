@@ -43,8 +43,8 @@ const editLesson = (lesson: any) => {
             </span></td>
         <td v-show="lesson?.message" colspan="3/1">
             <div class="table-subrow">
-
-                <Textarea v-if="isEdit" @change="editLesson(lesson)" v-model="lesson.message"
+                <span v-if="!isEdit">{{ lesson.message }}</span>
+                <Textarea v-else @change="editLesson(lesson)" v-model="lesson.message"
                     placeholder="Введите сообщение для группы" class="w-full" />
             </div>
         </td>
@@ -58,7 +58,7 @@ const editLesson = (lesson: any) => {
                 <div class="" v-if="!isEdit">
                     <span v-for="teacher in lesson.teachers">{{ teacher.name }}</span>
                 </div>
-                <MultiSelect v-model="lesson.teachers" v-else placeholder="Выберите преподавателя"
+                <MultiSelect filter v-model="lesson.teachers" v-else placeholder="Выберите преподавателя"
                     @change="editLesson(lesson)" :options="teachers" class="w-full" option-label="name" />
             </div>
         </td>

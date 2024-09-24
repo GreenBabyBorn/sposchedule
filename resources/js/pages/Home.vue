@@ -17,6 +17,7 @@ import PublicRowPeriodBell from '@/components/bells/PublicRowPeriodBell.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBuildingsQuery } from '@/queries/buildings';
 import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 
 const route = useRoute();
 const scheduleStore = useSchedulePublicStore();
@@ -239,6 +240,14 @@ onBeforeUnmount(() => {
         resizeObserver.unobserve(headerRef.value);
     }
 });
+
+const showFilters = ref(false)
+
+function toggleFilters() {
+    showFilters.value = !showFilters.value
+    searchedCabinet.value = ''
+    cabinet.value = ''
+}
 </script>
 
 <template>
@@ -247,40 +256,58 @@ onBeforeUnmount(() => {
             class=" pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
             :to="{ path: '/admin/schedules/changes', query: queryString }"></RouterLink>
         <div ref="headerRef"
-            class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap items-center justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
-            <div class="flex  flex-wrap gap-2 items-start">
-                <div class="flex flex-col md:w-auto w-full">
-                    <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
-                        v-model="date">
-                        <template #inputicon="slotProps">
-                            <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
-                                <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
-                                    locales: 'ru-RU'
-                                }).value]
-                                    }}</small>
-                                <small>{{ schedulesChanges?.week_type }}</small>
-                            </div>
-                        </template>
-                    </DatePicker>
-                </div>
-                <Select title="Корпус" showClear v-model="building" :options="buildings" option-label="label"
-                    option-value="value" placeholder="Корпус"></Select>
-                <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
-                    option-value="value" placeholder="Курс"></Select>
-                <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
-                    v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name" placeholder="Группа"
-                    class="w-full md:w-[10rem]" />
-                <InputText @input="debouncedCabinetFn" v-model="cabinet" placeholder="Поиск по кабинету"></InputText>
+            class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
 
+            <div class="flex flex-col flex-wrap gap-4 justify-between ">
+
+                <div class="flex flex-wrap gap-2 items-center">
+                    <div class="flex flex-col md:w-auto w-full">
+                        <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
+                            v-model="date">
+                            <template #inputicon="slotProps">
+                                <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
+                                    <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
+                                        locales: 'ru-RU'
+                                    }).value]
+                                        }}</small>
+                                    <small>{{ schedulesChanges?.week_type }}</small>
+                                </div>
+                            </template>
+                        </DatePicker>
+                    </div>
+                    <Select title="Корпус" showClear v-model="building" :options="buildings" option-label="label"
+                        option-value="value" placeholder="Корпус"></Select>
+                    <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
+                        option-value="value" placeholder="Курс"></Select>
+                    <div class="flex gap-2">
+
+                        <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
+                            v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
+                            placeholder="Группа" class="w-full md:w-[10rem]" />
+                        <Button title="Фильтры" @click="toggleFilters" severity="secondary" text
+                            icon="pi pi-sliders-h"></Button>
+                    </div>
+
+                </div>
+
+                <div v-show="showFilters" class="">
+                    <InputText @input="debouncedCabinetFn" v-model="cabinet" placeholder="Поиск по кабинету">
+                    </InputText>
+                </div>
             </div>
-            <div v-if="schedulesChanges?.last_updated"
-                class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap">
-                <span class="text-xs text-surface-400 leading-none text-nowrap">Последние обновление:</span>
-                <time title="Последние обновление" class="text-sm text-right text-surface-400"
-                    :datetime="schedulesChanges?.last_updated">{{
-                        useDateFormat(schedulesChanges?.last_updated,
-                            'DD.MM.YYYY HH:mm') }}</time>
+
+            <div class="">
+
+                <div v-if="schedulesChanges?.last_updated"
+                    class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap">
+                    <span class="text-xs text-surface-400 leading-none text-nowrap">Последние обновление:</span>
+                    <time title="Последние обновление" class="text-sm text-right text-surface-400"
+                        :datetime="schedulesChanges?.last_updated">{{
+                            useDateFormat(schedulesChanges?.last_updated,
+                                'DD.MM.YYYY HH:mm') }}</time>
+                </div>
             </div>
+
 
         </div>
         <div :style="{ marginTop: `${headerHeight + 10}px` }" class="flex flex-col gap-4">

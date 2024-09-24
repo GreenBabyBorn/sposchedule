@@ -891,6 +891,9 @@ class ScheduleController extends Controller
                 }
             }
 
+            if (empty($filteredLessons)) {
+                continue;
+            }
             // Сортируем занятия по индексу
             usort($filteredLessons, function ($a, $b) {
                 return $a['index'] <=> $b['index'];
