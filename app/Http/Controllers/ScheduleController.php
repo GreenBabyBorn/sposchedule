@@ -526,19 +526,29 @@ class ScheduleController extends Controller
                 }
             }
 
-            // Группируем расписания по зданию (building)
-            $buildingKey = $group->building == '6' ? '6' : '1-5';
+            // Получаем все здания, связанные с текущей группой
+            $buildings = $group->buildings;
 
-            array_push($finalSchedules[$buildingKey]['schedules'], [
-                'semester' => new SemesterResource($group->semesters->filter(function ($semester) use ($carbonDate) {
+            foreach ($buildings as $building) {
+                // Группируем расписания по зданию (building)
+                $buildingKey = $building->name == '6' ? '6' : '1-5';
+
+                // Проверяем, существует ли семестр
+                $filteredSemester = $group->semesters->filter(function ($semester) use ($carbonDate) {
                     $start = Carbon::parse($semester->start);
                     $end = Carbon::parse($semester->end);
                     return $carbonDate->between($start, $end);
-                })->first()),
-                'group' => new SkinnyGroup($group),
-                'schedule' => $groupSchedule,
-            ]);
+                })->first();
+
+                // Если семестр найден, передаем его в SemesterResource, если нет — передаем null или другое значение
+                array_push($finalSchedules[$buildingKey]['schedules'], [
+                    'semester' => $filteredSemester ? new SemesterResource($filteredSemester) : null, // Проверка на null
+                    'group' => new SkinnyGroup($group),
+                    'schedule' => $groupSchedule,
+                ]);
+            }
         }
+
 
         // Возвращаем финальное расписание
         return response()->json($finalSchedules);

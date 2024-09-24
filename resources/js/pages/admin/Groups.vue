@@ -11,7 +11,7 @@ import Chip from 'primevue/chip';
 import MultiSelect from 'primevue/multiselect';
 import { FilterMatchMode } from '@primevue/core/api';
 import Textarea from 'primevue/textarea';
-import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup, useDestroySemesterForGroup, useStoreSemesterForGroup } from '../../queries/groups'
+import { useDestroyGroup, useGroupsQuery, useStoreGroup, useUpdateGroup } from '../../queries/groups'
 import { useSemestersQuery } from '@/queries/semesters';
 import { useConfirm } from 'primevue/useconfirm';
 import { useBuildingsQuery } from '@/queries/buildings';
@@ -45,8 +45,8 @@ const courses = [
 ]
 
 const { mutateAsync: updateGroup, isPending: isUpdated } = useUpdateGroup()
-const { mutateAsync: storeSemesterForGroup } = useStoreSemesterForGroup()
-const { mutateAsync: destroySemesterForGroup } = useDestroySemesterForGroup()
+// const { mutateAsync: storeSemesterForGroup } = useStoreSemesterForGroup()
+// const { mutateAsync: destroySemesterForGroup } = useDestroySemesterForGroup()
 
 
 const onRowEditSave = async (event) => {
@@ -335,8 +335,9 @@ const selectedBuildings = ref()
                     </template>
                     <template #editor="{ data, field }">
 
-                        <MultiSelect v-model="data.semesters" display="chip" :options="semesters" optionLabel="name"
-                            filter placeholder="Выберите семестры" class="w-48" />
+                        <MultiSelect :max-selected-labels="2" v-model="data.semesters" display="chip"
+                            :options="semesters" optionLabel="name" filter placeholder="Выберите семестры"
+                            class="w-48" />
 
                     </template>
                 </Column>

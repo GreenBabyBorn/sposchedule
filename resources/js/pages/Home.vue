@@ -9,7 +9,7 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import Select from 'primevue/select';
 import { useStorage } from '@vueuse/core';
-import { useGroupsPublicQuery, useGroupsQuery } from '@/queries/groups';
+import { useGroupsPublicQuery } from '@/queries/groups';
 import { useSchedulePublicStore } from '@/stores/schedulePublic';
 import Skeleton from 'primevue/skeleton';
 import { usePublicBellsQuery } from '@/queries/bells';
@@ -69,32 +69,6 @@ const buildings = computed(() => {
 })
 
 const { data: courses, isFetched: coursesFetched } = useCoursesQuery(building);
-// const buildings = ref([
-//     {
-//         value: 1,
-//         label: '1 корпус',
-//     },
-//     {
-//         value: 2,
-//         label: '2 корпус',
-//     },
-//     {
-//         value: 3,
-//         label: '3 корпус',
-//     },
-//     {
-//         value: 4,
-//         label: '4 корпус',
-//     },
-//     {
-//         value: 5,
-//         label: '5 корпус',
-//     },
-//     {
-//         value: 6,
-//         label: '6 корпус',
-//     },
-// ])
 
 const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup, searchedCabinet, searchedTeacher);
 searchedTeacher
@@ -359,19 +333,6 @@ function toggleFilters() {
                 <div v-if="publicBells" class="flex justify-center items-center ">
                     <div class="overflow-x-auto rounded-md">
                         <table class="min-w-full border-collapse table-auto">
-                            <!-- <thead>
-                                <tr>
-                                    <th
-                                        class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
-                                        № пары</th>
-                                    <th
-                                        class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
-                                        График</th>
-                                    <th
-                                        class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
-                                        Конец</th>
-                                </tr>
-                            </thead> -->
                             <tbody>
                                 <PublicRowPeriodBell :key="period.id" v-for="period in publicBells?.periods"
                                     :period="period">

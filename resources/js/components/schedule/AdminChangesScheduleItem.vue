@@ -105,7 +105,7 @@ const { mutateAsync: storeSchedule, data: newSchedule } = useStoreScheduleChange
 const { mutateAsync: storeLesson } = useStoreLesson()
 
 async function addNewLesson() {
-    const loadedSchedule = props.schedule?.id;
+    const loadedSchedule = toRef(() => props.schedule).value.id;
 
     // Если тип расписания 'main', конвертируем его в изменения
     if (props.schedule.type === 'main') {
@@ -184,7 +184,7 @@ async function addNewLesson() {
         toast.add({
             severity: 'error',
             summary: 'Ошибка',
-            detail: e?.response?.data?.message || 'Не удалось сохранить урок.',
+            detail: e?.response?.data?.message || 'Не удалось сохранить пару.',
             life: 3000,
             closable: true,
         });

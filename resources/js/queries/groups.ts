@@ -78,28 +78,28 @@ export function useDestroyGroup() {
   return destroyGroupMutation;
 }
 
-export function useStoreSemesterForGroup() {
-  const queryClient = useQueryClient();
-  let storeGroupMutation = useMutation({
-    mutationFn: ({ id, semester_id }: any) =>
-      axios.post(`/api/groups/${id}/semesters`, { semester_id }),
-    onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['groups'] });
-    },
-  });
-  return storeGroupMutation;
-}
+// export function useStoreSemesterForGroup() {
+//   const queryClient = useQueryClient();
+//   let storeGroupMutation = useMutation({
+//     mutationFn: ({ id, semester_id }: any) =>
+//       axios.post(`/api/groups/${id}/semesters`, { semester_id }),
+//     onSuccess: () => {
+//       // queryClient.invalidateQueries({ queryKey: ['groups'] });
+//     },
+//   });
+//   return storeGroupMutation;
+// }
 
-export function useDestroySemesterForGroup() {
-  const queryClient = useQueryClient();
-  let storeGroupMutation = useMutation({
-    mutationFn: ({ id, semester_id }: any) =>
-      axios.delete(`/api/groups/${id}/semesters`, {
-        data: { semester_id },
-      }),
-    onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['groups'] });
-    },
-  });
-  return storeGroupMutation;
-}
+// export function useDestroySemesterForGroup() {
+//   const queryClient = useQueryClient();
+//   let storeGroupMutation = useMutation({
+//     mutationFn: ({ id, semester_id }: any) =>
+//       axios.delete(`/api/groups/${id}/semesters`, {
+//         data: { semester_id },
+//       }),
+//     onSuccess: () => {
+//       // queryClient.invalidateQueries({ queryKey: ['groups'] });
+//     },
+//   });
+//   return storeGroupMutation;
+// }
