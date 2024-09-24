@@ -17,10 +17,10 @@ return new class () extends Migration {
             $table->string('index');
             $table->string('specialization');
             $table->string('name')->unique();
-            $table->string('building')->nullable();  // Поле для внешнего ключа
+            // $table->string('building')->nullable();  // Поле для внешнего ключа
 
-            // Настраиваем внешний ключ, связывающий building_name с полем name в таблице buildings
-            $table->foreign('building')->references('name')->on('buildings');
+            // // Настраиваем внешний ключ, связывающий building_name с полем name в таблице buildings
+            // $table->foreign('building')->references('name')->on('buildings');
             $table->timestamps();
         });
 

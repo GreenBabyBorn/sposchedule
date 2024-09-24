@@ -72,8 +72,11 @@ class GroupController extends Controller
         // Начинаем с запроса к модели Group
         $query = Group::query();
 
-        if ($request->has(key: 'building')) {
-            $query->where('building', $request->input('building'));
+        $building = $request->input('building');
+        if($building) {
+            $query->whereHas('buildings', function ($query) use ($building) {
+                $query->where('name', $building);
+            });
         }
         // Фильтрация по course
         if ($request->has('course')) {
@@ -127,6 +130,8 @@ class GroupController extends Controller
         ]);
         $semesterIds = array_column($request->semesters, 'id');
         $group->semesters()->sync($semesterIds);
+        $buildingsIds = array_column($request->buildings, 'name');
+        $group->buildings()->sync($buildingsIds);
         $group->refresh();
         return new GroupResource($group);
     }
@@ -146,6 +151,14 @@ class GroupController extends Controller
     public function update(UpdateGroupRequest $request, Group $group)
     {
         $group->update($request->all());
+        if ($request->has('semesters') && is_array($request->semesters)) {
+            $semestersIds = array_column($request->semesters, 'id');
+            $group->semesters()->sync($semestersIds);
+        }
+        if ($request->has('buildings') && is_array($request->buildings)) {
+            $buildingsIds = array_column($request->buildings, 'name');
+            $group->buildings()->sync($buildingsIds);
+        }
         $group->refresh();
         return new GroupResource($group);
     }
@@ -183,8 +196,10 @@ class GroupController extends Controller
     {
         $building = $request->query('building');
         $coursesQuery = Group::select('course')->distinct()->orderBy('course', 'asc');
-        if ($building) {
-            $coursesQuery->where('building', $building);
+        if($building) {
+            $coursesQuery->whereHas('buildings', function ($query) use ($building) {
+                $query->where('name', $building);
+            });
         }
         $courses = $coursesQuery->get();
 

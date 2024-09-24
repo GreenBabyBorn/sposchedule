@@ -201,6 +201,7 @@ class ScheduleController extends Controller
         //         'semester_id' => $semester->id
         //     ];
 
+
         //     // Выполняем SQL-запрос
         //     $results = DB::select($query, $params);
 
@@ -301,7 +302,9 @@ class ScheduleController extends Controller
         }
         $building = $request->input('building');
         if($building) {
-            $groupsQuery->where('building', $building);
+            $groupsQuery->whereHas('buildings', function ($query) use ($building) {
+                $query->where('name', $building);
+            });
         }
         $name = $request->input('group');
         if($name) {
@@ -402,12 +405,18 @@ class ScheduleController extends Controller
 
             array_push($finalSchedules['schedules'], [
 
-                'semester' => new SemesterResource($group->semesters->filter(function ($semester) use ($carbonDate) {
+                'semester' => $group->semesters->filter(function ($semester) use ($carbonDate) {
                     $start = Carbon::parse($semester->start);
                     $end = Carbon::parse($semester->end);
 
                     return $carbonDate->between($start, $end);
-                })->first()),
+                })->first() ? new SemesterResource(
+                    $group->semesters->filter(function ($semester) use ($carbonDate) {
+                        $start = Carbon::parse($semester->start);
+                        $end = Carbon::parse($semester->end);
+                        return $carbonDate->between($start, $end);
+                    })->first()
+                ) : null, // Возвращаем null, если семестр не найден
                 'group' => new SkinnyGroup($group),
                 'schedule' => $groupSchedule
             ]);
@@ -847,7 +856,15 @@ class ScheduleController extends Controller
 
         // Добавляем фильтры, если они присутствуют
         if ($building = $request->input('building')) {
-            $query .= " AND g.building = :building ";
+            $query .= "
+                AND EXISTS (
+                    SELECT 1 
+                    FROM group_building gb
+                    JOIN buildings b ON gb.building_name = b.name
+                    WHERE gb.group_id = g.id 
+                    AND b.name = :building
+                )
+            ";
             $params['building'] = $building;
         }
         if ($course = $request->input('course')) {

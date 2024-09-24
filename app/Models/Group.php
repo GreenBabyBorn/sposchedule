@@ -15,12 +15,11 @@ class Group extends Model
         'index',
         'specialization',
         'name',
-        'building'
     ];
 
-    public function building()
+    public function buildings()
     {
-        return $this->belongsTo(Building::class, 'building', 'name');
+        return $this->belongsToMany(Building::class, 'group_building', 'group_id', 'building_name');
     }
 
     public function schedules()

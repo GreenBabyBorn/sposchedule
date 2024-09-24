@@ -255,6 +255,8 @@ function toggleFilters() {
     showFilters.value = !showFilters.value
     searchedCabinet.value = ''
     cabinet.value = ''
+    searchedTeacher.value = ''
+    teacher.value = ''
 }
 </script>
 

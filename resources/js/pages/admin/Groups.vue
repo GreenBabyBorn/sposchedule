@@ -51,39 +51,39 @@ const { mutateAsync: destroySemesterForGroup } = useDestroySemesterForGroup()
 
 const onRowEditSave = async (event) => {
     let { newData, index } = event;
-    let deletedSubjects = groups.value[index].semesters.filter(obj1 =>
-        !newData.semesters.some(obj2 => obj2.id === obj1.id)
-    );
-    let newSubjects = newData.semesters.filter(obj2 =>
-        !groups.value[index].semesters.some(obj1 => obj1.id === obj2.id)
-    );
-    if (deletedSubjects.length) {
-        for (let i = 0; i < deletedSubjects.length; i++) {
+    // let deletedSubjects = groups.value[index].semesters.filter(obj1 =>
+    //     !newData.semesters.some(obj2 => obj2.id === obj1.id)
+    // );
+    // let newSubjects = newData.semesters.filter(obj2 =>
+    //     !groups.value[index].semesters.some(obj1 => obj1.id === obj2.id)
+    // );
+    // if (deletedSubjects.length) {
+    //     for (let i = 0; i < deletedSubjects.length; i++) {
 
-            try {
-                await destroySemesterForGroup({ id: groups.value[index].id, semester_id: deletedSubjects[i].id })
-            }
-            catch (e) {
-                toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-                return
-            }
-        }
-        // queryClient.invalidateQueries({ queryKey: ['teachers'] })
-    }
+    //         try {
+    //             await destroySemesterForGroup({ id: groups.value[index].id, semester_id: deletedSubjects[i].id })
+    //         }
+    //         catch (e) {
+    //             toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+    //             return
+    //         }
+    //     }
+    //     // queryClient.invalidateQueries({ queryKey: ['teachers'] })
+    // }
 
     // console.log(deletedSubjects, newSubjects)
-    if (newSubjects.length) {
-        for (let i = 0; i < newSubjects.length; i++) {
-            try {
-                await storeSemesterForGroup({ id: groups.value[index].id, semester_id: newSubjects[i].id })
-            }
-            catch (e) {
-                toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-                return
-            }
-        }
-        // queryClient.invalidateQueries({ queryKey: ['teachers'] })
-    }
+    // if (newSubjects.length) {
+    //     for (let i = 0; i < newSubjects.length; i++) {
+    //         try {
+    //             await storeSemesterForGroup({ id: groups.value[index].id, semester_id: newSubjects[i].id })
+    //         }
+    //         catch (e) {
+    //             toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+    //             return
+    //         }
+    //     }
+    //     // queryClient.invalidateQueries({ queryKey: ['teachers'] })
+    // }
 
     try {
         await updateGroup({
@@ -127,7 +127,7 @@ const addGroup = async () => {
                 course: newGroupName.value.split('-')[1][0],
                 index: newGroupName.value.split('-')[1].slice(1),
                 semesters: selectedSemesters.value,
-                building: building.value
+                buildings: selectedBuildings.value
             }
         )
     }
@@ -139,6 +139,7 @@ const addGroup = async () => {
     newGroupError.value = false
     newGroupName.value = ''
     selectedSemesters.value = []
+    selectedBuildings.value = [];
 }
 
 
@@ -228,6 +229,7 @@ const parseAndSendGroups = async () => {
                 course: group.split('-')[1][0],
                 index: group.split('-')[1].slice(1),
                 semesters: selectedSemesters.value,
+                buildings: selectedBuildings.value,
             });
 
             // Успешное добавление группы
@@ -253,10 +255,11 @@ const parseAndSendGroups = async () => {
     // Очистка поля после завершения отправки
     importingGroups.value = '';
     selectedSemesters.value = [];
+    selectedBuildings.value = [];
 };
 
 const { data: buildings } = useBuildingsQuery()
-const building = ref()
+const selectedBuildings = ref()
 </script>
 
 <template>
@@ -270,8 +273,9 @@ const building = ref()
                 <InputText :invalid="newGroupError" placeholder="Пример: ИС-401" v-model="newGroupName"></InputText>
                 <MultiSelect v-model="selectedSemesters" display="chip" :options="semesters" optionLabel="name" filter
                     placeholder="Выбрать семестры" :maxSelectedLabels="3" class="" />
-                <Select v-model="building" option-label="name" option-value="name" :options="buildings"
-                    placeholder="Корпус"></Select>
+                <MultiSelect filter auto-filter-focus v-model="selectedBuildings" option-label="name"
+                    :options="buildings" placeholder="Корпус">
+                </MultiSelect>
                 <Button type="submit" @click.prevent="addGroup" :disabled="!newGroupName">Добавить группу</Button>
                 <Button icon="pi pi-file-import" outlined type="submit"
                     @click.prevent="importGroupsState = !importGroupsState" label="Импорт"></Button>
@@ -297,26 +301,33 @@ const building = ref()
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                <Column field="name" header="Название группы" style="width: 20%">
+                <Column field="name" header="Название группы">
                 </Column>
-                <Column field="building" header="Корпус" style="width: 20%">
+                <Column field="buildings" header="Корпус">
+                    <template #body="slotProps">
+                        <div class="flex gap-2 flex-wrap">
+                            <Chip v-for="building in slotProps.data.buildings" :label="building.name" />
+                        </div>
+                    </template>
                     <template #editor="{ data, field }">
-                        <Select v-model="data[field]" :options="buildings" option-label="name" option-value="name">
-                        </Select>
+
+                        <MultiSelect dataKey="name" :options="buildings" v-model="data.buildings" display="chip"
+                            option-label="name" filter placeholder="Выберите корпуса" class="" />
+
                     </template>
                 </Column>
-                <Column field="specialization" header="Специальность" style="width: 20%">
+                <Column field="specialization" header="Специальность">
                     <template #editor="{ data, field }">
                         <InputText fluid v-model="data[field]" />
                     </template>
                 </Column>
-                <Column field="course" header="Курс" style="width: 10%">
+                <Column field="course" header="Курс">
                     <template #editor="{ data, field }">
                         <Select v-model="data[field]" :options="courses" optionLabel="label" optionValue="value">
                         </Select>
                     </template>
                 </Column>
-                <Column field="semesters" header="Семестры" style="width: 10%">
+                <Column field="semesters" header="Семестры">
                     <template #body="slotProps">
                         <div class="flex gap-2 flex-wrap">
                             <Chip v-for="semester in slotProps.data.semesters" :label="semester.name" />
@@ -325,7 +336,7 @@ const building = ref()
                     <template #editor="{ data, field }">
 
                         <MultiSelect v-model="data.semesters" display="chip" :options="semesters" optionLabel="name"
-                            filter placeholder="Выберите семестры" :maxSelectedLabels="3" class="w-48" />
+                            filter placeholder="Выберите семестры" class="w-48" />
 
                     </template>
                 </Column>
