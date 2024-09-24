@@ -870,7 +870,7 @@ class ScheduleController extends Controller
             SELECT 1 FROM lesson_teacher lt
             JOIN teachers t ON lt.teacher_id = t.id
             WHERE lt.lesson_id = l.id
-            AND t.name LIKE :teacher_name
+            AND t.name ILIKE :teacher_name
         )
     ";
             $params['teacher_name'] = "%{$teacher}%";
