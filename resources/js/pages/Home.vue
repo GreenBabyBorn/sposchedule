@@ -35,8 +35,16 @@ const isoDate = computed(() => {
 const cabinet = ref('')
 const searchedCabinet = ref('')
 
+
 const debouncedCabinetFn = useDebounceFn(() => {
     searchedCabinet.value = cabinet.value
+}, 500, { maxWait: 1000 })
+
+const teacher = ref('')
+const searchedTeacher = ref('')
+
+const debouncedTeacherFn = useDebounceFn(() => {
+    searchedTeacher.value = teacher.value
 }, 500, { maxWait: 1000 })
 
 const coursesWithLabel = computed(() => {
@@ -88,8 +96,8 @@ const { data: courses, isFetched: coursesFetched } = useCoursesQuery(building);
 //     },
 // ])
 
-const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup, searchedCabinet);
-
+const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup, searchedCabinet, searchedTeacher);
+searchedTeacher
 const updateQueryParams = () => {
     router.replace({
         query: {
@@ -290,8 +298,10 @@ function toggleFilters() {
 
                 </div>
 
-                <div v-show="showFilters" class="">
+                <div v-show="showFilters" class="flex gap-2 items-center">
                     <InputText @input="debouncedCabinetFn" v-model="cabinet" placeholder="Поиск по кабинету">
+                    </InputText>
+                    <InputText @input="debouncedTeacherFn" v-model="teacher" placeholder="Поиск по преподавателю">
                     </InputText>
                 </div>
             </div>

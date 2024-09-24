@@ -813,6 +813,7 @@ class ScheduleController extends Controller
                    'week_type', l.week_type, 
                    'cabinet', l.cabinet,
                    'building', l.building,
+                   'message', l.message,
                    'teachers', (
                        SELECT json_agg(
                            json_build_object(
@@ -859,8 +860,20 @@ class ScheduleController extends Controller
         }
         if ($cabinet = $request->input('cabinet')) {
             // Условие для фильтрации по кабинету
-            $query .= " AND l.cabinet = :cabinet ";
-            $params['cabinet'] = $cabinet; // добавляем параметр для поиска по кабинету
+            $query .= " AND l.cabinet LIKE :cabinet ";
+            $params['cabinet'] = "%{$cabinet}%"; // добавляем параметр для поиска по кабинету
+        }
+        // Добавляем фильтрацию по преподавателю, если параметр передан
+        if ($teacher = $request->input('teacher')) {
+            $query .= "
+        AND EXISTS (
+            SELECT 1 FROM lesson_teacher lt
+            JOIN teachers t ON lt.teacher_id = t.id
+            WHERE lt.lesson_id = l.id
+            AND t.name LIKE :teacher_name
+        )
+    ";
+            $params['teacher_name'] = "%{$teacher}%";
         }
 
         // Завершаем запрос

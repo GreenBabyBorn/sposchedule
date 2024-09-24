@@ -140,7 +140,8 @@ export function usePublicSchedulesQuery(
   building,
   course,
   selectedGroup,
-  searchedCabinet
+  searchedCabinet,
+  searchedTeacher
 ) {
   // Условие enabled проверяет только наличие параметра date
   const enabled = computed(() => Boolean(date?.value || building?.value));
@@ -155,6 +156,7 @@ export function usePublicSchedulesQuery(
       course,
       selectedGroup,
       searchedCabinet,
+      searchedTeacher,
     ],
     retry: 0,
     queryFn: async () => {
@@ -165,6 +167,8 @@ export function usePublicSchedulesQuery(
       if (course?.value) queryParams.append('course', course.value);
       if (searchedCabinet?.value)
         queryParams.append('cabinet', searchedCabinet.value);
+      if (searchedTeacher?.value)
+        queryParams.append('teacher', searchedTeacher.value);
       if (selectedGroup?.value)
         queryParams.append('group', selectedGroup.value);
 
