@@ -300,10 +300,12 @@ function toggleFilters() {
 
                 </div>
 
-                <div v-show="showFilters" class="flex gap-2 items-center">
-                    <InputText @input="debouncedCabinetFn" v-model="cabinet" placeholder="Поиск по кабинету">
+                <div v-show="showFilters" class="flex flex-wrap gap-2 items-center">
+                    <InputText class="w-full md:w-auto" @input="debouncedCabinetFn" v-model="cabinet"
+                        placeholder="Поиск по кабинету">
                     </InputText>
-                    <InputText @input="debouncedTeacherFn" v-model="teacher" placeholder="Поиск по преподавателю">
+                    <InputText class="w-full md:w-auto" @input="debouncedTeacherFn" v-model="teacher"
+                        placeholder="Поиск по преподавателю">
                     </InputText>
                 </div>
             </div>
