@@ -30,30 +30,6 @@ const lessons: any = toRef<any>(() => props.lessons)
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
         </div>
         <table v-if="lessons" class="schedule-table dark:bg-surface-900 bg-surface-50 rounded">
-            <!-- <thead>
-                <tr class="text-sm dark:bg-surface-950">
-                    <th>
-                        <div class="">№</div>
-                    </th>
-                    <th>
-                        <div class="border-b dark:border-surface-700 flex justify-start p-1">
-                            <span>
-                                Предмет
-                            </span>
-                        </div>
-                        <div class="flex justify-end p-1">
-                            Преподаватели
-                        </div>
-                    </th>
-
-                    <th>
-                        <div class="">Корпус</div>
-                    </th>
-                    <th>
-                        <div class="">Кабинет</div>
-                    </th>
-                </tr>
-            </thead> -->
             <tbody>
                 <template :key="item.index" v-for="item in lessons">
                     <tr>
@@ -82,7 +58,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 <div class="flex flex-wrap gap-1 justify-start" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <span class="text-sm">{{ item.building }} корпус</span>
                             </div>

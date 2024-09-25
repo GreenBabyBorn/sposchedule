@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import SelectButton from 'primevue/selectbutton';
 import Select from 'primevue/select';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import DatePicker from 'primevue/datepicker';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
-import { useBellsQuery, useStoreBell, useStorePeriod } from '@/queries/bells';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import ColumnGroup from 'primevue/columngroup';   // optional
+import Row from 'primevue/row';
+import { useApplyPreset, useBellsQuery, useDestroyBells, usePresetsBells, useStoreBell, useStorePeriod, useStorePresetBell, useUpdateBell } from '@/queries/bells';
 import Button from 'primevue/button';
 import { useCoursesQuery } from '@/queries/schedules';
 import { useDateFormat } from '@vueuse/core';
@@ -14,6 +18,10 @@ import RowPeriodBell from '../../components/bells/AdminRowPeriodBell.vue';
 import { useBellsStore } from '@/stores/bells';
 import { storeToRefs } from 'pinia';
 import { useBuildingsQuery } from '@/queries/buildings';
+import ToggleButton from 'primevue/togglebutton';
+
+import Dialog from 'primevue/dialog';
+
 
 
 const toast = useToast();
@@ -22,8 +30,6 @@ const toast = useToast();
 const type = ref('Основное');
 const typeOptions = ref(['Основное', 'Изменения']);
 
-const variant = ref('Обычный');
-const variantOptions = ref(['Обычный', 'Сокращенные']);
 
 const typeState = computed(() => {
     return type.value === typeOptions.value[0];
@@ -73,6 +79,7 @@ const date = ref(new Date())
 
 const { data: buildingsFethed } = useBuildingsQuery()
 const building = ref(null)
+building.value = buildingsFethed.value?.[0].name
 
 const buildings = computed(() => {
     return buildingsFethed.value?.map(building => ({
@@ -80,32 +87,6 @@ const buildings = computed(() => {
         label: `${building.name} корпус`,
     })) || [];
 })
-// const buildings = ref([
-//     {
-//         value: 1,
-//         label: '1 корпус',
-//     },
-//     {
-//         value: 2,
-//         label: '2 корпус',
-//     },
-//     {
-//         value: 3,
-//         label: '3 корпус',
-//     },
-//     {
-//         value: 4,
-//         label: '4 корпус',
-//     },
-//     {
-//         value: 5,
-//         label: '5 корпус',
-//     },
-//     {
-//         value: 6,
-//         label: '6 корпус',
-//     },
-// ])
 
 
 const formattedDate = computed(() => {
@@ -113,13 +94,14 @@ const formattedDate = computed(() => {
 });
 
 const { data, isSuccess } = useBellsQuery(type, building, weekDay, formattedDate)
+const { data: bellsPresets } = usePresetsBells()
 
 const bellsStore = useBellsStore()
 const { bells } = storeToRefs(bellsStore)
 const { setBells } = bellsStore
 
 onMounted(() => {
-    building.value = buildingsFethed.value?.[0].name
+    // building.value = buildingsFethed.value?.[0].name
 })
 
 watch(buildingsFethed, () => {
@@ -151,6 +133,7 @@ function formatTime(dateString) {
 
 const { mutateAsync: storePeriod } = useStorePeriod()
 const { mutateAsync: storeBell, data: newBell } = useStoreBell()
+const { mutateAsync: storeBellPreset } = useStorePresetBell()
 
 const isoDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
@@ -160,10 +143,7 @@ const typeValues = {
     Основное: 'main',
     Изменения: 'changes',
 };
-const variantValues = {
-    Обычный: 'normal',
-    Сокращенные: 'reduced',
-};
+
 
 const bodyBellPeriod = computed(() => {
     let body = {
@@ -185,10 +165,9 @@ async function addPeriod() {
             try {
                 await storeBell({
                     type: typeValues[type.value],
-                    variant: variantValues[variant.value],
                     building: building.value,
-                    date: isoDate.value,
-                    week_day: weekDay.value,
+                    date: typeValues[type.value] === 'changes' ? isoDate.value : null,
+                    week_day: typeValues[type.value] === 'main' ? weekDay.value : null,
                 })
 
             }
@@ -216,27 +195,136 @@ async function addPeriod() {
     }
 }
 
+const selectedBells = ref()
+const { mutateAsync: destroyBells, isPending: isDestroyed } = useDestroyBells()
+const deleteBells = async () => {
+    if (!selectedBells.value.length) return;
+
+    for (let i = 0; i < selectedBells.value.length; i++) {
+        try {
+            await destroyBells(selectedBells.value[i].id)
+        }
+        catch (e) {
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+            return
+        }
+    }
+    selectedBells.value = []
+}
+const { mutateAsync: updateBell } = useUpdateBell()
+
 const showAddNewBellPeriod = ref(false)
 
+const visible = ref(false);
+const presetName = ref('')
+function savePreset() {
+    visible.value = false
+    try {
+        storeBellPreset({ bells_id: bells.value.id, name: presetName.value })
+        presetName.value = ''
+    }
+    catch (e) {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response?.data.message, life: 3000, closable: true });
+        return
+    }
+}
+const { mutateAsync: applyPreset, isSuccess: isSuccessApply } = useApplyPreset()
+const selectedPreset = ref(null)
+watch(selectedPreset, async () => {
+    if (!selectedPreset.value) return
+    if (!data.value?.id) {
+        try {
+            await storeBell({
+                type: typeValues[type.value],
+                building: building.value,
+                date: typeValues[type.value] === 'changes' ? isoDate.value : null,
+                week_day: typeValues[type.value] === 'main' ? weekDay.value : null,
+            })
 
+        }
+        catch (e) {
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response?.data.message, life: 3000, closable: true });
+            return
+        }
+    }
+
+
+    try {
+        await applyPreset({
+            bells_id: !data.value?.id ? newBell.value.data.id : bells.value.id,
+            preset_id: selectedPreset.value.id,
+        })
+
+        selectedPreset.value = null
+
+    }
+    catch (e) {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response?.data.message, life: 3000, closable: true });
+        return
+    }
+})
+
+
+
+const published = ref(null)
+watch(() => bells.value?.published, () => {
+    published.value = bells.value.published
+})
+
+const onRowEditSave = async (event) => {
+    let { newData, index } = event;
+    try {
+        await updateBell({ id: newData.id, body: newData })
+    }
+    catch (e) {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+        return
+    }
+}
+
+const editingRows = ref()
 </script>
 
 <template>
     <div class="flex flex-col gap-4">
         <div class="flex flex-wrap justify-between items-baseline">
             <h1 class="text-2xl">Звонки</h1>
+            <ToggleButton :disabled="!data" @change="updateBell({ id: bells?.id, body: { published: published } })"
+                v-model="published" class="text-sm" fluid onLabel="Снять с публикации" offLabel="Опубликовать" />
         </div>
         <div class="">
-            <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <SelectButton :allowEmpty="false" v-model="type" :options="typeOptions" aria-labelledby="basic" />
-                <!-- <SelectButton :allowEmpty="false" v-model="variant" :options="variantOptions" aria-labelledby="basic" /> -->
-                <Select title="Корпус" optionValue="value" v-model="building" :options="buildings" option-label="label"
-                    placeholder="Корпус"></Select>
-                <Select option-value="value" v-if="typeState" v-model="weekDay" :options="weekDaysOptions"
-                    optionLabel="label" placeholder="День недели" class="w-full md:w-56" />
+            <form class="flex flex-wrap items-center gap-2 p-4 rounded-lg dark:bg-surface-800">
+                <div class="flex flex-wrap items-center gap-2">
+                    <SelectButton :allowEmpty="false" v-model="type" :options="typeOptions" aria-labelledby="basic" />
+                    <Select title="Корпус" optionValue="value" v-model="building" :options="buildings"
+                        option-label="label" placeholder="Корпус"></Select>
+                    <Select option-value="value" v-if="typeState" v-model="weekDay" :options="weekDaysOptions"
+                        optionLabel="label" placeholder="День недели" class="w-full md:w-56" />
 
-                <DatePicker v-else dateFormat="dd.mm.yy" v-model="date" />
+                    <DatePicker v-else dateFormat="dd.mm.yy" v-model="date" />
+                    <!-- <Button @click="copyState = !copyState" text icon="pi pi-clone" title="Скопировать"></Button> -->
+                    <div class="border-l border-slate-600 flex gap-2 pl-2">
+                        <Button @click="visible = !visible" outlined icon="pi pi-clone" label="Сохранить"
+                            title="Сохранить в заготовки"></Button>
+                        <Select show-clear v-model="selectedPreset" placeholder="Применить заготовку"
+                            option-label="name_preset" :options="bellsPresets"></Select>
+                    </div>
+
+                    <Dialog v-model:visible="visible" modal header="Создание заготовки" :style="{ width: '25rem' }">
+
+                        <div class="flex items-center gap-4 mb-4">
+                            <label for="name" class="font-semibold w-24">Название заготовки</label>
+                            <InputText placeholder="Пример: сокр. пары" v-model="presetName" id="name"
+                                class="flex-auto" />
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <Button type="button" label="Отмена" severity="secondary" @click="visible = false"></Button>
+                            <Button type="button" label="Сохранить" @click="savePreset"></Button>
+                        </div>
+                    </Dialog>
+                </div>
             </form>
+
         </div>
         <div class="">
             <div class="rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
@@ -321,6 +409,28 @@ const showAddNewBellPeriod = ref(false)
                     severity="secondary" class="w-full" @click="showAddNewBellPeriod = !showAddNewBellPeriod"
                     :icon="!showAddNewBellPeriod ? 'pi pi-angle-down' : 'pi pi-angle-up'"></Button>
             </div>
+        </div>
+        <div class="flex flex-col gap-4">
+            <h1 class="text-2xl">Заготовки звонков</h1>
+            <DataTable v-model:editingRows="editingRows" :rows="10" editMode="row" @row-edit-save="onRowEditSave"
+                v-model:selection="selectedBells" :value="bellsPresets" tableStyle="min-width: 50rem">
+                <template #header>
+                    <div class="flex flex-wrap items-center gap-2  justify-between">
+                        <Button severity="danger" :disabled="!selectedBells?.length || !bellsPresets.length"
+                            type="button" icon="pi pi-trash" label="Удалить" outlined @click="deleteBells" />
+
+                    </div>
+                </template>
+                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+                <!-- <Column field="id" header="ID"></Column> -->
+                <Column field="name_preset" header="Название">
+                    <template #editor="{ data, field }">
+                        <InputText v-model="data[field]" />
+                    </template>
+                </Column>
+
+                <Column :rowEditor="true" style="width: 10%; min-width: 8rem" bodyStyle="text-align:center"></Column>
+            </DataTable>
         </div>
     </div>
 </template>

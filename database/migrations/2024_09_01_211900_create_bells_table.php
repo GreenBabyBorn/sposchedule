@@ -11,15 +11,13 @@ class CreateBellsTable extends Migration
         Schema::create('bells', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['main', 'changes']);
-            // $table->enum('variant', ['normal', 'reduced']);
             $table->string('week_day', 2)->nullable();
             $table->date('date')->nullable();
             $table->integer('building')->nullable();
+            $table->boolean('is_preset')->default(false);
+            $table->string('name_preset')->nullable();
+            $table->boolean('published')->default(false)->nullable();
             $table->timestamps();
-
-            // Уникальные ограничения
-            // $table->unique([ 'week_day', 'building'], 'unique_variant_week_day');
-            // $table->unique([ 'date', 'building'], 'unique_variant_date_building');
         });
     }
 

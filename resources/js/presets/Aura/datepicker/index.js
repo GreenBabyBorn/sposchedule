@@ -99,8 +99,7 @@ export default {
       'focus:ring-primary-500 dark:focus:ring-primary-400',
     ],
   },
-  inputIconContainer:
-    'absolute top-0 right-0 h-full flex px-4 pointer-events-none',
+  inputIconContainer: 'absolute cursor-pointer top-1/2 right-3 -mt-3',
   inputIcon: 'inline-block text-base',
   panel: ({ props }) => ({
     class: [
@@ -399,6 +398,7 @@ export default {
 
       // Spacing
       'px-2',
+      'text-surface-600 dark:text-white/70',
     ],
   },
   separator: {
@@ -416,6 +416,7 @@ export default {
 
       // Spacing
       'px-2',
+      'text-surface-600 dark:text-white/70',
     ],
   },
   minutePicker: {
@@ -427,6 +428,7 @@ export default {
 
       // Spacing
       'px-2',
+      'text-surface-600 dark:text-white/70',
     ],
   },
   secondPicker: {

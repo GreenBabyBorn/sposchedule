@@ -284,7 +284,7 @@ function toggleFilters() {
                 </div>
             </div>
 
-            <div class="">
+            <div class="my-auto">
 
                 <div v-if="schedulesChanges?.last_updated"
                     class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap">
@@ -322,8 +322,16 @@ function toggleFilters() {
 
             </div>
         </div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-2 items-center">
             <h1 class="text-2xl font-bold text-center py-2  ">Звонки</h1>
+            <span v-if="publicBells?.type" :class="{
+                'text-green-400 ': publicBells?.type
+                    !== 'main',
+                'text-surface-400 ': publicBells?.type
+                    === 'main'
+            }" class="text-sm text-right  py-1 px-2 rounded-lg ">{{
+                publicBells?.type
+                    === 'main' ? 'Основное' : 'Изменения' }}</span>
             <div class="">
                 <h2 class="text-xl text-center text-red-300" v-if="!building">Необходимо выбрать корпус</h2>
                 <h2 class="text-2xl text-center " v-else-if="!publicBells && isFetchedBells">На эту дату расписание

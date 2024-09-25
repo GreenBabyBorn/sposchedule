@@ -41,15 +41,12 @@ export function useBellsQuery(type, building, weekDay?, date?) {
   return useQuery({
     queryKey: ['bells', type, weekDay, date, building],
     enabled: enabled,
-    queryFn: useDebounceFn(
-      async () =>
-        (
-          await axios.get(
-            `/api/bells?type=${typeValues[type.value]}&building=${building.value}${weekDayOrDate.value}`
-          )
-        ).data,
-      300
-    ),
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/api/bells?type=${typeValues[type.value]}&building=${building.value || ''}${weekDayOrDate.value}`
+        )
+      ).data,
   });
 }
 
@@ -83,6 +80,41 @@ export function useStorePeriod() {
   });
   return storePeriodMutation;
 }
+
+export function useStorePresetBell() {
+  const queryClient = useQueryClient();
+  let storePeriodMutation = useMutation({
+    mutationFn: (body: object) =>
+      axios.post('/api/bells/presets', {
+        ...body,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
+    },
+  });
+  return storePeriodMutation;
+}
+export function useApplyPreset() {
+  const queryClient = useQueryClient();
+  let storePeriodMutation = useMutation({
+    mutationFn: (body: object) =>
+      axios.post('/api/bells/presets/apply', {
+        ...body,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells'] });
+      queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
+    },
+  });
+  return storePeriodMutation;
+}
+export function usePresetsBells() {
+  return useQuery({
+    queryKey: ['bells-presets'],
+
+    queryFn: async () => (await axios.get(`/api/bells/presets`)).data,
+  });
+}
 export function useStoreBell() {
   const queryClient = useQueryClient();
   let storePeriodMutation = useMutation({
@@ -92,6 +124,20 @@ export function useStoreBell() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bells'] });
+    },
+  });
+  return storePeriodMutation;
+}
+export function useUpdateBell() {
+  const queryClient = useQueryClient();
+  let storePeriodMutation = useMutation({
+    mutationFn: ({ id, body }: any) =>
+      axios.patch(`/api/bells/${id}`, {
+        ...body,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells'] });
+      queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
     },
   });
   return storePeriodMutation;
@@ -114,6 +160,16 @@ export function useDestroyBellPeriod() {
     mutationFn: (id: number) => axios.delete(`/api/bells-periods/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bells'] });
+    },
+  });
+  return destroyPeriodMutation;
+}
+export function useDestroyBells() {
+  const queryClient = useQueryClient();
+  let destroyPeriodMutation = useMutation({
+    mutationFn: (id: number) => axios.delete(`/api/bells/${id}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
     },
   });
   return destroyPeriodMutation;

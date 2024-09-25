@@ -17,9 +17,11 @@ class BellsResource extends JsonResource
         return [
             'id' => $this->id,
             'type' => $this->type,
-            'variant' => $this->variant,
             'date' => $this->date,
+            'is_preset' => $this->is_preset,
+            'name_preset' => $this->name_preset,
             'building' => $this->building,
+            'published' => $this->published,
             'periods' => BellsPeriodResource::collection($this->periods),
         ];
     }

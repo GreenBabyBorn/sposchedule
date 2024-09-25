@@ -11,12 +11,12 @@ class Bell extends Model
         'type',
         'week_day',
         'date',
-        'building'
+        'building',
+        'name_preset',
+        'is_preset',
+        'published',
     ];
 
-    // Определение вариантов расписания
-    // public const VARIANT_NORMAL = 'normal';
-    // public const VARIANT_REDUCED = 'reduced';
 
     public const TYPE_MAIN = 'main';
     public const TYPE_CHANGES = 'changes';

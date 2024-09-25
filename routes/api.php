@@ -18,6 +18,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
 Route::get('/bells/public', [BellController::class, 'publicBells']);
+Route::get('/bells/presets', [BellController::class, 'presetsBells']);
 Route::apiResource('bells', BellController::class)->only(['index', 'show']);
 Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
 Route::get('/schedules/changes/print', [ScheduleController::class, 'getScheduleByDatePrint']);
@@ -43,6 +44,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::post('/logout', [AuthController::class, 'logout']);
 
+
+    Route::post('/bells/presets', [BellController::class, 'saveAsPreset']);
+    Route::post('/bells/presets/apply', [BellController::class, 'applyPreset']);
     Route::apiResource('bells', BellController::class)->except(['index', 'show']);
     Route::apiResource('bells-periods', BellsPeriodController::class)->except(['index', 'show']);
 

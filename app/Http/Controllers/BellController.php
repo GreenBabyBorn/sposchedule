@@ -77,6 +77,93 @@ class BellController extends Controller
 
         return new BellsResource($bells);
     }
+    public function presetsBells(Request $request)
+    {
+        return BellsResource::collection(Bell::where('is_preset', true)->get());
+
+    }
+
+    public function applyPreset(Request $request)
+    {
+        // Получаем звонок по ID
+        $preset = Bell::find($request->preset_id);
+        $bells = Bell::find($request->bells_id);
+
+        if ($preset && $bells) {
+            // Копируем атрибуты $preset в $bells
+            // $bells->type = $preset->type;
+            // $bells->week_day = $preset->week_day;
+            // $bells->date = $preset->date;
+            // $bells->building = $preset->building;
+            // $bells->is_preset = $preset->is_preset;
+            // $bells->name_preset = $preset->name_preset;
+            // $bells->name_preset = $preset->name_preset;
+
+            // Сохраняем изменения в $bells
+            $bells->save();
+
+            // Очищаем текущие периоды у $bells, если необходимо
+            $bells->periods()->delete();
+
+            // Копируем периоды из $preset в $bells
+            foreach ($preset->periods as $period) {
+                // Создаем новый период для $bells на основе периода $preset
+                $newPeriod = $period->replicate(); // Копирует все атрибуты $period
+                $newPeriod->bells_id = $bells->id;  // Связываем новый период с новым bell
+                $newPeriod->save(); // Сохраняем новый период
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Пресет и связанные периоды успешно скопированы в объект звонков',
+            ]);
+        } else {
+            return response()->json([
+                'error' => 404,
+                'message' => 'Пресет или звонок не найден',
+            ], 404);
+        }
+    }
+
+
+    public function saveAsPreset(Request $request)
+    {
+        // Получаем звонок по ID
+        $bell = Bell::find($request->bells_id);
+
+        if (!$bell) {
+            return response()->json([
+                'message' => 'Звонок не найден'
+            ], 404);
+        }
+
+        if ($bell->is_preset) {
+            return response()->json([
+                'message' => 'Этот звонок уже является пресетом'
+            ], 400);
+        }
+
+        // Создаем копию звонка с флагом "preset"
+        $presetBell = $bell->replicate();
+        $presetBell->is_preset = true;
+        $presetBell->name_preset = $request->name ?? 'Пресет для звонка ' . $bell->id;
+        $presetBell->save();
+
+        // 3. Копируем зависимые записи из таблицы bells_periods
+        $bellPeriods = $bell->periods; // Предполагается, что у модели Bell есть отношение periods
+
+        foreach ($bellPeriods as $period) {
+            // Копируем период и привязываем его к новому звонку-пресету
+            $newPeriod = $period->replicate();
+            $newPeriod->bells_id = $presetBell->id; // Привязываем к новому звонку
+            $newPeriod->save();
+        }
+
+        return response()->json([
+            'message' => 'Звонок успешно сохранен как пресет',
+            'preset_bell' => new BellsResource($presetBell)
+        ]);
+    }
 
     public function publicBells(Request $request)
     {
@@ -113,7 +200,7 @@ class BellController extends Controller
         // Ищем измененное расписание (type=changes)
         $schedule = Bell::where('building', $building)
                 ->whereDate('date', $formattedDate)
-       ->where('type', 'changes')
+       ->where('type', 'changes')->where('published', true)
 
           ->first();
 
@@ -122,7 +209,7 @@ class BellController extends Controller
             $schedule = Bell::where('building', $building)
             ->where('type', 'main')
               ->where('week_day', $weekDay)
-
+              ->where('published', true)
               ->first();
         }
 
@@ -167,16 +254,16 @@ class BellController extends Controller
     {
         $bell = Bell::findOrFail($id);
 
-        $validator = Validator::make($request->all(), [
-            'type' => 'required|in:main,changes',
-            'variant' => 'required|in:normal,reduced',
-            'week_day' => 'nullable|string|max:2|required_if:type,main',
-            'date' => 'nullable|date|required_if:type,changes',
-        ]);
+        // $validator = Validator::make($request->all(), [
+        //     'type' => 'required|in:main,changes',
+        //     'variant' => 'required|in:normal,reduced',
+        //     'week_day' => 'nullable|string|max:2|required_if:type,main',
+        //     'date' => 'nullable|date|required_if:type,changes',
+        // ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
+        // if ($validator->fails()) {
+        //     return response()->json(['errors' => $validator->errors()], 422);
+        // }
 
         $bell->update($request->all());
         return response()->json($bell);
