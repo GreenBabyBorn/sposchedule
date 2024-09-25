@@ -99,7 +99,8 @@ export default {
       'focus:ring-primary-500 dark:focus:ring-primary-400',
     ],
   },
-  inputIconContainer: 'absolute cursor-pointer top-1/2 right-3 -mt-3',
+  inputIconContainer:
+    'absolute cursor-pointer top-1/2 right-3 -translate-y-2/4',
   inputIcon: 'inline-block text-base',
   panel: ({ props }) => ({
     class: [
