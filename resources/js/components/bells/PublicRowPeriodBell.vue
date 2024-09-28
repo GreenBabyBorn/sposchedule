@@ -11,13 +11,13 @@ const period = toRef(() => props.period);
 </script>
 <template>
 
-    <tr>
+    <tr class="bg-surface-200 dark:bg-surface-700 py-4">
         <td class=" px-4 text-center py-4 font-bold text-surface-700 group-last:border-none  dark:text-surface-400">
             {{ period.index }} пара
         </td>
 
-        <td class=" px-4 text-center py-4 group-last:border-none ">
-            <div class="mb-2">
+        <td class="px-4 text-center py-4 group-last:border-none flex flex-col gap-1 justify-center">
+            <div class="">
                 {{ period.period_from }} - {{ period.period_to }}
             </div>
             <div v-if="period?.period_from_after && period?.period_from_after">

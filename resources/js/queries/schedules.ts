@@ -84,9 +84,12 @@ export function usePrintChangesSchedulesQuery(date) {
       (await axios.get(`/api/schedules/changes/print?date=${date.value}`)).data,
   });
 }
-export function usePrintMainSchedulesQuery(semester_id, course) {
+export function usePrintMainSchedulesQuery(semester_id, course, buildings) {
   const enabled = computed(
-    () => Boolean(semester_id.value) || Boolean(course.value)
+    () =>
+      Boolean(semester_id.value) ||
+      Boolean(course.value) ||
+      Boolean(buildings.value)
   );
 
   return useQuery({
@@ -96,7 +99,7 @@ export function usePrintMainSchedulesQuery(semester_id, course) {
     queryFn: async () =>
       (
         await axios.get(
-          `/api/schedules/main/semester/${semester_id.value}/print?course=${course.value}`
+          `/api/schedules/main/semester/${semester_id.value}/print?course=${course.value}&buildings=${buildings?.value?.toString()}`
         )
       ).data,
   });

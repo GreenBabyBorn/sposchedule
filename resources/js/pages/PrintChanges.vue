@@ -106,7 +106,7 @@ const monthDeclensions = {
 </script>
 
 <template>
-    <div class="main">
+    <div class="main" v-if="changesSchedules?.['1-5']">
         <div class="top">
             <div class="flex justify-between">
                 <div>Исполнитель: <span contenteditable class="underline">{{ user?.name
@@ -188,7 +188,7 @@ const monthDeclensions = {
             </table>
         </div>
     </div>
-    <div class="main">
+    <div v-if="changesSchedules?.['6']" class="main">
         <div class="top">
             <div class="flex justify-between">
                 <div>Исполнитель: <span contenteditable class="underline">{{ user.name

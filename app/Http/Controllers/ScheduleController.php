@@ -441,118 +441,7 @@ class ScheduleController extends Controller
     }
 
 
-    public function getScheduleByDatePrint(Request $request)
-    {
-        // Получаем дату из запроса
-        $date = $request->input('date');
 
-        // Преобразуем дату в объект Carbon
-        $carbonDate = Carbon::parse($date);
-
-        // Получаем день недели в формате, соответствующем полю week_day в расписании ('ПН', 'ВТ', ...)
-        $weekDayMapping = [
-            0 => 'ВС',
-            1 => 'ПН',
-            2 => 'ВТ',
-            3 => 'СР',
-            4 => 'ЧТ',
-            5 => 'ПТ',
-            6 => 'СБ',
-        ];
-
-        $weekDay = $weekDayMapping[$carbonDate->dayOfWeek];
-
-        // Продолжаем с группами
-        $groupsQuery = Group::query();
-        $course = $request->input('course');
-        if ($course) {
-            $groupsQuery->where('course', $course);
-        }
-        $groups = $groupsQuery->get();
-
-        // Получаем все изменения расписания (type = 'changes') для выбранного дня недели
-        $changes = Schedule::where('type', 'changes')
-            ->where('date', $carbonDate)
-            ->get();
-
-        // Определяем семестр
-        $semester = Semester::where('start', '<=', $carbonDate)
-            ->where('end', '>=', $carbonDate)
-            ->first();
-
-        if (!$semester) {
-            return response()->json([
-                'error' => 404,
-                'message' => 'Семестра на данную дату не найдено'
-            ], 404);
-        }
-
-        // Определяем номер недели с начала семестра
-        $semesterStart = Carbon::parse($semester->start);
-        $weekNumber = $semesterStart->diffInWeeks($carbonDate);
-
-        // Если неделя четная - ЧИСЛ, нечетная - ЗНАМ
-        $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
-
-        // Массив для хранения финального расписания, сгруппированного по зданиям
-        $finalSchedules = [
-            '1-5' => [
-                'week_type' => $weekType,
-                'schedules' => []
-            ],
-            '6' => [
-                'week_type' => $weekType,
-                'schedules' => []
-            ],
-        ];
-
-        foreach ($groups as $group) {
-            // Получаем изменения для текущей группы и текущего дня недели
-            $groupChanges = $changes->where('group_id', $group->id);
-
-            // Создаем временное хранилище для расписания
-            $groupSchedule = [];
-
-            // Заменяем или дополняем слоты изменениями (changes)
-            foreach ($groupChanges as $change) {
-                if ($change->published) {
-                    $groupSchedule = [
-                        'id' => $change->id,
-                        'week_type' => $change->week_type,
-                        'lessons' => LessonResource::collection(Lesson::where('schedule_id', $change->id)
-                            ->orderBy('index')
-                            ->get()),
-                    ];
-                }
-            }
-
-            // Получаем все здания, связанные с текущей группой
-            $buildings = $group->buildings;
-
-            foreach ($buildings as $building) {
-                // Группируем расписания по зданию (building)
-                $buildingKey = $building->name == '6' ? '6' : '1-5';
-
-                // Проверяем, существует ли семестр
-                $filteredSemester = $group->semesters->filter(function ($semester) use ($carbonDate) {
-                    $start = Carbon::parse($semester->start);
-                    $end = Carbon::parse($semester->end);
-                    return $carbonDate->between($start, $end);
-                })->first();
-
-                // Если семестр найден, передаем его в SemesterResource, если нет — передаем null или другое значение
-                array_push($finalSchedules[$buildingKey]['schedules'], [
-                    'semester' => $filteredSemester ? new SemesterResource($filteredSemester) : null, // Проверка на null
-                    'group' => new SkinnyGroup($group),
-                    'schedule' => $groupSchedule,
-                ]);
-            }
-        }
-
-
-        // Возвращаем финальное расписание
-        return response()->json($finalSchedules);
-    }
 
     // public function getPublicSchedules(Request $request)
     // {
@@ -969,23 +858,154 @@ class ScheduleController extends Controller
         return response()->json($finalSchedules);
     }
 
-    public function getSchedulesMainPrint(Semester $semester, Request $request)
+    public function getScheduleByDatePrint(Request $request)
     {
-        // Получаем курс из query параметров
-        $course = $request->query('course');
+        // Получаем дату из запроса
+        $date = $request->input('date');
 
-        // Если курс указан, фильтруем группы по этому курсу, иначе получаем все группы
+        // Преобразуем дату в объект Carbon
+        $carbonDate = Carbon::parse($date);
+
+        // Получаем день недели в формате, соответствующем полю week_day в расписании ('ПН', 'ВТ', ...)
+        $weekDayMapping = [
+            0 => 'ВС',
+            1 => 'ПН',
+            2 => 'ВТ',
+            3 => 'СР',
+            4 => 'ЧТ',
+            5 => 'ПТ',
+            6 => 'СБ',
+        ];
+
+        $weekDay = $weekDayMapping[$carbonDate->dayOfWeek];
+
+        // Продолжаем с группами
         $groupsQuery = Group::query();
+        $course = $request->input('course');
         if ($course) {
             $groupsQuery->where('course', $course);
         }
         $groups = $groupsQuery->get();
 
-        // Инициализируем массивы для двух зданий: 1-5 и 6
-        $response = [
-            '1-5' => [],
-            '6' => []
+        // Получаем все изменения расписания (type = 'changes') для выбранного дня недели
+        $changes = Schedule::where('type', 'changes')
+            ->where('date', $carbonDate)
+            ->get();
+
+        // Определяем семестр
+        $semester = Semester::where('start', '<=', $carbonDate)
+            ->where('end', '>=', $carbonDate)
+            ->first();
+
+        if (!$semester) {
+            return response()->json([
+                'error' => 404,
+                'message' => 'Семестра на данную дату не найдено'
+            ], 404);
+        }
+
+        // Определяем номер недели с начала семестра
+        $semesterStart = Carbon::parse($semester->start);
+        $weekNumber = $semesterStart->diffInWeeks($carbonDate);
+
+        // Если неделя четная - ЧИСЛ, нечетная - ЗНАМ
+        $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
+
+        // Массив для хранения финального расписания, сгруппированного по зданиям
+        $finalSchedules = [
+            '1-5' => [
+                'week_type' => $weekType,
+                'schedules' => []
+            ],
+            '6' => [
+                'week_type' => $weekType,
+                'schedules' => []
+            ],
         ];
+
+        foreach ($groups as $group) {
+            // Получаем изменения для текущей группы и текущего дня недели
+            $groupChanges = $changes->where('group_id', $group->id);
+
+            // Создаем временное хранилище для расписания
+            $groupSchedule = [];
+
+            // Заменяем или дополняем слоты изменениями (changes)
+            foreach ($groupChanges as $change) {
+                if ($change->published) {
+                    $groupSchedule = [
+                        'id' => $change->id,
+                        'week_type' => $change->week_type,
+                        'lessons' => LessonResource::collection(Lesson::where('schedule_id', $change->id)
+                            ->orderBy('index')
+                            ->get()),
+                    ];
+                }
+            }
+
+            // Если нет изменений или расписаний, пропускаем текущую группу
+            if (empty($groupSchedule)) {
+                continue;
+            }
+
+            // Получаем все здания, связанные с текущей группой
+            $buildings = $group->buildings;
+
+            foreach ($buildings as $building) {
+                // Группируем расписания по зданию (building)
+                $buildingKey = $building->name == '6' ? '6' : '1-5';
+
+                // Проверяем, существует ли семестр
+                $filteredSemester = $group->semesters->filter(function ($semester) use ($carbonDate) {
+                    $start = Carbon::parse($semester->start);
+                    $end = Carbon::parse($semester->end);
+                    return $carbonDate->between($start, $end);
+                })->first();
+
+                // Если семестр найден, передаем его в SemesterResource, если нет — передаем null или другое значение
+                array_push($finalSchedules[$buildingKey]['schedules'], [
+                    'semester' => $filteredSemester ? new SemesterResource($filteredSemester) : null, // Проверка на null
+                    'group' => new SkinnyGroup($group),
+                    'schedule' => $groupSchedule,
+                ]);
+            }
+        }
+
+        // Фильтруем пустые расписания, чтобы выводить только те здания, в которых есть расписания
+        $finalSchedules = array_filter($finalSchedules, function ($buildingSchedule) {
+            return !empty($buildingSchedule['schedules']);
+        });
+
+        // Возвращаем финальное расписание
+        return response()->json($finalSchedules);
+    }
+
+
+    public function getSchedulesMainPrint(Semester $semester, Request $request)
+    {
+        // Получаем курс и диапазон корпусов из query параметров
+        $course = $request->query('course');
+        $buildingsFilter = $request->query('buildings', null); // Ожидается строка или массив
+
+        // Если курс указан, фильтруем группы по этому курсу, иначе получаем все группы
+        $groupsQuery = Group::query();
+        if ($course) {
+            // Убедимся, что курс передан как целое число
+            $groupsQuery->where('course', intval($course));
+        }
+
+        // Загружаем группы с их связанными зданиями
+        $groups = $groupsQuery->with('buildings')->get();
+
+        // Преобразуем фильтр зданий в массив, если он был передан
+        $buildingsFilterArray = null;
+        if ($buildingsFilter) {
+            // Разделяем строку по запятым и преобразуем в массив
+            $buildingsFilterArray = array_map('trim', explode(',', $buildingsFilter));
+        }
+
+        // Инициализируем пустой массив для ответа
+        $response = [];
 
         foreach ($groups as $group) {
             // Получаем расписания для данной группы с типом 'main'
@@ -1049,22 +1069,27 @@ class ScheduleController extends Controller
                 $groupSchedule[$weekDay] = array_values($dayLessons);
             }
 
-            // Преобразуем коллекцию зданий группы в массив
-            $buildings = $group->buildings->pluck('id')->toArray(); // Преобразуем здания группы в массив идентификаторов
+            // Преобразуем коллекцию зданий группы в массив имен зданий
+            $buildings = $group->buildings->pluck('name')->toArray();
 
-            // Определяем ключ здания для данной группы (1-5 или 6)
-            $buildingKey = in_array(6, $buildings) ? '6' : '1-5';
+            // Если указан фильтр по корпусам, проверяем, попадает ли группа в нужные корпуса
+            if ($buildingsFilterArray) {
+                $intersectedBuildings = array_intersect($buildingsFilterArray, $buildings);
 
-            // Добавляем расписание этой группы в соответствующий массив здания
-            $response[$buildingKey][] = [
+                // Если пересечения нет, пропускаем эту группу
+                if (empty($intersectedBuildings)) {
+                    continue;
+                }
+            }
+
+            // Добавляем расписание группы в общий ответ
+            $response[] = [
                 'group' => new SkinnyGroup($group), // Информация о группе
+                'buildings' => $buildings, // Связанные здания
                 'schedule' => $groupSchedule // Расписание по дням недели
             ];
         }
 
         return response()->json($response);
     }
-
-
-
 }

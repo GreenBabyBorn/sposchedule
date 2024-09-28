@@ -4,4 +4,8 @@
 <template>
     <slot />
 </template>
-<style></style>
+<style>
+body {
+    background: none;
+}
+</style>

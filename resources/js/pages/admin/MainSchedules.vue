@@ -3,12 +3,17 @@ import ScheduleItem from '../../components/schedule/AdminMainScheduleItem.vue'
 import Select from 'primevue/select';
 import { computed, onMounted, ref, watch } from 'vue'
 import { useGroupsQuery } from '@/queries/groups';
-import { useMainSchedulesQuery, useUpdateSchedule } from '@/queries/schedules';
+import { useCoursesQuery, useMainSchedulesQuery, useUpdateSchedule } from '@/queries/schedules';
 import { useScheduleStore } from '@/stores/schedule'
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import { useStorage } from '@vueuse/core';
+import Button from 'primevue/button';
+import { useSemestersQuery } from '@/queries/semesters';
+import MultiSelect from 'primevue/multiselect';
+import { useBuildingsQuery } from '@/queries/buildings';
+
 
 const route = useRoute()
 
@@ -68,6 +73,28 @@ onMounted(() => {
 
 });
 
+const semesterForPrint = ref();
+const { data: allSemesters } = useSemestersQuery()
+
+const course = ref(null);
+const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
+
+const coursesWithLabel = computed(() => {
+    return courses.value?.map(course => ({
+        label: `${course.course} курс`,
+        value: course.course
+    })) || [];
+
+})
+
+const selectedBuildings = ref(null)
+const { data: buildingsFethed } = useBuildingsQuery()
+const buildings = computed(() => {
+    return buildingsFethed.value?.map(building => ({
+        value: building.name,
+        label: `${building.name} корпус`,
+    })) || [];
+})
 
 </script>
 
@@ -82,8 +109,27 @@ onMounted(() => {
                     optionValue="name" optionLabel="name" placeholder="Группа" class="w-full md:w-[10rem]" />
                 <Select v-model="selectedMainSemester" :options="semesters" optionLabel="name" placeholder="Семестр"
                     class="w-full md:w-[15rem]" />
-                <a class="pi pi-print relative items-center inline-flex text-center align-bottom justify-center leading-[normal] px-3 py-2 rounded-md text-primary-contrast bg-primary border border-primary focus:outline-none focus:outline-offset-0 focus:ring-1 hover:bg-primary-emphasis hover:border-primary-emphasis focus:ring-primary transition duration-200 ease-in-out cursor-pointer overflow-hidden select-none"
-                    target="_blank" title="На печать" :href="`/print/main`"></a>
+
+                <div class="flex gap-2 items-center border-l border-surface-600  pl-2">
+                    <Select show-clear v-model="semesterForPrint" :options="allSemesters" placeholder="Семестры"
+                        option-label="name" class="" />
+                    <MultiSelect :max-selected-labels="2" :selectedItemsLabel="'{0} выбрано'"
+                        v-model="selectedBuildings" :options="buildings" placeholder="Корпуса" option-label="label"
+                        class="" />
+                    <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
+                        option-value="value" placeholder="Курс"></Select>
+                    <Button :disabled="!course || !selectedBuildings || !semesterForPrint" icon="pi pi-print"
+                        as="router-link" :to="{
+
+                            path: '/print/main', query: {
+                                semester: semesterForPrint?.id,
+                                course: course,
+                                buildings: [selectedBuildings?.map(obj => obj.value)],
+                            }
+                        }" />
+
+
+                </div>
             </div>
         </div>
         <div class="flex flex-col gap-6">

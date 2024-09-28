@@ -91,7 +91,7 @@ const minDate = ref(new Date());
         </div>
         <div class="">
             <form class="flex flex-wrap items-end gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <div class="basis-1/5">
+                <div class="">
                     <label for="years" class=" block mb-1">Учебный год</label>
                     <!-- <InputText id="years" v-model="inputSemester.years" placeholder="2023/2024"></InputText> -->
                     <DatePicker placeholder="Учебный год" :min-date="minDate" view="year" input-id="dates"

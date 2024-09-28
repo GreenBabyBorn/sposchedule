@@ -9,47 +9,15 @@ import { storeToRefs } from 'pinia';
 const route = useRoute();
 const semesterId = ref()
 const course = ref()
+const buildings = ref()
 onMounted(() => {
     semesterId.value = route.query.semester;
     course.value = route.query.course;
+    buildings.value = route.query.buildings;
 })
 
 // const selectedCourse = ref()
-const { data: mainSchedules, isFetched, error, isError, isLoading, isSuccess, isFetchedAfterMount } = usePrintMainSchedulesQuery(semesterId, course);
-
-// const blocks1_5 = computed(() => {
-//     const chunkSize = 4; // Размер подмассива
-//     const result = [];
-
-//     for (let i = 0; i < changesSchedules?.value?.['1-5']?.schedules?.length; i += chunkSize) {
-//         const chunk = changesSchedules?.value?.['1-5']?.schedules.slice(i, i + chunkSize);
-
-//         // Добавление пустых объектов, если подмассив меньше чем 4 элемента
-//         while (chunk.length < chunkSize) {
-//             chunk.push({}); // или chunk.push(null); в зависимости от того, что должно быть в пустых местах
-//         }
-
-//         result.push(chunk);
-//     }
-
-//     return result;
-// }); const blocks6 = computed(() => {
-//     const chunkSize = 4; // Размер подмассива
-//     const result = [];
-
-//     for (let i = 0; i < changesSchedules?.value?.['6'].schedules.length; i += chunkSize) {
-//         const chunk = changesSchedules?.value?.['6'].schedules.slice(i, i + chunkSize);
-
-//         // Добавление пустых объектов, если подмассив меньше чем 4 элемента
-//         while (chunk.length < chunkSize) {
-//             chunk.push({}); // или chunk.push(null); в зависимости от того, что должно быть в пустых местах
-//         }
-
-//         result.push(chunk);
-//     }
-
-//     return result;
-// });
+const { data: mainSchedules, isFetched, error, isError, isLoading, isSuccess, isFetchedAfterMount } = usePrintMainSchedulesQuery(semesterId, course, buildings);
 
 
 const dayNamesWithPreposition = {
@@ -64,8 +32,8 @@ const dayNamesWithPreposition = {
 
 
 
-const authStore = useAuthStore()
-const { user, isAuth } = storeToRefs(authStore)
+// const authStore = useAuthStore()
+// const { user, isAuth } = storeToRefs(authStore)
 
 
 watch([isFetchedAfterMount, isSuccess], async () => {
@@ -75,7 +43,7 @@ watch([isFetchedAfterMount, isSuccess], async () => {
 
         // Ждём завершения загрузки ресурсов и запускаем печать
 
-        // window.print();
+        window.print();
 
     }
 });
@@ -84,33 +52,6 @@ watch([isFetchedAfterMount, isSuccess], async () => {
 
 const daysOfWeek = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
 
-function getIndexes(items) {
-    const daysIndexes = {
-        'ПН': new Set(),
-        'ВТ': new Set(),
-        'СР': new Set(),
-        'ЧТ': new Set(),
-        'ПТ': new Set(),
-        'СБ': new Set(),
-    }
-
-    for (const item of items) {
-        for (const day of daysOfWeek) {
-            for (const index of item.schedule[day]) {
-                daysIndexes[day].add(index.index);
-            }
-        }
-    }
-
-    // Преобразуем Set в массивы
-    const result = {};
-    for (const day in daysIndexes) {
-        result[day] = Array.from(daysIndexes[day]);
-    }
-
-    console.log(result);
-    return result;
-}
 
 const getIndexesFromWeekdays = computed(() => {
     const daysIndexes = {
@@ -122,7 +63,7 @@ const getIndexesFromWeekdays = computed(() => {
         'СБ': new Set(),
     }
 
-    for (const item of mainSchedules?.value?.['1-5']) {
+    for (const item of mainSchedules?.value) {
         for (const day of daysOfWeek) {
             for (const index of item.schedule[day]) {
                 daysIndexes[day].add(index.index);
@@ -136,7 +77,6 @@ const getIndexesFromWeekdays = computed(() => {
         result[day] = Array.from(daysIndexes[day]).sort((a: number, b: number) => a - b);
     }
 
-    console.log(result);
     return result;
 })
 
@@ -144,7 +84,7 @@ const getIndexesFromWeekdays = computed(() => {
 
 <template>
     <div class="main">
-        <div class="top">
+        <div v-if="mainSchedules" class="top">
             <div class="flex justify-end">
                 <div contenteditable class="text-right ">
                     УТВЕРЖДАЮ <br>
@@ -153,9 +93,9 @@ const getIndexesFromWeekdays = computed(() => {
                 </div>
             </div>
 
-            <div @click="getIndexes(mainSchedules?.['1-5'])" class="info">
-                <h1 class="text-sm">Расписание учебных занятий на 1 семестр 2024-2025 учебного года</h1>
-                <h2 class="text-xs"> {{ course }} курс Учебный корпус №1 - №5</h2>
+            <div class="info">
+                <h1 contenteditable class="text-sm">Расписание учебных занятий на 1 семестр 2024-2025 учебного года</h1>
+                <h2 contenteditable class="text-xs"> {{ course }} курс Учебный корпус №{{ buildings?.toString() }}</h2>
             </div>
         </div>
 
@@ -163,10 +103,10 @@ const getIndexesFromWeekdays = computed(() => {
 
 
             <div v-for="weekDay in daysOfWeek" :key="weekDay">
-                <table :width="mainSchedules?.['1-5']?.length * 150 + 'px'">
+                <table :width="mainSchedules?.length * 150 + 'px'">
                     <tr v-if="weekDay === 'ПН'">
 
-                        <template v-for="group_schedule in mainSchedules?.['1-5']" :key="group_schedule?.group.name">
+                        <template v-for="group_schedule in mainSchedules" :key="group_schedule?.group.name">
                             <th width="10px" class="bg-yellow-300">
 
                             </th>
@@ -179,13 +119,12 @@ const getIndexesFromWeekdays = computed(() => {
                         </template>
                     </tr>
                 </table>
-                <table :width="mainSchedules?.['1-5']?.length * 150 + 'px'"
+                <table :width="mainSchedules?.length * 150 + 'px'"
                     :class="{ 'border-t-8 border-blue-400': weekDay !== 'ПН' }" class="border-collapse">
                     <thead>
 
                         <tr>
-                            <template v-for="group_schedule in mainSchedules?.['1-5']"
-                                :key="group_schedule?.group.name">
+                            <template v-for="group_schedule in mainSchedules" :key="group_schedule?.group.name">
                                 <th width="10px" class="bg-yellow-300">
                                     <div v-if="weekDay === 'ПН'"
                                         style="display: flex; justify-content: center; align-items: center; padding: 5px 0px;">
@@ -227,10 +166,9 @@ const getIndexesFromWeekdays = computed(() => {
                             </template>
                         </tr>
                     </thead>
-                    <tbody v-if="mainSchedules?.['1-5']">
+                    <tbody v-if="mainSchedules">
                         <tr v-for="index in getIndexesFromWeekdays?.[weekDay]" :key="index">
-                            <template v-for="group_schedule in mainSchedules?.['1-5']"
-                                :key="group_schedule?.group.name">
+                            <template v-for="group_schedule in mainSchedules" :key="group_schedule?.group.name">
                                 <td class="bg-yellow-300 font-bold"
                                     v-if="getIndexesFromWeekdays?.[weekDay][0] === index"
                                     :rowspan="getIndexesFromWeekdays?.[weekDay]?.length">
@@ -407,13 +345,13 @@ td {
 .subject-name {
     text-align: center;
     text-transform: uppercase;
-    font-size: 5px;
+    font-size: 6px;
 }
 
 .teacher {
     text-align: center;
 
-    font-size: 5px;
+    font-size: 6px;
 }
 
 .cabinet {

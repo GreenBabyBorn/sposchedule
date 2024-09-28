@@ -340,7 +340,7 @@ function toggleFilters() {
                 </h2>
                 <div v-if="publicBells" class="flex justify-center items-center ">
                     <div class="overflow-x-auto rounded-md">
-                        <table class="min-w-full border-collapse table-auto">
+                        <table class="border-collapse table-auto">
                             <tbody>
                                 <PublicRowPeriodBell :key="period.id" v-for="period in publicBells?.periods"
                                     :period="period">
