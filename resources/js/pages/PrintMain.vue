@@ -5,6 +5,7 @@ import { computed, onMounted, ref, watch, onUpdated, nextTick } from 'vue';
 import { useRoute, } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
+import { useSemesterShowQuery } from '@/queries/semesters';
 
 const route = useRoute();
 const semesterId = ref()
@@ -80,6 +81,8 @@ const getIndexesFromWeekdays = computed(() => {
     return result;
 })
 
+const { data: semester } = useSemesterShowQuery(semesterId)
+
 </script>
 
 <template>
@@ -94,7 +97,9 @@ const getIndexesFromWeekdays = computed(() => {
             </div>
 
             <div class="info">
-                <h1 contenteditable class="text-sm">Расписание учебных занятий на 1 семестр 2024-2025 учебного года</h1>
+                <h1 contenteditable class="text-sm">Расписание учебных занятий на {{ semester?.index }} cеместр {{
+                    semester?.years }} учебного года
+                </h1>
                 <h2 contenteditable class="text-xs"> {{ course }} курс Учебный корпус №{{ buildings?.toString() }}</h2>
             </div>
         </div>

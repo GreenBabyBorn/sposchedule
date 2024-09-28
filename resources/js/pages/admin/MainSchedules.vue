@@ -10,7 +10,7 @@ import { useRoute } from 'vue-router';
 import router from '@/router';
 import { useStorage } from '@vueuse/core';
 import Button from 'primevue/button';
-import { useSemestersQuery } from '@/queries/semesters';
+import { useSemesterShowQuery, useSemestersQuery } from '@/queries/semesters';
 import MultiSelect from 'primevue/multiselect';
 import { useBuildingsQuery } from '@/queries/buildings';
 
@@ -96,6 +96,8 @@ const buildings = computed(() => {
     })) || [];
 })
 
+
+
 </script>
 
 <template>
@@ -103,14 +105,14 @@ const buildings = computed(() => {
         <div class="flex flex-wrap justify-between items-baseline">
             <h1 class="text-2xl">Основное расписание</h1>
         </div>
-        <div class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
+        <div class="flex  flex-wrap items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex flex-wrap  gap-2 items-center">
-                <Select :autoFilterFocus="true" filter v-model="selectedMainGroupName" :options="groups"
-                    optionValue="name" optionLabel="name" placeholder="Группа" class="w-full md:w-[10rem]" />
-                <Select v-model="selectedMainSemester" :options="semesters" optionLabel="name" placeholder="Семестр"
-                    class="w-full md:w-[15rem]" />
+                <Select fluid :autoFilterFocus="true" filter v-model="selectedMainGroupName" :options="groups"
+                    optionValue="name" optionLabel="name" placeholder="Группа" class="" />
+                <Select fluid v-model="selectedMainSemester" :options="semesters" optionLabel="name"
+                    placeholder="Семестр" class="" />
 
-                <div class="flex gap-2 items-center border-l border-surface-600  pl-2">
+                <div class="flex  flex-wrap gap-2 items-center border-l border-surface-600  pl-2">
                     <Select show-clear v-model="semesterForPrint" :options="allSemesters" placeholder="Семестры"
                         option-label="name" class="" />
                     <MultiSelect :max-selected-labels="2" :selectedItemsLabel="'{0} выбрано'"
@@ -118,8 +120,8 @@ const buildings = computed(() => {
                         class="" />
                     <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
                         option-value="value" placeholder="Курс"></Select>
-                    <Button :disabled="!course || !selectedBuildings || !semesterForPrint" icon="pi pi-print"
-                        as="router-link" :to="{
+                    <Button target="_blank" :disabled="!course || !selectedBuildings || !semesterForPrint"
+                        icon="pi pi-print" as="router-link" :to="{
 
                             path: '/print/main', query: {
                                 semester: semesterForPrint?.id,

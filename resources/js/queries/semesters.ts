@@ -8,6 +8,17 @@ export function useSemestersQuery() {
   });
 }
 
+export function useSemesterShowQuery(id) {
+  return useQuery({
+    queryKey: ['semesters', id],
+    queryFn: async () => {
+      const url = `/api/semesters/${id.value}`;
+      const response = await axios.get(url);
+      return response.data;
+    },
+  });
+}
+
 export function useStoreSemester() {
   const queryClient = useQueryClient();
   let storeSemesterMutation = useMutation({
