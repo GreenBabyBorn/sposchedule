@@ -969,4 +969,102 @@ class ScheduleController extends Controller
         return response()->json($finalSchedules);
     }
 
+    public function getSchedulesMainPrint(Semester $semester, Request $request)
+    {
+        // Получаем курс из query параметров
+        $course = $request->query('course');
+
+        // Если курс указан, фильтруем группы по этому курсу, иначе получаем все группы
+        $groupsQuery = Group::query();
+        if ($course) {
+            $groupsQuery->where('course', $course);
+        }
+        $groups = $groupsQuery->get();
+
+        // Инициализируем массивы для двух зданий: 1-5 и 6
+        $response = [
+            '1-5' => [],
+            '6' => []
+        ];
+
+        foreach ($groups as $group) {
+            // Получаем расписания для данной группы с типом 'main'
+            $schedules = Schedule::where('group_id', $group->id)
+                ->where('semester_id', $semester->id)
+                ->where('type', 'main')
+                ->where('published', true)
+                ->with('lessons') // Загрузить уроки вместе с расписанием
+                ->get()
+                ->groupBy('week_day');
+
+            // Инициализируем пустой массив для расписания этой группы по дням недели
+            $groupSchedule = [
+                'ПН' => [],
+                'ВТ' => [],
+                'СР' => [],
+                'ЧТ' => [],
+                'ПТ' => [],
+                'СБ' => [],
+                'ВС' => [],
+            ];
+
+            // Заполняем расписание по дням недели
+            foreach ($schedules as $weekDay => $scheduleGroup) {
+                // Подготавливаем массив для дня недели
+                $dayLessons = [];
+
+                // Сортируем расписание по времени начала урока
+                foreach ($scheduleGroup as $schedule) {
+                    foreach ($schedule->lessons as $lesson) {
+                        $index = $lesson->index; // Поле "index", указывающее номер пары
+
+                        if (!isset($dayLessons[$index])) {
+                            $dayLessons[$index] = [
+                                'index' => $index,
+                            ];
+                        }
+
+                        if ($lesson->week_type === 'ЧИСЛ' && !empty($lesson)) {
+                            $dayLessons[$index]['ЧИСЛ'] = new LessonResource($lesson);
+                            if (empty($dayLessons[$index]['ЗНАМ'])) {
+                                $dayLessons[$index]['ЗНАМ'] = new \stdClass();
+                            }
+                        }
+
+                        if ($lesson->week_type === 'ЗНАМ' && !empty($lesson)) {
+                            $dayLessons[$index]['ЗНАМ'] = new LessonResource($lesson);
+                            if (empty($dayLessons[$index]['ЧИСЛ'])) {
+                                $dayLessons[$index]['ЧИСЛ'] = new \stdClass();
+                            }
+                        }
+
+                        if ($lesson->week_type === null) {
+                            $dayLessons[$index]['lesson'] = new LessonResource($lesson);
+                        }
+                    }
+                }
+
+                ksort($dayLessons);
+                // Преобразуем $dayLessons в плоский массив и добавляем его в расписание для дня недели
+                $groupSchedule[$weekDay] = array_values($dayLessons);
+            }
+
+            // Преобразуем коллекцию зданий группы в массив
+            $buildings = $group->buildings->pluck('id')->toArray(); // Преобразуем здания группы в массив идентификаторов
+
+            // Определяем ключ здания для данной группы (1-5 или 6)
+            $buildingKey = in_array(6, $buildings) ? '6' : '1-5';
+
+            // Добавляем расписание этой группы в соответствующий массив здания
+            $response[$buildingKey][] = [
+                'group' => new SkinnyGroup($group), // Информация о группе
+                'schedule' => $groupSchedule // Расписание по дням недели
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+
+
 }

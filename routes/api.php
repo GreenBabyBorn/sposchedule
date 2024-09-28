@@ -22,6 +22,7 @@ Route::get('/bells/presets', [BellController::class, 'presetsBells']);
 Route::apiResource('bells', BellController::class)->only(['index', 'show']);
 Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
 Route::get('/schedules/changes/print', [ScheduleController::class, 'getScheduleByDatePrint']);
+Route::get('/schedules/main/semester/{semester}/print', [ScheduleController::class, 'getSchedulesMainPrint']);
 Route::get('/groups/courses', [GroupController::class, 'getCourses']);
 Route::get('/groups/public', [GroupController::class, 'indexPublic']);
 Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);

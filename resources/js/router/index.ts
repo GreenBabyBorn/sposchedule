@@ -17,6 +17,7 @@ import AuthView from '../pages/Login.vue';
 import Bells from '../pages/admin/Bells.vue';
 import NotFound from '../pages/NotFound.vue';
 import PrintView from '../pages/PrintChanges.vue';
+import PrintMainView from '../pages/PrintMain.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
@@ -47,6 +48,15 @@ const router = createRouter({
       component: PrintView,
       meta: {
         layout: AppLayoutsEnum.empty,
+        title: 'Изменения',
+      },
+    },
+    {
+      path: '/print/main',
+      component: PrintMainView,
+      meta: {
+        layout: AppLayoutsEnum.empty,
+        title: 'Основное',
       },
     },
     // {

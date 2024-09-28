@@ -84,6 +84,23 @@ export function usePrintChangesSchedulesQuery(date) {
       (await axios.get(`/api/schedules/changes/print?date=${date.value}`)).data,
   });
 }
+export function usePrintMainSchedulesQuery(semester_id, course) {
+  const enabled = computed(
+    () => Boolean(semester_id.value) || Boolean(course.value)
+  );
+
+  return useQuery({
+    enabled: enabled,
+    queryKey: ['PrintScheduleMain', semester_id, course],
+    retry: 0,
+    queryFn: async () =>
+      (
+        await axios.get(
+          `/api/schedules/main/semester/${semester_id.value}/print?course=${course.value}`
+        )
+      ).data,
+  });
+}
 
 export function useStoreScheduleChange() {
   const queryClient = useQueryClient();
