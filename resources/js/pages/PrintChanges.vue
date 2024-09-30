@@ -81,7 +81,7 @@ watch([isFetchedAfterMount, isSuccess], async () => {
 
         // Ждём завершения загрузки ресурсов и запускаем печать
 
-        window.print();
+        // window.print();
 
     }
 });
@@ -115,9 +115,9 @@ function printPage() {
     <div class="main" v-if="changesSchedules?.['1-5']">
         <div class="top">
             <div class="flex justify-between">
-                <div>Исполнитель: <span contenteditable class="underline">{{ user?.name
+                <div>Исполнитель: <span :contenteditable="isAuth" class="underline">{{ user?.name
                         }}</span></div>
-                <div contenteditable class="text-right">
+                <div :contenteditable="isAuth" class="text-right">
                     СОГЛАСОВАНО <br>
                     Зам. директора по УМР <br>
                     _________ О.А. Толубаева
@@ -282,6 +282,10 @@ function printPage() {
 @media print {
     @page {
         size: landscape;
+    }
+
+    .controls {
+        display: none;
     }
 
     .groups-row {
