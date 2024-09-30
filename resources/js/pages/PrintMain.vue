@@ -347,6 +347,7 @@ function printPage() {
     }
 
     .main {
+        overflow: visible !important;
         page-break-after: always;
     }
 }
@@ -367,7 +368,7 @@ function printPage() {
 
 .main {
     padding: 1rem;
-    overflow-x: scroll;
+    overflow: auto;
 }
 
 
