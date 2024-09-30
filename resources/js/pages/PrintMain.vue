@@ -10,6 +10,7 @@ import { useBuildingsQuery } from '@/queries/buildings';
 import MultiSelect from 'primevue/multiselect';
 import Select from 'primevue/select';
 import Button from 'primevue/button';
+import LoadingBar from '@/components/LoadingBar.vue';
 
 import ProgressSpinner from 'primevue/progressspinner';
 
@@ -128,6 +129,7 @@ function printPage() {
 </script>
 
 <template>
+    <LoadingBar />
     <div class="controls py-2 flex  flex-wrap gap-2 items-center  pl-2">
         <Select show-clear v-model="semesterForPrint" :options="allSemesters" placeholder="Семестры" option-label="name"
             class="" />
@@ -141,8 +143,7 @@ function printPage() {
 
     </div>
     <div class="main">
-        <ProgressSpinner v-if="isLoading">
-        </ProgressSpinner>
+
         <div v-if="mainSchedules" class="top">
             <div class="flex justify-end">
                 <div contenteditable class="text-right ">
@@ -366,6 +367,7 @@ function printPage() {
 
 .main {
     padding: 1rem;
+    overflow-x: scroll;
 }
 
 
