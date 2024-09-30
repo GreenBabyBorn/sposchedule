@@ -283,6 +283,13 @@ function toggleFilters() {
 
                             path: '/print/main',
                         }" />
+                    <Button severity="secondary" label="Изменения" target="_blank" icon="pi pi-print" as="router-link"
+                        :to="{
+                            path: '/print/changes',
+                            query: {
+                                date: isoDate
+                            }
+                        }" />
                 </div>
             </div>
 

@@ -4,6 +4,7 @@ import { useDateFormat, useStorage } from '@vueuse/core';
 import { computed, onMounted, ref, watch, onUpdated, nextTick } from 'vue';
 import { useRoute, } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
+import Button from 'primevue/button';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();
@@ -101,11 +102,16 @@ const monthDeclensions = {
 };
 
 
-
+function printPage() {
+    window.print();
+}
 
 </script>
 
 <template>
+    <div class="controls py-2 flex  flex-wrap gap-2 items-center  pl-2">
+        <Button label="Печать" @click="printPage()" icon="pi pi-print" />
+    </div>
     <div class="main" v-if="changesSchedules?.['1-5']">
         <div class="top">
             <div class="flex justify-between">
@@ -295,10 +301,7 @@ const monthDeclensions = {
     }
 }
 
-* {
-    font-family: 'Times New Roman', Times, serif;
-    font-size: 1.2rem;
-}
+* {}
 
 .bg-line {
     height: 2rem;
@@ -318,6 +321,8 @@ const monthDeclensions = {
 .main {
     padding: 1rem;
     overflow-x: hidden;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 1.2rem;
 }
 
 .schedules {

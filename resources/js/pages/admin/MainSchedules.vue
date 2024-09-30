@@ -3,17 +3,13 @@ import ScheduleItem from '../../components/schedule/AdminMainScheduleItem.vue'
 import Select from 'primevue/select';
 import { computed, onMounted, ref, watch } from 'vue'
 import { useGroupsQuery } from '@/queries/groups';
-import { useCoursesQuery, useMainSchedulesQuery, useUpdateSchedule } from '@/queries/schedules';
+import { useMainSchedulesQuery } from '@/queries/schedules';
 import { useScheduleStore } from '@/stores/schedule'
 import { storeToRefs } from 'pinia';
 import { useRoute } from 'vue-router';
 import router from '@/router';
 import { useStorage } from '@vueuse/core';
 import Button from 'primevue/button';
-import { useSemesterShowQuery, useSemestersQuery } from '@/queries/semesters';
-import MultiSelect from 'primevue/multiselect';
-import { useBuildingsQuery } from '@/queries/buildings';
-
 
 const route = useRoute()
 

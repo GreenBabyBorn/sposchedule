@@ -62,8 +62,8 @@ const dayNamesWithPreposition = {
 
 
 
-// const authStore = useAuthStore()
-// const { user, isAuth } = storeToRefs(authStore)
+const authStore = useAuthStore()
+const { user, isAuth } = storeToRefs(authStore)
 
 
 watch([isFetchedAfterMount, isSuccess], async () => {
@@ -108,12 +108,9 @@ const getIndexesFromWeekdays = computed(() => {
 
 const { data: semester } = useSemesterShowQuery(semesterId)
 
-
 function printPage() {
     window.print();
 }
-
-
 
 function updateQueryParams() {
     router.replace({
@@ -166,11 +163,11 @@ watchEffect(() => {
         <Select show-clear v-model="selectedSemester" :options="semesters" placeholder="Семестры" option-label="name"
             class="" />
         <MultiSelect :max-selected-labels="2" :selectedItemsLabel="'{0} выбрано'" v-model="selectedBuildings"
-            :options="buildings" placeholder="Корпуса" option-label="label" class="" />
-        <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
-            option-value="value" placeholder="Курс"></Select>
-        <Button @click="printPage()" :disabled="!course || !selectedBuildings || !selectedSemester || !isSuccess"
-            icon="pi pi-print" />
+            :options="buildings" placeholder="Корпуса" option-label="label" />
+        <Select showClear v-model="course" :options="coursesWithLabel" option-label="label" option-value="value"
+            placeholder="Курс"></Select>
+        <Button label="Печать" @click="printPage()"
+            :disabled="!course || !selectedBuildings || !selectedSemester || !isSuccess" icon="pi pi-print" />
 
 
     </div>
@@ -178,7 +175,7 @@ watchEffect(() => {
 
         <div class="top">
             <div class="flex justify-end">
-                <div contenteditable class="text-right ">
+                <div :contenteditable="isAuth" class="text-right ">
                     УТВЕРЖДАЮ <br>
                     директор <br>
                     _________ Клочков А.Ю.
@@ -186,10 +183,12 @@ watchEffect(() => {
             </div>
 
             <div class="info">
-                <h1 contenteditable class="text-sm">Расписание учебных занятий на {{ semester?.index }} cеместр {{
-                    semester?.years }} учебного года
+                <h1 :contenteditable="isAuth" class="text-sm">Расписание учебных занятий на {{ semester?.index }}
+                    cеместр {{
+                        semester?.years }} учебного года
                 </h1>
-                <h2 contenteditable class="text-xs"> {{ course }} курс Учебный корпус №{{ buildingsArray?.toString() }}
+                <h2 :contenteditable="isAuth" class="text-xs"> {{ course }} курс Учебный корпус №{{
+                    buildingsArray?.toString() }}
                 </h2>
             </div>
         </div>
@@ -366,7 +365,7 @@ watchEffect(() => {
 }
 
 * {
-    font-family: 'Arial', Times, serif;
+
     /* font-size: 1.2rem; */
 }
 
@@ -380,6 +379,7 @@ watchEffect(() => {
 }
 
 .main {
+    font-family: 'Arial', Times, serif;
     padding: 1rem;
     overflow: auto;
 }

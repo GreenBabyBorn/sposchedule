@@ -2,24 +2,19 @@
 
 import DatePicker from 'primevue/datepicker';
 import ChangesScheduleItem from '@/components/schedule/AdminChangesScheduleItem.vue';
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useChangesSchedulesQuery, useCoursesQuery } from '@/queries/schedules';
-import { useDateFormat, useNow } from '@vueuse/core';
+import { useDateFormat } from '@vueuse/core';
 import { useScheduleStore } from '@/stores/schedule';
 import { storeToRefs } from 'pinia';
 import router from '@/router';
 import { useRoute } from 'vue-router';
 import Select from 'primevue/select';
-import { useStorage } from '@vueuse/core'
-// import ProgressSpinner from 'primevue/progressspinner';
-// import Button from 'primevue/button';
+import Button from 'primevue/button';
 import { useTeachersQuery } from '@/queries/teachers';
 import { useSubjectsQuery } from '@/queries/subjects';
 import { useBuildingsQuery } from '@/queries/buildings';
 import { useGroupsPublicQuery } from '@/queries/groups';
-
-
-
 
 const route = useRoute()
 const scheduleStore = useScheduleStore();
@@ -29,9 +24,6 @@ const { setSchedulesChanges } = scheduleStore;
 const { data: subjects } = useSubjectsQuery()
 const { data: teachers } = useTeachersQuery()
 
-// Хранение query параметров в localStorage
-// const localStorage = useStorage('changesSchedules', { date: '', course: '' });
-
 const isoDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
 });
@@ -39,7 +31,6 @@ const isoDate = computed(() => {
 const selectedGroup = ref()
 const building = ref(null)
 
-// const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
 const { data: courses, isFetched: coursesFetched } = useCoursesQuery(building);
 
 const coursesWithLabel = computed(() => {
@@ -65,13 +56,9 @@ const updateQueryParams = () => {
             group: selectedGroup.value || null,
         },
     });
-
-    // Обновляем localStorage при изменении query параметров
-    // if (isoDate.value) localStorage.value.date = isoDate.value;
-    // localStorage.value.course = selectedCourse.value; 2
 };
 
-const { data: changesSchedules, isFetchedAfterMount, error, isError, isLoading } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
+const { data: changesSchedules, isError } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
 
 
 
@@ -111,13 +98,9 @@ onMounted(() => {
         // Если дата есть в query параметрах, используем ее
         const [day, month, year] = (route.query.date as string).split('.').map(Number);
         date.value = new Date(year, month - 1, day);
-        // localStorage.value.date = route.query.date as string; // Сохраняем в localStorage
+
     }
-    // else if (localStorage.value.date && dateRegex.test(route.query.date as string)) {
-    //     // Если даты нет в query, используем из localStorage
-    //     const [day, month, year] = localStorage.value.date.split('.').map(Number);
-    //     date.value = new Date(year, month - 1, day);
-    // } 
+
     else {
         // Если нет даты ни в query, ни в localStorage, используем текущую дату
         date.value = new Date();
@@ -136,12 +119,6 @@ onMounted(() => {
     }
 
 
-    // else if (localStorage.value.course) {
-    //     // Если курса нет в query, используем из localStorage
-    //     // course.value = localStorage.value.course;
-    // }
-
-    // Синхронизация параметров в URL
 
     updateQueryParams();
 })
@@ -192,13 +169,17 @@ const buildings = computed(() => {
                 </DatePicker>
                 <Select title="Корпус" showClear v-model="building" :options="buildings" option-label="label"
                     option-value="value" placeholder="Корпус"></Select>
-                <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
-                    option-value="value" placeholder="Курс"></Select>
+                <Select showClear v-model="course" :options="coursesWithLabel" option-label="label" option-value="value"
+                    placeholder="Курс"></Select>
                 <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
-                    v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name" placeholder="Группа"
-                    class="w-full md:w-[10rem]" />
-                <a class="pi pi-print relative items-center inline-flex text-center align-bottom justify-center leading-[normal] px-3 py-2 rounded-md text-primary-contrast bg-primary border border-primary focus:outline-none focus:outline-offset-0 focus:ring-1 hover:bg-primary-emphasis hover:border-primary-emphasis focus:ring-primary transition duration-200 ease-in-out cursor-pointer overflow-hidden select-none"
-                    target="_blank" title="На печать" :href="`/print/changes?date=${isoDate}`"></a>
+                    v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
+                    placeholder="Группа" />
+                <Button target="_blank" icon="pi pi-print" as="router-link" :to="{
+                    path: '/print/changes',
+                    query: {
+                        date: isoDate
+                    }
+                }" />
             </div>
         </div>
 
