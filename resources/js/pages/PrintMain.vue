@@ -142,9 +142,9 @@ function printPage() {
 
 
     </div>
-    <div class="main">
+    <div v-if="mainSchedules" class="main">
 
-        <div v-if="mainSchedules" class="top">
+        <div class="top">
             <div class="flex justify-end">
                 <div contenteditable class="text-right ">
                     УТВЕРЖДАЮ <br>
