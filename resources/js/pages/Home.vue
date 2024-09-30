@@ -76,10 +76,10 @@ const updateQueryParams = () => {
     router.replace({
         query: {
             ...route.query,
-            date: isoDate.value || null,
-            building: building.value || null,
-            course: selectedCourse.value || null,
-            group: selectedGroup.value || null,
+            date: isoDate.value || undefined,
+            building: building.value || undefined,
+            course: selectedCourse.value || undefined,
+            group: selectedGroup.value || undefined,
         },
     });
 
@@ -112,9 +112,6 @@ watch([isoDate, selectedCourse, selectedGroup, building], () => {
     updateQueryParams();
 
 }, { deep: true });
-
-
-
 
 watch(building, () => {
     course.value = null
@@ -281,6 +278,11 @@ function toggleFilters() {
                     <InputText class="w-full md:w-auto" @input="debouncedTeacherFn" v-model="teacher"
                         placeholder="Поиск по преподавателю">
                     </InputText>
+                    <Button severity="secondary" label="Основное" target="_blank" icon="pi pi-print" as="router-link"
+                        :to="{
+
+                            path: '/print/main',
+                        }" />
                 </div>
             </div>
 

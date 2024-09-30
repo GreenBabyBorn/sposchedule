@@ -89,7 +89,7 @@ export function usePrintMainSchedulesQuery(semester_id, course, buildings) {
     () =>
       Boolean(semester_id?.value) &&
       Boolean(course?.value) &&
-      Boolean(buildings?.value)
+      Boolean(buildings?.value.toString())
   );
 
   return useQuery({

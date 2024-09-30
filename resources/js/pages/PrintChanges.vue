@@ -274,6 +274,10 @@ const monthDeclensions = {
 
 <style scoped>
 @media print {
+    @page {
+        size: landscape;
+    }
+
     .groups-row {
         page-break-inside: avoid;
         /* Не разрывать группу внутри */
@@ -287,6 +291,7 @@ const monthDeclensions = {
 
     .main {
         page-break-after: always;
+        overflow: visible !important;
     }
 }
 
@@ -312,6 +317,7 @@ const monthDeclensions = {
 
 .main {
     padding: 1rem;
+    overflow-x: hidden;
 }
 
 .schedules {

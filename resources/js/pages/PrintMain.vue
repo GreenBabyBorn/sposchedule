@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useCoursesQuery, usePrintMainSchedulesQuery } from '@/queries/schedules';
-import { useDateFormat, useStorage } from '@vueuse/core';
-import { computed, onMounted, ref, watch, onUpdated, nextTick } from 'vue';
+import { computed, onMounted, ref, watch, onUpdated, nextTick, watchEffect } from 'vue';
 import { useRoute, } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
@@ -11,18 +10,15 @@ import MultiSelect from 'primevue/multiselect';
 import Select from 'primevue/select';
 import Button from 'primevue/button';
 import LoadingBar from '@/components/LoadingBar.vue';
-
-import ProgressSpinner from 'primevue/progressspinner';
-
+import router from '@/router';
 
 const route = useRoute();
-// const semesterId = ref()
 
-const semesterForPrint = ref(null);
-const { data: allSemesters } = useSemestersQuery()
+const selectedSemester = ref(null);
+const { data: semesters, isFetched: semestersFetched } = useSemestersQuery()
 
 const course = ref(null);
-const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
+const { data: courses } = useCoursesQuery();
 
 const coursesWithLabel = computed(() => {
     return courses.value?.map(course => ({
@@ -32,32 +28,26 @@ const coursesWithLabel = computed(() => {
 
 })
 
+const { data: buildingsData, isFetched: buildingsFetched } = useBuildingsQuery()
 const selectedBuildings = ref(null)
-const { data: buildingsFethed } = useBuildingsQuery()
 const buildings = computed(() => {
-    return buildingsFethed.value?.map(building => ({
+    return buildingsData.value?.map(building => ({
         value: building.name,
         label: `${building.name} корпус`,
     })) || [];
 })
-// const course = ref()
-// const buildings = ref()
-onMounted(() => {
-    // semesterId.value = route.query.semester;
-    // course.value = route.query.course;
-    // buildings.value = route.query.buildings;
-})
+
 
 const semesterId = computed(() => {
-    return semesterForPrint.value?.id
+    return selectedSemester.value?.id
 })
 
 const buildingsArray = computed(() => {
     return [selectedBuildings.value?.map(obj => obj.value)]
 })
 
-// const selectedCourse = ref()
-const { data: mainSchedules, isFetched, error, isError, isLoading, isSuccess, isFetchedAfterMount } = usePrintMainSchedulesQuery(semesterId, course, buildingsArray);
+
+const { data: mainSchedules, isSuccess, isFetchedAfterMount } = usePrintMainSchedulesQuery(semesterId, course, buildingsArray);
 
 
 const dayNamesWithPreposition = {
@@ -80,8 +70,6 @@ watch([isFetchedAfterMount, isSuccess], async () => {
     if (isFetchedAfterMount.value && isSuccess.value) {
         // Ждём, пока контент будет полностью отрендерен
         await nextTick();
-
-        // Ждём завершения загрузки ресурсов и запускаем печать
 
         // window.print();
 
@@ -110,8 +98,6 @@ const getIndexesFromWeekdays = computed(() => {
             }
         }
     }
-
-    // Преобразуем Set в массивы
     const result = {};
     for (const day in daysIndexes) {
         result[day] = Array.from(daysIndexes[day]).sort((a: number, b: number) => a - b);
@@ -126,18 +112,64 @@ const { data: semester } = useSemesterShowQuery(semesterId)
 function printPage() {
     window.print();
 }
+
+
+
+function updateQueryParams() {
+    router.replace({
+        query: {
+            ...route.query,
+            semester: semesterId.value || undefined,
+            buildings: buildingsArray.value || undefined,
+            course: course.value || undefined,
+        },
+    });
+};
+
+watch([semesterId, course, selectedBuildings], () => {
+    updateQueryParams();
+
+}, { deep: true });
+
+
+
+watchEffect(() => {
+    if (semestersFetched.value && buildingsFetched.value) {
+        // Восстанавливаем семестр, если query параметр "semester" существует и данные загружены
+        if (route.query.semester) {
+            selectedSemester.value = semesters.value?.find(item => item.id === Number(route.query.semester));
+        }
+
+        // Восстанавливаем здания, если query параметр "buildings" существует и данные загружены
+        if (route.query.buildings) {
+            const buildingsQueryParam = route.query.buildings;
+
+            // Если это массив, используем его напрямую
+            // Если строка, разбиваем её по запятой
+            const buildingNames = route.query.buildings.toString(); // если строка, разбиваем на массив
+
+            selectedBuildings.value = buildings.value?.filter(building => buildingNames.includes(building.value));
+        }
+
+        // Восстанавливаем курс, если query параметр "course" существует
+        if (route.query.course) {
+            course.value = Number(route.query.course);
+        }
+    }
+});
+
 </script>
 
 <template>
     <LoadingBar />
     <div class="controls py-2 flex  flex-wrap gap-2 items-center  pl-2">
-        <Select show-clear v-model="semesterForPrint" :options="allSemesters" placeholder="Семестры" option-label="name"
+        <Select show-clear v-model="selectedSemester" :options="semesters" placeholder="Семестры" option-label="name"
             class="" />
         <MultiSelect :max-selected-labels="2" :selectedItemsLabel="'{0} выбрано'" v-model="selectedBuildings"
             :options="buildings" placeholder="Корпуса" option-label="label" class="" />
         <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
             option-value="value" placeholder="Курс"></Select>
-        <Button @click="printPage()" :disabled="!course || !selectedBuildings || !semesterForPrint"
+        <Button @click="printPage()" :disabled="!course || !selectedBuildings || !selectedSemester || !isSuccess"
             icon="pi pi-print" />
 
 
@@ -270,24 +302,12 @@ function printPage() {
                                                     {{ lesson?.['ЧИСЛ']?.subject?.name }} /
                                                 </div>
 
-                                                <!-- <div class="teacher">
-                                                    <span v-for="teacher in lesson?.['ЧИСЛ']?.teachers">
-                                                        {{ teacher.name }}
-                                                    </span>
-                                                </div> -->
-
                                             </div>
 
                                             <div class="">
                                                 <div class="subject-name">
                                                     {{ lesson?.['ЗНАМ']?.subject?.name }}
                                                 </div>
-
-                                                <!-- <div class="teacher">
-                                                    <span v-for="teacher in lesson?.['ЗНАМ']?.teachers">
-                                                        {{ teacher.name }}
-                                                    </span>
-                                                </div> -->
                                             </div>
                                         </template>
                                     </template>
@@ -331,25 +351,18 @@ function printPage() {
 
 <style scoped>
 @media print {
-    .groups-row {
-        page-break-inside: avoid;
-        /* Не разрывать группу внутри */
-        margin-bottom: 10px;
-    }
+
 
     .controls {
         display: none;
     }
 
-    .groups-row.page-break {
-        page-break-after: always;
-        /* Разрывать страницу после каждого второго блока */
-    }
-
     .main {
         overflow: visible !important;
-        page-break-after: always;
+        /* Убираем возможные разрывы страниц и переносы */
+        /* page-break-inside: avoid; */
     }
+
 }
 
 * {

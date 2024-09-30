@@ -73,31 +73,6 @@ onMounted(() => {
 
 });
 
-// const semesterForPrint = ref();
-// const { data: allSemesters } = useSemestersQuery()
-
-// const course = ref(null);
-// const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
-
-// const coursesWithLabel = computed(() => {
-//     return courses.value?.map(course => ({
-//         label: `${course.course} курс`,
-//         value: course.course
-//     })) || [];
-
-// })
-
-// const selectedBuildings = ref(null)
-// const { data: buildingsFethed } = useBuildingsQuery()
-// const buildings = computed(() => {
-//     return buildingsFethed.value?.map(building => ({
-//         value: building.name,
-//         label: `${building.name} корпус`,
-//     })) || [];
-// })
-
-
-
 </script>
 
 <template>
@@ -115,26 +90,6 @@ onMounted(() => {
 
                     path: '/print/main',
                 }" />
-                <!-- <div class="flex  flex-wrap gap-2 items-center border-l border-surface-600  pl-2">
-                    <Select show-clear v-model="semesterForPrint" :options="allSemesters" placeholder="Семестры"
-                        option-label="name" class="" />
-                    <MultiSelect :max-selected-labels="2" :selectedItemsLabel="'{0} выбрано'"
-                        v-model="selectedBuildings" :options="buildings" placeholder="Корпуса" option-label="label"
-                        class="" />
-                    <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
-                        option-value="value" placeholder="Курс"></Select>
-                    <Button target="_blank" :disabled="!course || !selectedBuildings || !semesterForPrint"
-                        icon="pi pi-print" as="router-link" :to="{
-
-                            path: '/print/main', query: {
-                                semester: semesterForPrint?.id,
-                                course: course,
-                                buildings: [selectedBuildings?.map(obj => obj.value)],
-                            }
-                        }" />
-
-
-                </div> -->
             </div>
         </div>
         <div class="flex flex-col gap-6">
