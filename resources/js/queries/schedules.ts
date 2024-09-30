@@ -87,21 +87,22 @@ export function usePrintChangesSchedulesQuery(date) {
 export function usePrintMainSchedulesQuery(semester_id, course, buildings) {
   const enabled = computed(
     () =>
-      Boolean(semester_id.value) ||
-      Boolean(course.value) ||
-      Boolean(buildings.value)
+      Boolean(semester_id?.value) &&
+      Boolean(course?.value) &&
+      Boolean(buildings?.value)
   );
 
   return useQuery({
     enabled: enabled,
-    queryKey: ['PrintScheduleMain', semester_id, course],
-    retry: 0,
-    queryFn: async () =>
-      (
-        await axios.get(
-          `/api/schedules/main/semester/${semester_id.value}/print?course=${course.value}&buildings=${buildings?.value?.toString()}`
-        )
-      ).data,
+    queryKey: ['PrintScheduleMain', semester_id, course, buildings],
+    queryFn: async () => {
+      // Выполнение запроса, если все параметры валидны
+      const response = await axios.get(
+        `/api/schedules/main/semester/${semester_id?.value}/print?course=${course?.value}&buildings=${buildings?.value?.toString()}`
+      );
+
+      return response.data;
+    },
   });
 }
 

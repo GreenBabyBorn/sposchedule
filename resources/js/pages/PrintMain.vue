@@ -1,24 +1,59 @@
 <script setup lang="ts">
-import { usePrintMainSchedulesQuery } from '@/queries/schedules';
+import { useCoursesQuery, usePrintMainSchedulesQuery } from '@/queries/schedules';
 import { useDateFormat, useStorage } from '@vueuse/core';
 import { computed, onMounted, ref, watch, onUpdated, nextTick } from 'vue';
 import { useRoute, } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
-import { useSemesterShowQuery } from '@/queries/semesters';
+import { useSemesterShowQuery, useSemestersQuery } from '@/queries/semesters';
+import { useBuildingsQuery } from '@/queries/buildings';
+import MultiSelect from 'primevue/multiselect';
+import Select from 'primevue/select';
+import Button from 'primevue/button';
 
 const route = useRoute();
-const semesterId = ref()
-const course = ref()
-const buildings = ref()
+// const semesterId = ref()
+
+const semesterForPrint = ref(null);
+const { data: allSemesters } = useSemestersQuery()
+
+const course = ref(null);
+const { data: courses, isFetched: coursesFetched } = useCoursesQuery();
+
+const coursesWithLabel = computed(() => {
+    return courses.value?.map(course => ({
+        label: `${course.course} курс`,
+        value: course.course
+    })) || [];
+
+})
+
+const selectedBuildings = ref(null)
+const { data: buildingsFethed } = useBuildingsQuery()
+const buildings = computed(() => {
+    return buildingsFethed.value?.map(building => ({
+        value: building.name,
+        label: `${building.name} корпус`,
+    })) || [];
+})
+// const course = ref()
+// const buildings = ref()
 onMounted(() => {
-    semesterId.value = route.query.semester;
-    course.value = route.query.course;
-    buildings.value = route.query.buildings;
+    // semesterId.value = route.query.semester;
+    // course.value = route.query.course;
+    // buildings.value = route.query.buildings;
+})
+
+const semesterId = computed(() => {
+    return semesterForPrint.value?.id
+})
+
+const buildingsArray = computed(() => {
+    return [selectedBuildings.value?.map(obj => obj.value)]
 })
 
 // const selectedCourse = ref()
-const { data: mainSchedules, isFetched, error, isError, isLoading, isSuccess, isFetchedAfterMount } = usePrintMainSchedulesQuery(semesterId, course, buildings);
+const { data: mainSchedules, isFetched, error, isError, isLoading, isSuccess, isFetchedAfterMount } = usePrintMainSchedulesQuery(semesterId, course, buildingsArray);
 
 
 const dayNamesWithPreposition = {
@@ -44,7 +79,7 @@ watch([isFetchedAfterMount, isSuccess], async () => {
 
         // Ждём завершения загрузки ресурсов и запускаем печать
 
-        window.print();
+        // window.print();
 
     }
 });
@@ -83,9 +118,25 @@ const getIndexesFromWeekdays = computed(() => {
 
 const { data: semester } = useSemesterShowQuery(semesterId)
 
+
+function printPage() {
+    window.print();
+}
 </script>
 
 <template>
+    <div class="controls py-2 flex  flex-wrap gap-2 items-center border-l border-surface-600  pl-2">
+        <Select show-clear v-model="semesterForPrint" :options="allSemesters" placeholder="Семестры" option-label="name"
+            class="" />
+        <MultiSelect :max-selected-labels="2" :selectedItemsLabel="'{0} выбрано'" v-model="selectedBuildings"
+            :options="buildings" placeholder="Корпуса" option-label="label" class="" />
+        <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
+            option-value="value" placeholder="Курс"></Select>
+        <Button @click="printPage()" :disabled="!course || !selectedBuildings || !semesterForPrint"
+            icon="pi pi-print" />
+
+
+    </div>
     <div class="main">
         <div v-if="mainSchedules" class="top">
             <div class="flex justify-end">
@@ -100,7 +151,8 @@ const { data: semester } = useSemesterShowQuery(semesterId)
                 <h1 contenteditable class="text-sm">Расписание учебных занятий на {{ semester?.index }} cеместр {{
                     semester?.years }} учебного года
                 </h1>
-                <h2 contenteditable class="text-xs"> {{ course }} курс Учебный корпус №{{ buildings?.toString() }}</h2>
+                <h2 contenteditable class="text-xs"> {{ course }} курс Учебный корпус №{{ buildingsArray?.toString() }}
+                </h2>
             </div>
         </div>
 
@@ -191,8 +243,11 @@ const { data: semester } = useSemesterShowQuery(semesterId)
 
                                     <template v-for="lesson in group_schedule?.schedule?.[weekDay]"
                                         :key="lesson?.index">
+                                        <div class="">
+
+                                        </div>
                                         <template v-if="lesson?.lesson?.index === index">
-                                            <div class="subject-name">
+                                            <div class="subject-name ">
                                                 {{ lesson?.lesson?.subject?.name }}
                                             </div>
 
@@ -276,6 +331,10 @@ const { data: semester } = useSemesterShowQuery(semesterId)
         margin-bottom: 10px;
     }
 
+    .controls {
+        display: none;
+    }
+
     .groups-row.page-break {
         page-break-after: always;
         /* Разрывать страницу после каждого второго блока */
@@ -351,12 +410,15 @@ td {
     text-align: center;
     text-transform: uppercase;
     font-size: 6px;
+
+    padding-top: 5px;
 }
 
 .teacher {
     text-align: center;
 
     font-size: 6px;
+    padding-bottom: 5px;
 }
 
 .cabinet {

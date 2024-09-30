@@ -11,7 +11,7 @@ const period = toRef(() => props.period);
 </script>
 <template>
 
-    <tr class="bg-surface-200 dark:bg-surface-700 py-4">
+    <tr class="bg-surface-50 dark:bg-surface-900 py-4">
         <td class=" px-4 text-center py-4 font-bold text-surface-700 group-last:border-none  dark:text-surface-400">
             {{ period.index }} пара
         </td>

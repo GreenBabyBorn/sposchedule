@@ -32,13 +32,13 @@ const items = ref([
         route: '/admin/teachers'
     },
     {
-        label: 'Основное расписание',
-        icon: 'pi pi-calendar-plus',
+        label: 'Расписание',
+        icon: 'pi pi-calendar',
         route: '/admin/schedules/main'
     },
     {
-        label: 'Расписание',
-        icon: 'pi pi-calendar',
+        label: 'Изменения',
+        icon: 'pi pi-calendar-plus',
         route: '/admin/schedules/changes'
     },
     {

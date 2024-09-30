@@ -173,7 +173,7 @@ const buildings = computed(() => {
 <template>
     <div class="flex flex-col gap-4">
         <div class="flex flex-wrap justify-between items-baseline">
-            <h1 class="text-2xl">Расписание изменений
+            <h1 class="text-2xl">Расписание (изменения)
             </h1>
         </div>
         <div class="flex  items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">

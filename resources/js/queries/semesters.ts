@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
+import { computed } from 'vue';
 
 export function useSemestersQuery() {
   return useQuery({
@@ -9,10 +10,12 @@ export function useSemestersQuery() {
 }
 
 export function useSemesterShowQuery(id) {
+  const enabled = computed(() => Boolean(id?.value));
   return useQuery({
+    enabled: enabled,
     queryKey: ['semesters', id],
     queryFn: async () => {
-      const url = `/api/semesters/${id.value}`;
+      const url = `/api/semesters/${id?.value}`;
       const response = await axios.get(url);
       return response.data;
     },
