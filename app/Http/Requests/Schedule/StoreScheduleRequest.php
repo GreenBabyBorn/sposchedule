@@ -28,7 +28,7 @@ class StoreScheduleRequest extends FormRequest
         return [
             'group_id' => ['required', 'exists:groups,id',
             function ($attribute, $value, $fail) {
-                if ($this->type === 'main') {
+                if ($this->type === 'main' || $this->type === 'changes') {
                     $existingSchedule = \App\Models\Schedule::where('group_id', $this->group_id)
                         ->where('type', $this->type)
                         ->where('week_day', $this->week_day)
