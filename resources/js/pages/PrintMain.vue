@@ -11,6 +11,9 @@ import MultiSelect from 'primevue/multiselect';
 import Select from 'primevue/select';
 import Button from 'primevue/button';
 
+import ProgressSpinner from 'primevue/progressspinner';
+
+
 const route = useRoute();
 // const semesterId = ref()
 
@@ -125,7 +128,7 @@ function printPage() {
 </script>
 
 <template>
-    <div class="controls py-2 flex  flex-wrap gap-2 items-center border-l border-surface-600  pl-2">
+    <div class="controls py-2 flex  flex-wrap gap-2 items-center  pl-2">
         <Select show-clear v-model="semesterForPrint" :options="allSemesters" placeholder="Семестры" option-label="name"
             class="" />
         <MultiSelect :max-selected-labels="2" :selectedItemsLabel="'{0} выбрано'" v-model="selectedBuildings"
@@ -138,6 +141,8 @@ function printPage() {
 
     </div>
     <div class="main">
+        <ProgressSpinner v-if="isLoading">
+        </ProgressSpinner>
         <div v-if="mainSchedules" class="top">
             <div class="flex justify-end">
                 <div contenteditable class="text-right ">
