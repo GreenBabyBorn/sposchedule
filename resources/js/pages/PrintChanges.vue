@@ -8,7 +8,7 @@ import Button from 'primevue/button';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();
-const date = ref()
+const date = ref(null)
 
 onMounted(() => {
     const [day, month, year] = (route.query.date as string).split('.').map(Number);
@@ -142,7 +142,7 @@ function printPage() {
             </div>
         </div>
         <div :class="{ 'page-break': (index + 1) % 2 === 0 }" class="groups-row" v-for="block, index in blocks1_5"
-            :key="block[0]?.group.name">
+            :key="block[0]?.group?.name">
             <div class=" bg-line"></div>
             <table class="w-full border-collapse">
                 <thead>
@@ -197,7 +197,7 @@ function printPage() {
     <div v-if="changesSchedules?.['6']" class="main">
         <div class="top">
             <div class="flex justify-between">
-                <div>Исполнитель: <span contenteditable class="underline">{{ user.name
+                <div>Исполнитель: <span contenteditable class="underline">{{ user?.name
                         }}</span></div>
                 <div contenteditable class="text-right">
                     СОГЛАСОВАНО <br>
@@ -305,11 +305,10 @@ function printPage() {
     }
 }
 
-* {}
 
 .bg-line {
     height: 2rem;
-
+    width: 100%;
     background:
         /* Сверху */
         repeating-linear-gradient(45deg,
@@ -327,17 +326,17 @@ function printPage() {
     overflow-x: hidden;
     font-family: 'Times New Roman', Times, serif;
     font-size: 1.2rem;
+    overflow: auto;
+    width: 1080px;
 }
 
-.schedules {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-}
+
 
 table {
     table-layout: auto;
     border-collapse: collapse;
-    width: 100%;
+
+
 }
 
 
@@ -379,12 +378,7 @@ td {
     text-align: left;
 }
 
-.schedules {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    /* row-gap: 2rem;    */
-    align-items: start;
-}
+
 
 .cabinet {
     max-width: 15px;
