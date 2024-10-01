@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SelectButton from 'primevue/selectbutton';
 import Select from 'primevue/select';
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch, watchEffect } from 'vue';
 import DatePicker from 'primevue/datepicker';
 import InputText from 'primevue/inputtext';
 import Checkbox from 'primevue/checkbox';
@@ -21,6 +21,9 @@ import { useBuildingsQuery } from '@/queries/buildings';
 import ToggleButton from 'primevue/togglebutton';
 
 import Dialog from 'primevue/dialog';
+import router from '@/router';
+import { useRoute } from 'vue-router';
+
 
 
 
@@ -77,7 +80,7 @@ const weekDaysOptions = ref([
 const date = ref(new Date())
 
 
-const { data: buildingsFethed } = useBuildingsQuery()
+const { data: buildingsFethed, isFetched: buildingsFetched } = useBuildingsQuery()
 const building = ref(null)
 building.value = buildingsFethed.value?.[0].name
 
@@ -283,6 +286,52 @@ const onRowEditSave = async (event) => {
 }
 
 const editingRows = ref()
+
+const route = useRoute();
+
+function updateQueryParams() {
+    router.replace({
+        query: {
+            ...route.query,
+            type: type.value || undefined,
+            building: building.value || undefined,
+            weekDay: weekDay.value || undefined,
+            date: isoDate.value || undefined,
+        },
+    });
+};
+
+watch([type, building, weekDay, date], () => {
+    updateQueryParams();
+
+}, { deep: true });
+
+
+
+watchEffect(() => {
+    if (buildingsFetched.value) {
+        const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\.(0[1-9]|1[0-2])\.(\d{4})$/;
+        if (route.query.date && dateRegex.test(route.query.date as string)) {
+            const [day, month, year] = (route.query.date as string).split('.').map(Number);
+            date.value = new Date(year, month - 1, day);
+        }
+        else {
+            date.value = new Date();
+        }
+
+        if (route.query.building) {
+            building.value = route.query.building;
+        }
+
+        if (route.query.weekDay) {
+            weekDay.value = route.query.weekDay as any;
+        }
+
+        if (route.query.type) {
+            type.value = route.query.type as any;
+        }
+    }
+});
 </script>
 
 <template>
@@ -303,7 +352,7 @@ const editingRows = ref()
 
                     <DatePicker v-else dateFormat="dd.mm.yy" v-model="date" />
                     <!-- <Button @click="copyState = !copyState" text icon="pi pi-clone" title="Скопировать"></Button> -->
-                    <div class="border-l border-slate-600 flex gap-2 pl-2">
+                    <div class="border-l border-surface-600 flex gap-2 pl-2">
                         <Button @click="visible = !visible" outlined icon="pi pi-clone" label="Сохранить"
                             title="Сохранить в заготовки"></Button>
                         <Select show-clear v-model="selectedPreset" placeholder="Применить заготовку"
@@ -348,7 +397,7 @@ const editingRows = ref()
                                 :period="period">
                             </RowPeriodBell>
 
-                            <tr v-show="showAddNewBellPeriod" class="">
+                            <tr v-show="showAddNewBellPeriod" class="border-t">
                                 <td class="">
                                     <div class="max-w-12">
                                         <InputText class="text-center" fluid v-model="newPeriod.index"></InputText>
