@@ -351,7 +351,7 @@ const isEdit = ref(false)
                     <td>
                         <div class="table-subrow">
                             <Button
-                                :disabled="!newLessonMessageState && (!newLesson.index || !newLesson.building || !newLesson.subject) || newLessonMessageState && !newLesson.message"
+                                :disabled="!newLessonMessageState && (!newLesson.index || !newLesson.subject) || newLessonMessageState && !newLesson.message"
                                 @click="addNewLesson()" text icon="pi pi-save" />
                             <Button @click="handlenewLessonMessage"
                                 :title="`${newLessonMessageState ? 'Переключиться на обычную пару' : 'Переключиться на комментарий'}`"

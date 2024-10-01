@@ -61,9 +61,9 @@ const lessons: any = toRef<any>(() => props.lessons)
                                 <div class="flex flex-wrap gap-1 justify-start" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
-                                    }}</span>
+                                        }}</span>
                                 </div>
-                                <span class="text-sm">{{ item.building }} корпус</span>
+                                <span v-if="item.building" class="text-sm">{{ item.building }} корпус</span>
                             </div>
 
                         </td>

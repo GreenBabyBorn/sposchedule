@@ -57,7 +57,7 @@ class StoreLessonRequest extends FormRequest
                     //     return $query->where('schedule_id', $this->input('schedule_id'));
                     // }) : '',
                 ],
-                'building' => 'required|integer|min:1',
+                'building' => 'nullable|integer|min:1',
             ];
         }
 
