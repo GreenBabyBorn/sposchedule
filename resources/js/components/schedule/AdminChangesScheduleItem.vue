@@ -52,7 +52,7 @@ const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson()
 const { mutateAsync: fromMainToChangesSchedule, data: newChanges } = useFromMainToChangesSchedule()
 async function editLesson(item) {
     if (!item.id) return
-    if (!item.message == (!item.building || !item.subject)) return
+    if (!item.message == (!item.subject)) return
     // console.log(item)
     if (props.type === 'main') {
         try {
