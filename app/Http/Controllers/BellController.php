@@ -167,16 +167,15 @@ class BellController extends Controller
 
     public function publicBells(Request $request)
     {
-        // Получаем параметры `building` и `date` из запроса
         $building = $request->input('building');
         $date = $request->input('date');
 
-        // Проверяем, что оба параметра переданы
-        if (!$building || !$date) {
+        if (!$date) {
             return response()->json([
-                'message' => 'Необходимо указать building и date.',
+                'message' => 'Необходимо указать дату.',
             ], 400);
         }
+
         $weekDayMapping = [
             0 => 'ВС',
             1 => 'ПН',
@@ -186,7 +185,7 @@ class BellController extends Controller
             5 => 'ПТ',
             6 => 'СБ',
         ];
-        // Форматируем дату
+
         try {
             $parsedDate = Carbon::parse($date);
             $formattedDate = $parsedDate->format('Y-m-d');
@@ -197,32 +196,45 @@ class BellController extends Controller
             ], 400);
         }
 
-        // Ищем измененное расписание (type=changes)
-        $schedule = Bell::where('building', $building)
-                ->whereDate('date', $formattedDate)
-       ->where('type', 'changes')->where('published', true)
+        $changesQuery = Bell::where('type', 'changes')
+            ->whereDate('date', $formattedDate)
+            ->where('published', true)
+            ->where('is_preset', false);
 
-          ->first();
-
-        // Если измененное расписание не найдено, ищем основное расписание (type=main)
-        if (!$schedule) {
-            $schedule = Bell::where('building', $building)
-            ->where('type', 'main')
-              ->where('week_day', $weekDay)
-              ->where('published', true)
-              ->first();
+        if ($building) {
+            $changesQuery->where('building', $building);
         }
 
-        // Проверяем, есть ли записи
-        if (!$schedule) {
+        $changes = $changesQuery->get();
+
+        $mainQuery = Bell::where('type', 'main')
+            ->where('week_day', $weekDay)
+            ->where('published', true)
+            ->where('is_preset', false);
+
+
+        if ($building) {
+            $mainQuery->where('building', $building);
+        }
+
+        $mainBells = $mainQuery->get();
+
+        $bells = $changes->merge($mainBells);
+
+        $filteredBells = $bells->sortByDesc(function ($bell) {
+            return $bell->type === 'changes' ? 1 : 0;
+        })->unique('building');
+
+        if ($filteredBells->isEmpty()) {
             return response()->json([
                 'message' => 'Расписание не найдено для указанного здания и даты.',
             ], 404);
         }
 
-        // Возвращаем данные через Resource
-        return new BellsResource($schedule);
+
+        return BellsResource::collection($filteredBells);
     }
+
     // Получение конкретного расписания звонков
     public function show($id)
     {

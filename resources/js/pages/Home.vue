@@ -229,6 +229,56 @@ function toggleFilters() {
     searchedTeacher.value = ''
     teacher.value = ''
 }
+
+const mergedBells = computed(() => {
+    // Функция для сравнения periods между разными корпусами
+    const periodsEqual = (periods1, periods2) => {
+        if (periods1.length !== periods2.length) return false;
+        return periods1.every((p1, index) => {
+            const p2 = periods2[index];
+            return (
+                p1.index === p2.index &&
+                p1.has_break === p2.has_break &&
+                p1.period_from === p2.period_from &&
+                p1.period_to === p2.period_to &&
+                p1.period_from_after === p2.period_from_after &&
+                p1.period_to_after === p2.period_to_after
+            );
+        });
+    };
+
+    // Группируем звонки по одинаковым периодам
+    const grouped = [];
+
+    publicBells.value?.forEach(bell => {
+        // Находим группу, у которой совпадают periods
+        let group = grouped.find(g => periodsEqual(g.bells.periods, bell.periods));
+
+        if (group) {
+            // Если такая группа найдена, добавляем туда здание
+            group.building += `, ${bell.building}`;
+        } else {
+            // Если группа не найдена, создаем новую
+            grouped.push({
+                building: String(bell.building),
+                bells: bell
+            });
+        }
+    });
+
+    return grouped;
+})
+
+const getIndexesFromBells = computed(() => {
+    const indexes = new Set<number>();
+    mergedBells.value?.forEach(bell => {
+        bell.bells.periods.forEach(period => {
+            indexes.add(period.index);
+        });
+    });
+    return Array.from(indexes);
+
+})
 </script>
 
 <template>
@@ -308,6 +358,12 @@ function toggleFilters() {
 
         </div>
         <div :style="{ marginTop: `${headerHeight + 10}px` }" class="flex flex-col gap-4">
+            <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-2xl text-center">Группы
+                на
+                выбранную дату
+                не
+                найдены...</span>
+            <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
             <div class="schedules">
                 <div v-if="isLoading" v-for="item in 32" class="schedule">
                     <Skeleton height="2rem" class="mb-4">
@@ -315,12 +371,7 @@ function toggleFilters() {
                     <Skeleton height="10rem">
                     </Skeleton>
                 </div>
-                <span v-else-if="isFetched && !schedulesChanges?.schedules.length" class="text-2xl text-center">Группы
-                    на
-                    выбранную дату
-                    не
-                    найдены...</span>
-                <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
+
                 <template v-else-if="schedulesChanges?.schedules">
                     <ScheduleItem class="schedule" v-for="item in schedulesChanges?.schedules" :key="item?.id"
                         :date="isoDate" :schedule="item?.schedule" :semester="item?.semester"
@@ -331,8 +382,8 @@ function toggleFilters() {
 
             </div>
         </div>
-        <div class="flex flex-col gap-2 items-center">
-            <h1 class="text-2xl font-bold text-center py-2  ">Звонки</h1>
+        <div class="flex flex-col gap-2 items-center w-full">
+            <h1 class="text-2xl font-bold text-center py-2">Звонки</h1>
             <span v-if="publicBells?.type" :class="{
                 'text-green-400 ': publicBells?.type
                     !== 'main',
@@ -342,22 +393,51 @@ function toggleFilters() {
                 publicBells?.type
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
             <div class="">
-                <h2 class="text-xl text-center text-red-300" v-if="!building">Необходимо выбрать корпус</h2>
-                <h2 class="text-2xl text-center " v-else-if="!publicBells && isFetchedBells">На эту дату расписание
+
+                <h2 class="text-2xl text-center " v-if="!publicBells && isFetchedBells">На эту дату расписание
                     звонков не
                     найдено
                 </h2>
-                <div v-if="publicBells" class="flex justify-center items-center ">
-                    <div class="overflow-x-auto rounded-md">
-                        <table class="border-collapse table-auto">
-                            <tbody>
-                                <PublicRowPeriodBell :key="period.id" v-for="period in publicBells?.periods"
-                                    :period="period">
-                                </PublicRowPeriodBell>
-                            </tbody>
-                        </table>
-                    </div>
+                <div v-if="publicBells" class="">
+                    <table class="bells-table dark:bg-surface-900 bg-surface-50 rounded">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="flex gap-2 flex-col text-xs p-2">
+                                        <span class="self-end">Корпус</span>
+                                        <span class="border rotate-12 opacity-25"></span>
+                                        <span class="self-start">№ пары</span>
+                                    </div>
+                                </th>
+                                <th v-for="bell in mergedBells" :key="bell?.building">
+                                    {{ bell?.building }}
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="" v-for="index in getIndexesFromBells" :key="index">
+                                <td class="text-center py-4 font-bold">{{ index }} пара</td>
+                                <template v-for="bell in mergedBells" :key="bell?.building">
+                                    <template v-for="period in bell.bells.periods" :key="period.index">
+                                        <td v-if="period?.index === index">
+                                            <div>
+                                                {{ period.period_from }} - {{ period.period_to }}
+                                            </div>
+                                            <div v-if="period?.period_from_after">
+                                                {{ period.period_from_after }} - {{ period.period_to_after }}
+                                            </div>
+                                        </td>
+
+                                    </template>
+                                    <td v-if="!bell.bells.periods.find((period) => period.index === index)"> </td>
+                                </template>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
+
             </div>
         </div>
     </div>
@@ -376,6 +456,19 @@ function toggleFilters() {
     /* Центрирование */
     width: 300px;
     /* Установите минимальную или фиксированную ширину */
+}
+
+.bells-table {
+
+    border-collapse: collapse;
+    /* width: 100%; */
+
+
+}
+
+.bells-table td {
+    padding: 0.75rem 1rem;
+
 }
 
 @media screen and (max-width: 768px) {

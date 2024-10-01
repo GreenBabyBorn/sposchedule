@@ -51,7 +51,7 @@ export function useBellsQuery(type, building, weekDay?, date?) {
 }
 
 export function usePublicBellsQuery(building, date) {
-  const enabled = computed(() => Boolean(date?.value && building?.value));
+  const enabled = computed(() => Boolean(date?.value || building?.value));
 
   return useQuery({
     queryKey: ['bells', date, building],
