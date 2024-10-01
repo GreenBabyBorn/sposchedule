@@ -58,7 +58,7 @@ const updateQueryParams = () => {
     });
 };
 
-const { data: changesSchedules, isError } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
+const { data: changesSchedules, isError, isSuccess } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
 
 
 
@@ -183,11 +183,10 @@ const buildings = computed(() => {
             </div>
         </div>
 
-        <div class="schedules">
-            <span v-if="isError">Семестра на данную дату не найдено, чтобы добавить перейдите на экран добавления
-                <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
-            </span>
-
+        <span v-if="isError">Семестра на данную дату не найдено, чтобы добавить перейдите на экран добавления
+            <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
+        </span>
+        <div v-if="isSuccess" class="schedules">
             <ChangesScheduleItem :key="index" :subjects="subjects" :teachers="teachers" class="schedule"
                 v-for="(item, index) in schedulesChanges?.schedules" :date="isoDate" :schedule="item?.schedule"
                 :semester="item?.semester" :type="item?.schedule?.type" :group="item?.group"

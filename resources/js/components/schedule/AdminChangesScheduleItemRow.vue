@@ -54,6 +54,9 @@ const editLesson = (lesson: any) => {
                 <Select v-model="lesson.subject" v-else filter @change="editLesson(lesson)" class="w-full text-left"
                     :options="subjects" option-label="name" />
             </div>
+            <div v-else>
+                <span class="text-red-400">Предмет был удален</span>
+            </div>
             <div v-if="lesson.teachers" class="table-subrow">
                 <div class="" v-if="!isEdit">
                     <span v-for="teacher in lesson.teachers">{{ teacher.name }}</span>

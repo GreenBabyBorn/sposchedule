@@ -282,17 +282,29 @@ const hideAddNewLesson = ref(false)
                                     {{ item.index }}
                                 </span></td>
                             <td>
-                                <div v-if="item['ЧИСЛ']" class="table-subrow"><Select filter
-                                        @change="editLesson(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].subject"
-                                        class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
+                                <div v-if="item['ЧИСЛ']" class="table-subrow">
+                                    <Select v-if="item['ЧИСЛ'].subject" filter @change="editLesson(item['ЧИСЛ'])"
+                                        v-model="item['ЧИСЛ'].subject" class="w-full text-left" :options="subjects"
+                                        optionLabel="name">
+                                    </Select>
+                                    <span v-else class="text-red-400">Предмет был удален</span>
+                                </div>
 
-                                <div class="table-subrow" v-if="item.lesson"><Select filter
-                                        @change="editLesson(item.lesson)" v-model="item.lesson.subject"
-                                        class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
+                                <div class="table-subrow" v-if="item.lesson">
+                                    <Select v-if="item.lesson.subject" filter @change="editLesson(item.lesson)"
+                                        v-model="item.lesson.subject" class="w-full text-left" :options="subjects"
+                                        optionLabel="name">
+                                    </Select>
+                                    <span v-else class="text-red-400">Предмет был удален</span>
+                                </div>
 
-                                <div v-if="item['ЗНАМ']" class="table-subrow"><Select filter
-                                        @change="editLesson(item['ЗНАМ'])" v-model="item['ЗНАМ'].subject"
-                                        class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
+                                <div v-if="item['ЗНАМ']" class="table-subrow">
+                                    <Select v-if="item['ЗНАМ'].subject" filter @change="editLesson(item['ЗНАМ'])"
+                                        v-model="item['ЗНАМ'].subject" class="w-full text-left" :options="subjects"
+                                        optionLabel="name"></Select>
+                                    <span v-else class="text-red-400">Предмет был удален</span>
+                                </div>
+
                             </td>
                             <td>
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">

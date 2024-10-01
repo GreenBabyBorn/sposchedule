@@ -48,7 +48,10 @@ const lessons: any = toRef<any>(() => props.lessons)
                             <div v-if="item.id"
                                 :class="{ 'border-b border-surface-200 dark:border-surface-700': item.teachers?.length }"
                                 class="flex justify-between gap-1 items-center">
-                                <span class="text-sm text-left ">{{ item.subject_name }}</span>
+                                <span v-if="item.subject_name" class="text-sm text-left ">{{ item.subject_name }}</span>
+                                <div v-else class="">
+                                    <span class="text-sm text-left text-red-400">Предмет был удален</span>
+                                </div>
                                 <span>{{ item.cabinet }}</span>
 
 
