@@ -68,40 +68,38 @@ async function deletePeriod(id) {
 </script>
 
 <template>
-    <tr class="group">
+    <tr class="">
 
-        <td
-            class="border-surface-200 px-6 py-4 text-sm text-surface-700 group-last:border-none dark:border-surface-800 dark:text-surface-400">
+        <td class="text-center text-lg">
             {{ period.index }}
         </td>
 
-        <td class="border-surface-200 px-6 py-4 group-last:border-none dark:border-surface-800">
-            <div class="mb-2">
-                <DatePicker @blur="editPeriod(period)" v-model="period.period_from" id="datepicker-timeonly" timeOnly
-                    fluid />
+        <td class="">
+            <div class="flex justify-center items-center flex-col gap-2 py-2">
+                <div class="flex gap-2 items-center">
+                    <DatePicker @blur="editPeriod(period)" v-model="period.period_from" id="datepicker-timeonly"
+                        timeOnly fluid />
+                    -
+                    <DatePicker @blur="editPeriod(period)" v-model="period.period_to" id="datepicker-timeonly" timeOnly
+                        fluid />
+                </div>
+                <div class="flex gap-2 items-center" v-if="period.has_break">
+                    <DatePicker @blur="editPeriod(period)" v-model="period.period_from_after" id="datepicker-timeonly"
+                        timeOnly fluid />
+                    -
+                    <DatePicker @blur="editPeriod(period)" v-model="period.period_to_after" id="datepicker-timeonly"
+                        timeOnly fluid />
+                </div>
             </div>
-            <div v-if="period.has_break">
-                <DatePicker @blur="editPeriod(period)" v-model="period.period_from_after" id="datepicker-timeonly"
-                    timeOnly fluid />
-            </div>
+
+
         </td>
 
-        <td class="border-surface-200 px-6 py-4 group-last:border-none dark:border-surface-800">
-            <div class="mb-2">
-                <DatePicker @blur="editPeriod(period)" v-model="period.period_to" id="datepicker-timeonly" timeOnly
-                    fluid />
-            </div>
-            <div v-if="period.has_break">
-                <DatePicker @blur="editPeriod(period)" v-model="period.period_to_after" id="datepicker-timeonly"
-                    timeOnly fluid />
-            </div>
-        </td>
-
-        <td class="border-surface-200 px-6 py-4 group-last:border-none dark:border-surface-800">
+        <td class="text-center">
             <Checkbox @change="editPeriod(period)" v-model="period.has_break" :binary="true" />
         </td>
 
-        <td class="border-surface-200 px-6 py-4 group-last:border-none dark:border-surface-800">
+        <td class="">
             <div class="flex justify-center">
                 <Button @click="deletePeriod(period.id)" text icon="pi pi-trash" severity="danger" />
             </div>

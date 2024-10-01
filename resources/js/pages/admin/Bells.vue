@@ -327,25 +327,19 @@ const editingRows = ref()
 
         </div>
         <div class="">
-            <div class="rounded-md border border-surface-200 dark:border-surface-800 dark:bg-surface-950">
+            <div class="rounded-md ">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full border-collapse">
+                    <table class="w-full border-collapse">
                         <thead>
                             <tr>
-                                <th
-                                    class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
+                                <th>
                                     №</th>
-                                <th
-                                    class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
-                                    Начало</th>
-                                <th
-                                    class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
-                                    Конец</th>
-                                <th
-                                    class="border-b border-surface-200 px-6 py-4 text-left text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
+                                <th>
+                                    Начало - Конец</th>
+
+                                <th>
                                     С перерывом</th>
-                                <th
-                                    class="text-center border-b border-surface-200 px-6 py-4  text-sm text-surface-700 dark:border-surface-800 dark:text-surface-300">
+                                <th>
                                     Действия</th>
                             </tr>
                         </thead>
@@ -354,41 +348,37 @@ const editingRows = ref()
                                 :period="period">
                             </RowPeriodBell>
 
-                            <tr v-show="showAddNewBellPeriod" class="group dark:bg-surface-800">
-                                <td
-                                    class="border-b border-surface-200 px-6 py-4  text-sm  group-last:border-none dark:border-surface-800 dark:text-surface-400">
+                            <tr v-show="showAddNewBellPeriod" class="">
+                                <td class="">
                                     <div class="max-w-12">
-                                        <InputText fluid v-model="newPeriod.index"></InputText>
+                                        <InputText class="text-center" fluid v-model="newPeriod.index"></InputText>
                                     </div>
                                 </td>
-                                <td
-                                    class="border-b border-surface-200 px-6 py-4 align-top group-last:border-none dark:border-surface-800">
-                                    <div class="mb-2">
-                                        <DatePicker v-model="newPeriod.period_from" id="datepicker-timeonly" timeOnly
-                                            fluid />
+                                <td class="">
+                                    <div class="flex justify-center items-center flex-col gap-2 py-2">
+                                        <div class="flex gap-2 items-center">
+                                            <DatePicker v-model="newPeriod.period_from" id="datepicker-timeonly"
+                                                timeOnly fluid />
+                                            -
+                                            <DatePicker v-model="newPeriod.period_to" id="datepicker-timeonly" timeOnly
+                                                fluid />
+                                        </div>
+                                        <div class="flex gap-2 items-center" v-if="newPeriod.has_break">
+                                            <DatePicker v-model="newPeriod.period_from_after" id="datepicker-timeonly"
+                                                timeOnly fluid />
+                                            -
+                                            <DatePicker v-model="newPeriod.period_to_after" id="datepicker-timeonly"
+                                                timeOnly fluid />
+                                        </div>
                                     </div>
-                                    <div v-if="newPeriod.has_break">
-                                        <DatePicker v-model="newPeriod.period_from_after" id="datepicker-timeonly"
-                                            timeOnly fluid />
-                                    </div>
+
+
                                 </td>
-                                <td
-                                    class="border-b border-surface-200 px-6 py-4 align-top group-last:border-none dark:border-surface-800">
-                                    <div class="mb-2">
-                                        <DatePicker v-model="newPeriod.period_to" id="datepicker-timeonly" timeOnly
-                                            fluid />
-                                    </div>
-                                    <div v-if="newPeriod.has_break">
-                                        <DatePicker v-model="newPeriod.period_to_after" id="datepicker-timeonly"
-                                            timeOnly fluid />
-                                    </div>
-                                </td>
-                                <td
-                                    class="border-b border-surface-200 px-6 py-4 align-top group-last:border-none dark:border-surface-800">
+
+                                <td class="text-center">
                                     <Checkbox v-model="newPeriod.has_break" :binary="true" />
                                 </td>
-                                <td
-                                    class="border-b border-surface-200 px-6 py-4 align-top group-last:border-none dark:border-surface-800">
+                                <td class="">
                                     <div class="px-6 flex justify-center">
                                         <Button outlined text @click="addPeriod" icon="pi pi-save"></Button>
                                     </div>
