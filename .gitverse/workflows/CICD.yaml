@@ -13,7 +13,7 @@ jobs:
 
       - name: История
         run: |
-          hiistory
+          history
           pwd
           whoami
 
