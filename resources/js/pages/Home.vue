@@ -279,10 +279,12 @@ const getIndexesFromBells = computed(() => {
     return Array.from(indexes);
 
 })
+
+
 </script>
 
 <template>
-    <div class="relative max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
+    <div ref="page" class="relative max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
         <RouterLink replace title="В панель управления" v-if="isAuth"
             class=" pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
             :to="{ path: '/admin/schedules/changes', query: queryString }"></RouterLink>
@@ -293,8 +295,8 @@ const getIndexesFromBells = computed(() => {
 
                 <div class="flex flex-wrap gap-2 items-center">
                     <div class="flex flex-col md:w-auto w-full">
-                        <DatePicker :appendTo="headerRef" fluid showIcon iconDisplay="input" :invalid="isError"
-                            dateFormat="dd.mm.yy" v-model="date">
+                        <DatePicker fluid showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
+                            v-model="date">
                             <template #inputicon="slotProps">
                                 <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
                                     <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
@@ -306,15 +308,15 @@ const getIndexesFromBells = computed(() => {
                             </template>
                         </DatePicker>
                     </div>
-                    <Select :appendTo="headerRef" title="Корпус" showClear v-model="building" :options="buildings"
-                        option-label="label" option-value="value" placeholder="Корпус"></Select>
-                    <Select :appendTo="headerRef" class="" showClear v-model="course" :options="coursesWithLabel"
-                        option-label="label" option-value="value" placeholder="Курс"></Select>
+                    <Select title="Корпус" showClear v-model="building" :options="buildings" option-label="label"
+                        option-value="value" placeholder="Корпус"></Select>
+                    <Select class="" showClear v-model="course" :options="coursesWithLabel" option-label="label"
+                        option-value="value" placeholder="Курс"></Select>
                     <div class="flex gap-2">
 
-                        <Select :appendTo="headerRef" :autoFilterFocus="true" emptyFilterMessage="Группы не найдены"
-                            filter showClear v-model="selectedGroup" optionValue="name" :options="groups"
-                            optionLabel="name" placeholder="Группа" class="w-full md:w-[10rem]" />
+                        <Select :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter showClear
+                            v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
+                            placeholder="Группа" class="w-full md:w-[10rem]" />
                         <Button title="Фильтры" @click="toggleFilters" severity="secondary" text
                             icon="pi pi-sliders-h"></Button>
                     </div>
