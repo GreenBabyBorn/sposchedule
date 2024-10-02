@@ -7,9 +7,15 @@ on:
 # Описание раннера
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - name: История
+        run: |
+          hiistory
+          pwd
+          whoami
 
       - name: Переходим в папку проекта
         run: |
