@@ -83,7 +83,6 @@ onMounted(() => {
                 <Select fluid v-model="selectedMainSemester" :options="semesters" optionLabel="name"
                     placeholder="Семестр" class="" />
                 <Button target="_blank" icon="pi pi-print" as="router-link" :to="{
-
                     path: '/print/main',
                 }" />
             </div>

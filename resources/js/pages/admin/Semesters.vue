@@ -94,8 +94,8 @@ const minDate = ref(new Date());
                 <div class="">
                     <label for="years" class=" block mb-1">Учебный год</label>
                     <!-- <InputText id="years" v-model="inputSemester.years" placeholder="2023/2024"></InputText> -->
-                    <DatePicker placeholder="Учебный год" :min-date="minDate" view="year" input-id="dates"
-                        date-format="yy" v-model="years" selectionMode="range" :manualInput="false" />
+                    <DatePicker append-to="self" placeholder="Учебный год" :min-date="minDate" view="year"
+                        input-id="dates" date-format="yy" v-model="years" selectionMode="range" :manualInput="false" />
                 </div>
                 <div class="">
                     <label for=" semester" class=" block mb-1">Номер семестра</label>
@@ -105,8 +105,8 @@ const minDate = ref(new Date());
                 </div>
                 <div class="">
                     <label for="dates" class="block mb-1">Начало - Конец семестра</label>
-                    <DatePicker placeholder="Начало - Конец семестра" input-id="dates" date-format="dd.mm.yy"
-                        v-model="dates" selectionMode="range" :manualInput="false" />
+                    <DatePicker append-to="self" placeholder="Начало - Конец семестра" input-id="dates"
+                        date-format="dd.mm.yy" v-model="dates" selectionMode="range" :manualInput="false" />
                 </div>
 
                 <Button @click.prevent="addSemester">Добавить</Button>

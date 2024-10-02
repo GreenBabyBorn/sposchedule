@@ -350,7 +350,7 @@ watchEffect(() => {
                     <Select option-value="value" v-if="typeState" v-model="weekDay" :options="weekDaysOptions"
                         optionLabel="label" placeholder="День недели" class="w-full md:w-56" />
 
-                    <DatePicker v-else dateFormat="dd.mm.yy" v-model="date" />
+                    <DatePicker append-to="self" v-else dateFormat="dd.mm.yy" v-model="date" />
                     <!-- <Button @click="copyState = !copyState" text icon="pi pi-clone" title="Скопировать"></Button> -->
                     <div class="border-l border-surface-600 flex gap-2 pl-2">
                         <Button @click="visible = !visible" outlined icon="pi pi-clone" label="Сохранить"

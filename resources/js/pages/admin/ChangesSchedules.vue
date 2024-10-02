@@ -155,8 +155,8 @@ const buildings = computed(() => {
         </div>
         <div class="flex  items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800">
             <div class="flex gap-2 items-center flex-wrap">
-                <DatePicker class="shrink-0" showIcon iconDisplay="input" :invalid="isError" dateFormat="dd.mm.yy"
-                    v-model="date">
+                <DatePicker append-to="self" class="shrink-0" showIcon iconDisplay="input" :invalid="isError"
+                    dateFormat="dd.mm.yy" v-model="date">
                     <template #inputicon="slotProps">
                         <div @click="slotProps.clickCallback" class="flex gap-2 justify-between items-center">
                             <small>{{ reducedWeekDays[useDateFormat(date, 'dddd', {
