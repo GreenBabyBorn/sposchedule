@@ -338,8 +338,7 @@ watchEffect(() => {
     <div class="flex flex-col gap-4">
         <div class="flex flex-wrap justify-between items-baseline">
             <h1 class="text-2xl">Звонки</h1>
-            <ToggleButton :disabled="!data" @change="updateBell({ id: bells?.id, body: { published: published } })"
-                v-model="published" class="text-sm" fluid onLabel="Снять с публикации" offLabel="Опубликовать" />
+
         </div>
         <div class="">
             <form class="flex flex-wrap items-center gap-2 p-4 rounded-lg dark:bg-surface-800">
@@ -351,9 +350,12 @@ watchEffect(() => {
                         optionLabel="label" placeholder="День недели" class="w-full md:w-56" />
 
                     <DatePicker append-to="self" v-else dateFormat="dd.mm.yy" v-model="date" />
+                    <ToggleButton :disabled="!data"
+                        @change="updateBell({ id: bells?.id, body: { published: published } })" v-model="published"
+                        class="text-sm" fluid onLabel="Снять с публикации" offLabel="Опубликовать" />
                     <!-- <Button @click="copyState = !copyState" text icon="pi pi-clone" title="Скопировать"></Button> -->
                     <div class="border-l border-surface-600 flex gap-2 pl-2">
-                        <Button @click="visible = !visible" outlined icon="pi pi-clone" label="Сохранить"
+                        <Button @click="visible = !visible" outlined icon="pi pi-clone" label="Сохранить заготовку"
                             title="Сохранить в заготовки"></Button>
                         <Select show-clear v-model="selectedPreset" placeholder="Применить заготовку"
                             option-label="name_preset" :options="bellsPresets"></Select>
