@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -67,5 +68,41 @@ class AuthController extends Controller
         }
 
         return response()->json(['message' => 'Выход успешный']);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        // Получаем текущего пользователя
+        $user = $request->user();
+
+        // Валидация данных
+        $validatedData = $request->validate([
+            'name' => 'sometimes|string|max:255', // Поле может быть передано, но не обязательно
+            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id, // Уникальный email, игнорируем текущего пользователя
+            'password' => 'sometimes|string|min:6|confirmed', // Обновление пароля, если передан
+        ]);
+
+        // Обновление имени, если передано
+        if ($request->has('name')) {
+            $user->name = $request->name;
+        }
+
+        // Обновление email, если передано
+        if ($request->has('email')) {
+            $user->email = $request->email;
+        }
+
+        // Обновление пароля, если передано
+        if ($request->has('password')) {
+            $user->password = Hash::make($request->password);
+        }
+
+        // Сохраняем изменения
+        $user->save();
+
+        return response()->json([
+            'message' => 'Профиль успешно обновлен',
+            'user' => $user
+        ]);
     }
 }

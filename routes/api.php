@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::patch('/user', [AuthController::class, 'updateProfile']);
 
 
     Route::post('/bells/presets', [BellController::class, 'saveAsPreset']);
