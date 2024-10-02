@@ -3,8 +3,6 @@ name: Deploy Application
 # Триггер на пуш в ветку main
 on:
   push:
-    branches:
-      - master
 
 # Описание раннера
 jobs:
