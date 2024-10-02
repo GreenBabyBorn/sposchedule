@@ -776,7 +776,7 @@ class ScheduleController extends Controller
         }
         if ($cabinet = $request->input('cabinet')) {
             // Условие для фильтрации по кабинету
-            $query .= " AND l.cabinet LIKE :cabinet ";
+            $query .= " AND l.cabinet ILIKE :cabinet ";
             $params['cabinet'] = "%{$cabinet}%"; // добавляем параметр для поиска по кабинету
         }
         // Добавляем фильтрацию по преподавателю, если параметр передан
