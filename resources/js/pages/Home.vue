@@ -405,12 +405,26 @@ const getIndexesFromBells = computed(() => {
                                 <th>
                                     <div class="flex gap-2 flex-col text-xs p-2">
                                         <span class="self-end">Корпус</span>
-                                        <span class="border rotate-12 opacity-25"></span>
+                                        <span class="border rotate-12"></span>
                                         <span class="self-start">№ пары</span>
                                     </div>
                                 </th>
                                 <th v-for="bell in mergedBells" :key="bell?.building">
-                                    {{ bell?.building }}
+                                    <div class="flex flex-col gap-1 items-center">
+                                        <span>
+
+                                            {{ bell?.building }}
+                                        </span>
+                                        <span :class="{
+                                            'text-green-400 ': bell.bells?.type
+                                                !== 'main',
+                                            'text-surface-400 ': bell.bells?.type
+                                                === 'main'
+                                        }" class="text-sm text-right rounded-lg ">{{
+                                            bell.bells?.type
+                                                === 'main' ? 'Основное' : 'Изменения' }}</span>
+                                    </div>
+
                                 </th>
                             </tr>
                         </thead>
