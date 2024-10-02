@@ -223,7 +223,7 @@ class BellController extends Controller
 
         $filteredBells = $bells->sortByDesc(function ($bell) {
             return $bell->type === 'changes' ? 1 : 0;
-        })->unique('building');
+        })->unique('building')->sortBy('building');
 
         if ($filteredBells->isEmpty()) {
             return response()->json([
