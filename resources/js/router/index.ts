@@ -4,7 +4,6 @@ import { RouteNamesEnum } from '@/router/router.types';
 import { AppLayoutsEnum } from '@/layouts/layouts.types';
 
 import HomeView from '../pages/Home.vue';
-import BellsView from '../pages/Bells.vue';
 import GroupsView from '../pages/admin/Groups.vue';
 import SubjectsView from '../pages/admin/Subjects.vue';
 import TeachersView from '../pages/admin/Teachers.vue';
