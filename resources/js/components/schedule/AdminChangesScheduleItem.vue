@@ -18,7 +18,7 @@ import ToggleButton from 'primevue/togglebutton';
 
 
 import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
-import { useNow } from '@vueuse/core';
+import { useNow, useStorage } from '@vueuse/core';
 
 const toast = useToast();
 const props = defineProps({
@@ -270,29 +270,32 @@ const isOneDayDifference = (inputDate) => {
     const today: any = new Date(now.value.getFullYear(), now.value.getMonth(), now.value.getDate());
     const differenceInMs = today - parsedDate;
     const differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
-    return Math.abs(differenceInDays) > 0;
+    return differenceInDays > 0 && parsedDate < today;
 };
 
-
+const enabledEdir = useStorage('enableEdit', false)
 </script>
 
 <template>
-    <div class="schedule-item">
-        <div class="p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center">
+    <div :class="{ 'opacity-50': isOneDayDifference(dateRef) && !Boolean(enabledEdir) }"
+        :title="isOneDayDifference(dateRef) && !Boolean(enabledEdir) ? 'Редактирование для прошедших дней отключено' : 'Редактировать'"
+        class="schedule-item">
+        <div class="rounded p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center">
             <div class="flex items-center gap-2">
                 <span class="text-xl text-left font-medium text-surface-800 dark:text-white/80">
                     {{ props?.group?.name }}
                 </span>
 
-                <Button :disabled="isOneDayDifference(dateRef)" title="Редактировать" severity="secondary"
+                <Button :disabled="isOneDayDifference(dateRef) && !Boolean(enabledEdir)" severity="secondary"
                     @click="isEdit = !isEdit" text icon="pi pi-pen-to-square"></Button>
             </div>
 
 
             <span>{{ props?.week_type }}</span>
             <div v-if="props.type !== 'main'" class="">
-                <ToggleButton @change="handlePublished" :disabled="!lessons" v-model="published" class="text-sm" fluid
-                    onLabel="Снять с публикации" offLabel="Опубликовать" />
+                <ToggleButton @change="handlePublished"
+                    :disabled="!lessons || isOneDayDifference(dateRef) && !Boolean(enabledEdir)" v-model="published"
+                    class="text-sm" fluid onLabel="Снять с публикации" offLabel="Опубликовать" />
             </div>
             <span :class="{
                 'text-green-400 ': props?.type
