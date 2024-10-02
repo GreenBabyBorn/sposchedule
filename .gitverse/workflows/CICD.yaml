@@ -9,12 +9,6 @@ jobs:
   deploy:
     runs-on: linux
     steps:
-      - name: История проекта
-        run: |
-          history
-          pwd
-          whoami
-
       - name: Переходим в папку проекта и пересобираем
         run: |
           cd /home/green/sposchedule
