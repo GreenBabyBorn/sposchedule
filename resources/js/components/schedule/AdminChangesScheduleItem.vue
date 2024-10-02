@@ -37,6 +37,10 @@ const lessons: any = toRef<any>(() => props.lessons)
 const teachers: any = toRef<any>(() => props.teachers)
 const subjects: any = toRef<any>(() => props.subjects)
 const dateRef: any = toRef<any>(() => props.date)
+const semester: any = toRef<any>(() => props.semester)
+const group: any = toRef<any>(() => props.group)
+
+
 
 // const {  teachers, subjects } = toRef<any>(props).value
 // const lessons: any = ref(props.lessons)
@@ -133,10 +137,16 @@ async function addNewLesson() {
     // Если расписание не загружено и тип 'changes', создаем новое расписание
     if (!loadedSchedule) {
         try {
+            console.log({
+                group_id: group.value?.id,
+                semester_id: semester.value?.id,
+                type: 'changes',
+                date: props.date,
+            })
             await storeSchedule({
                 body: {
-                    group_id: props.group.id,
-                    semester_id: props.semester.id,
+                    group_id: group.value.id,
+                    semester_id: semester.value.id,
                     type: 'changes',
                     // view_mode: 'table',
                     date: props.date,
@@ -347,13 +357,14 @@ const enabledEdir = useStorage('enableEdit', false)
                         </div>
                     </td>
                     <td v-show="!newLessonMessageState">
-                        <div class="table-subrow"><Select :autoFilterFocus="true" filter placeholder="Предмет"
-                                v-model="newLesson.subject" class="w-full text-left" :options="subjects"
-                                optionLabel="name" />
+                        <div class="table-subrow"><Select :resetFilterOnHide="true" :autoFilterFocus="true" filter
+                                placeholder="Предмет" v-model="newLesson.subject" class="w-full text-left"
+                                :options="subjects" optionLabel="name" />
                         </div>
                         <div class="table-subrow">
-                            <MultiSelect :autoFilterFocus="true" filter placeholder="Преподаватели"
-                                v-model="newLesson.teachers" class="w-full" :options="teachers" optionLabel="name" />
+                            <MultiSelect :resetFilterOnHide="true" :autoFilterFocus="true" filter
+                                placeholder="Преподаватели" v-model="newLesson.teachers" class="w-full"
+                                :options="teachers" optionLabel="name" />
 
                         </div>
                     </td>

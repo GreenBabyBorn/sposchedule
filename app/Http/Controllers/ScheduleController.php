@@ -402,24 +402,31 @@ class ScheduleController extends Controller
             // Добавляем финальное расписание группы в общий массив
 
 
+            if($group->semesters->filter(function ($semester) use ($carbonDate) {
+                $start = Carbon::parse($semester->start);
+                $end = Carbon::parse($semester->end);
 
-            array_push($finalSchedules['schedules'], [
+                return $carbonDate->between($start, $end);
+            })->first()) {
+                array_push($finalSchedules['schedules'], [
 
-                'semester' => $group->semesters->filter(function ($semester) use ($carbonDate) {
-                    $start = Carbon::parse($semester->start);
-                    $end = Carbon::parse($semester->end);
-
-                    return $carbonDate->between($start, $end);
-                })->first() ? new SemesterResource(
-                    $group->semesters->filter(function ($semester) use ($carbonDate) {
+                    'semester' => $group->semesters->filter(function ($semester) use ($carbonDate) {
                         $start = Carbon::parse($semester->start);
                         $end = Carbon::parse($semester->end);
+
                         return $carbonDate->between($start, $end);
-                    })->first()
-                ) : null, // Возвращаем null, если семестр не найден
-                'group' => new SkinnyGroup($group),
-                'schedule' => $groupSchedule
-            ]);
+                    })->first() ? new SemesterResource(
+                        $group->semesters->filter(function ($semester) use ($carbonDate) {
+                            $start = Carbon::parse($semester->start);
+                            $end = Carbon::parse($semester->end);
+                            return $carbonDate->between($start, $end);
+                        })->first()
+                    ) : null, // Возвращаем null, если семестр не найден
+                    'group' => new SkinnyGroup($group),
+                    'schedule' => $groupSchedule
+                ]);
+            }
+
             // $finalSchedules[$group->id] = [
             //     'group_name' => $group->name,
             //     'schedule' => $groupSchedule

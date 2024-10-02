@@ -32,6 +32,7 @@ class StoreScheduleRequest extends FormRequest
                     $existingSchedule = \App\Models\Schedule::where('group_id', $this->group_id)
                         ->where('type', $this->type)
                         ->where('week_day', $this->week_day)
+                        ->where('semester_id', $this->semester_id)
                         ->first();
 
                     if ($existingSchedule) {
@@ -41,6 +42,7 @@ class StoreScheduleRequest extends FormRequest
                     $existingSchedule = \App\Models\Schedule::where('group_id', $this->group_id)
                     ->where('type', $this->type)
                     ->where('date', $this->date)
+                    ->where('semester_id', $this->semester_id)
                     ->first();
 
                     if ($existingSchedule) {

@@ -390,24 +390,25 @@ const hideAddNewLesson = ref(false)
                             <InputText size="small" class="min-w-10 w-full text-center" v-model="newLesson.index" />
                         </td>
                         <td>
-                            <div class="table-subrow"><Select :focusOnHover="false" :autoFilterFocus="true" filter
-                                    v-model="newLesson['ЧИСЛ'].subject" class="w-full text-left" :options="subjects"
-                                    optionLabel="name"></Select></div>
-                            <div v-if="newLesson['ЗНАМ']" class="table-subrow"><Select :focusOnHover="false"
-                                    :autoFilterFocus="true" filter v-model="newLesson['ЗНАМ'].subject"
+                            <div class="table-subrow"><Select :resetFilterOnHide="true" :focusOnHover="false"
+                                    :autoFilterFocus="true" filter v-model="newLesson['ЧИСЛ'].subject"
                                     class="w-full text-left" :options="subjects" optionLabel="name"></Select></div>
+                            <div v-if="newLesson['ЗНАМ']" class="table-subrow"><Select :resetFilterOnHide="true"
+                                    :focusOnHover="false" :autoFilterFocus="true" filter
+                                    v-model="newLesson['ЗНАМ'].subject" class="w-full text-left" :options="subjects"
+                                    optionLabel="name"></Select></div>
                         </td>
                         <td>
                             <div class="table-subrow">
-                                <MultiSelect :autoFilterFocus="true" filter placeholder="Выберите преподавателя"
-                                    v-model="newLesson['ЧИСЛ'].teachers" class="w-full" :options="teachers"
-                                    optionLabel="name">
+                                <MultiSelect :resetFilterOnHide="true" :autoFilterFocus="true" filter
+                                    placeholder="Выберите преподавателя" v-model="newLesson['ЧИСЛ'].teachers"
+                                    class="w-full" :options="teachers" optionLabel="name">
                                 </MultiSelect>
                             </div>
                             <div v-if="newLesson['ЗНАМ']" class="table-subrow">
-                                <MultiSelect :autoFilterFocus="true" filter placeholder="Выберите преподавателя"
-                                    v-model="newLesson['ЗНАМ'].teachers" class="w-full" :options="teachers"
-                                    optionLabel="name">
+                                <MultiSelect :resetFilterOnHide="true" :autoFilterFocus="true" filter
+                                    placeholder="Выберите преподавателя" v-model="newLesson['ЗНАМ'].teachers"
+                                    class="w-full" :options="teachers" optionLabel="name">
                                 </MultiSelect>
                             </div>
                         </td>
