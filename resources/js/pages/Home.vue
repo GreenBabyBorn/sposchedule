@@ -317,7 +317,7 @@ const getIndexesFromBells = computed(() => {
 
                         <Select append-to="self" :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter
                             showClear v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
-                            placeholder="Группа" class="w-full md:w-[10rem]" />
+                            placeholder="Группа" class="w-full" />
                         <Button title="Фильтры" @click="toggleFilters" severity="secondary" text
                             icon="pi pi-sliders-h"></Button>
                     </div>
