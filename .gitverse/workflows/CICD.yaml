@@ -1,0 +1,26 @@
+name: Deploy Application
+
+# Триггер на пуш в ветку main
+on:
+  push:
+    branches:
+      - main
+
+# Описание раннера
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Переходим в папку проекта
+        run: |
+          cd /home/green/sposchedule
+
+      - name: Получаем новые изменения
+        run: |
+          git pull
+
+      - name: Пересобираем контейнер с проектом
+        run: |
+          docker compose -f docker-compose.prod.yml -p sposchedule up -d --build
