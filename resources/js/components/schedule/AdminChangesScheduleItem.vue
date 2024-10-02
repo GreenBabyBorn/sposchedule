@@ -18,6 +18,7 @@ import ToggleButton from 'primevue/togglebutton';
 
 
 import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
+import { useNow } from '@vueuse/core';
 
 const toast = useToast();
 const props = defineProps({
@@ -35,6 +36,7 @@ const props = defineProps({
 const lessons: any = toRef<any>(() => props.lessons)
 const teachers: any = toRef<any>(() => props.teachers)
 const subjects: any = toRef<any>(() => props.subjects)
+const dateRef: any = toRef<any>(() => props.date)
 
 // const {  teachers, subjects } = toRef<any>(props).value
 // const lessons: any = ref(props.lessons)
@@ -254,20 +256,36 @@ function handlenewLessonMessage() {
     }
 }
 const isEdit = ref(false)
+
+
+const now = useNow();
+
+const parseDate = (dateStr) => {
+    const [day, month, year] = dateStr.split('.').map(Number);
+    return new Date(year, month - 1, day);
+};
+
+const isOneDayDifference = (inputDate) => {
+    const parsedDate: any = parseDate(inputDate);
+    const today: any = new Date(now.value.getFullYear(), now.value.getMonth(), now.value.getDate());
+    const differenceInMs = today - parsedDate;
+    const differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
+    return Math.abs(differenceInDays) > 0;
+};
+
+
 </script>
 
 <template>
     <div class="schedule-item">
         <div class="p-2 dark:bg-surface-800  flex flex-wrap  justify-between items-center">
-
-            <!-- <button class="pi pi-pen-to-square"></button> -->
             <div class="flex items-center gap-2">
                 <span class="text-xl text-left font-medium text-surface-800 dark:text-white/80">
                     {{ props?.group?.name }}
                 </span>
 
-                <Button title="Редактировать" severity="secondary" @click="isEdit = !isEdit" text
-                    icon="pi pi-pen-to-square"></Button>
+                <Button :disabled="isOneDayDifference(dateRef)" title="Редактировать" severity="secondary"
+                    @click="isEdit = !isEdit" text icon="pi pi-pen-to-square"></Button>
             </div>
 
 
