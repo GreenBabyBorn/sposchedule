@@ -7,7 +7,7 @@ on:
 # Описание раннера
 jobs:
   deploy:
-    runs-on: 30da4ff3a411
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
