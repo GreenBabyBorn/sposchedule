@@ -308,10 +308,11 @@ const getIndexesFromBells = computed(() => {
                             </template>
                         </DatePicker>
                     </div>
-                    <Select fluid append-to="self" title="Корпус" showClear v-model="building" :options="buildings"
-                        option-label="label" option-value="value" placeholder="Корпус"></Select>
-                    <Select append-to="self" class="" showClear v-model="course" :options="coursesWithLabel"
-                        option-label="label" option-value="value" placeholder="Курс"></Select>
+                    <Select overlay-class="w-full" append-to="self" title="Корпус" showClear v-model="building"
+                        :options="buildings" option-label="label" option-value="value" placeholder="Корпус"></Select>
+                    <Select overlay-class="w-full" append-to="self" class="" showClear v-model="course"
+                        :options="coursesWithLabel" option-label="label" option-value="value"
+                        placeholder="Курс"></Select>
                     <div class="flex gap-2">
 
                         <Select append-to="self" :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter
