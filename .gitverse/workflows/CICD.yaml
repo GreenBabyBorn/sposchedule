@@ -15,14 +15,8 @@ jobs:
           pwd
           whoami
 
-      - name: Переходим в папку проекта
+      - name: Переходим в папку проекта и пересобираем
         run: |
           cd /home/green/sposchedule
-
-      - name: Получаем новые изменения
-        run: |
           git pull
-
-      - name: Пересобираем контейнер с проектом
-        run: |
           docker compose -f docker-compose.prod.yml -p sposchedule up -d --build
