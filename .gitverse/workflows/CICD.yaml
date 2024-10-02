@@ -13,7 +13,7 @@ jobs:
 
       - name: Переходим в папку проекта
         run: |
-          cd /home/green/sposchedule
+          cd /mnt/sposchedule
 
       - name: Получаем новые изменения
         run: |
