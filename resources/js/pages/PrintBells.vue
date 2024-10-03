@@ -133,6 +133,32 @@ const getIndexesFromBells = computed(() => {
 
 })
 
+const dayNamesWithPreposition = {
+    понедельник: 'понедельник',
+    вторник: 'вторник',
+    среда: 'среду',
+    четверг: 'четверг',
+    пятница: 'пятницу',
+    суббота: 'субботу',
+    воскресенье: 'воскресенье'
+};
+
+const monthDeclensions = {
+    'январь': 'января',
+    'февраль': 'февраля',
+    'март': 'марта',
+    'апрель': 'апреля',
+    'май': 'мая',
+    'июнь': 'июня',
+    'июль': 'июля',
+    'август': 'августа',
+    'сентябрь': 'сентября',
+    'октябрь': 'октября',
+    'ноябрь': 'ноября',
+    'декабрь': 'декабря'
+};
+
+
 </script>
 
 <template>
@@ -146,7 +172,22 @@ const getIndexesFromBells = computed(() => {
     </div>
     <div class="main">
         <div class="flex flex-col gap-2 items-center w-full ">
-            <h1 class="text-2xl font-bold text-center py-2">Звонки</h1>
+
+            <h1 v-if="publicBells" class=" font-bold text-center py-2">
+                <span class="uppercase">Расписание звонков</span> <br>
+                на
+                {{ dayNamesWithPreposition[useDateFormat(date, 'dddd', {
+                    locales: 'ru-RU'
+                }).value] }} {{ `${useDateFormat(date, 'DD', {
+                    locales: 'ru-RU'
+                }).value} ${monthDeclensions[useDateFormat(date, 'MMMM', {
+                    locales: 'ru-RU'
+                }).value]} ${useDateFormat(date, 'YYYY', {
+                    locales: 'ru-RU'
+                }).value}`
+
+                }} года
+            </h1>
             <span v-if="publicBells?.type" :class="{
                 'text-green-400 ': publicBells?.type
                     !== 'main',
@@ -156,7 +197,6 @@ const getIndexesFromBells = computed(() => {
                 publicBells?.type
                     === 'main' ? 'Основное' : 'Изменения' }}</span>
             <div class="">
-
                 <h2 class="text-2xl text-center " v-if="!publicBells && isFetchedBells">На эту дату расписание
                     звонков не
                     найдено
