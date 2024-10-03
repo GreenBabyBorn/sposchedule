@@ -1,66 +1,87 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# SPOSCHEDULE
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Описание проекта
 
-## About Laravel
+Веб-приложение для управления расписанием занятий в колледже позволяет пользователям (администраторам, преподавателям и студентам) эффективно создавать, редактировать и просматривать расписание пар. Оно поддерживает гибкую настройку расписаний, их изменение по дням недели, отображение информации о корпусах, группах и преподавателях.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Приложение включает несколько основных функций, таких как логирование действий, контроль доступа, экспорт расписания в PDF и поддержка изменений в расписании на конкретные даты и т.д.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Проект создавался с учетом **спицифики** работы Рязанского Колледжа Электроники.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Технологии
 
-## Learning Laravel
+### Backend
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **PHP (Laravel 11)** — серверная логика и API.
+- **PostgreSQL** — база данных для хранения информации.
+- **Docker** — контейнеризация приложения для упрощения развертывания.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Frontend
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **Vue.js** — динамическое взаимодействие с пользователем, поддержка реактивных данных.
+- **PrimeVue** — UI библиотека готовых компонентов.
+- **TailwindCSS** — CSS-фреймворк.
+- **TanStack Query v5** — для управления асинхронным состоянием приложения
+- **HTML5, CSS3, JavaScript** — для разработки пользовательского интерфейса.
 
-## Laravel Sponsors
+### DevOps
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- **GitHub Actions** — для CI/CD.
+- **Docker Compose** — для развертывания приложения.
 
-### Premium Partners
+## Установка и запуск
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+### Требования
 
-## Contributing
+- **Docker и Docker Compose**
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Инструкции по установке
 
-## Code of Conduct
+1. Клонируйте репозиторий:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+   ```bash
+   git clone ссылка_на_этот_репозиторий
+   ```
 
-## Security Vulnerabilities
+2. Перейдите в директорию проекта:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+   ```bash
+   cd sposchedule
+   ```
 
-## License
+3. Настройте файл окружения `.env`:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+   ```bash
+   cp .env.example .env
+   ```
+
+   Настройте параметры подключения к базе данных и другие переменные окружения.
+
+4. Соберите и запустите контейнеры:
+
+   ```bash
+   docker-compose -f docker-compose.prod.yml up -d --build
+   ```
+
+5. Подключитесь к контейнеру **app** (`docker exec -it название_контейнера bash`) и выполните миграции и заполните таблицу (только при первом развертывании):
+
+   ```bash
+   php artisan migrate --seed
+   ```
+
+6. Приложение будет доступно на порту, указанном в `docker-compose.prod.yml`.
+
+## Использование
+
+- Для входа в систему администратору потребуется учетная запись, которая создалась во время заполнения БД (сидинга).
+- Расписание можно управлять через веб-интерфейс, который доступен после авторизации.
+
+## Лицензия
+
+Приложение распространяется по лицензии [Apache License 2.0](LICENSE).
+
+## Авторы
+
+- **GreenBabyBorn** - Основной разработчик
+
+Если у вас есть вопросы или предложения, пожалуйста, свяжитесь с нами.
