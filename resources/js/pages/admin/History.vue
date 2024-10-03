@@ -78,6 +78,8 @@ const filters = ref({
                         {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}
                     </template>
                 </Column>
+                <Column field="user_name" header="Пользователь">
+                </Column>
             </DataTable>
         </div>
     </div>

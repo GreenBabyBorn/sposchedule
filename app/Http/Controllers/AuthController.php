@@ -86,13 +86,11 @@ class AuthController extends Controller
         // Обновление имени, если передано
         if ($request->has('name')) {
             $user->name = $request->name;
-            HistoryLogger::logAction('ФИО было изменено');
         }
 
         // Обновление email, если передано
         if ($request->has('email')) {
             $user->email = $request->email;
-            HistoryLogger::logAction('Почта была изменена');
         }
 
         // Обновление пароля, если передано
@@ -100,7 +98,7 @@ class AuthController extends Controller
             $user->password = Hash::make($request->password);
             HistoryLogger::logAction('Пароль был изменен');
         }
-
+        HistoryLogger::logAction('Профиль обновлен');
         // Сохраняем изменения
         $user->save();
 
