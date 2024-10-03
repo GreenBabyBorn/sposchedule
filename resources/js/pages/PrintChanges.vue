@@ -6,6 +6,7 @@ import { useRoute, } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import Button from 'primevue/button';
 import { storeToRefs } from 'pinia';
+import LoadingBar from '@/components/LoadingBar.vue';
 
 const route = useRoute();
 const date = ref(null)
@@ -109,6 +110,7 @@ function printPage() {
 </script>
 
 <template>
+    <LoadingBar />
     <div class="controls py-2 flex  flex-wrap gap-2 items-center  pl-2">
         <Button label="Печать" @click="printPage()" icon="pi pi-print" />
     </div>
