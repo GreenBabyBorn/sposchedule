@@ -46,7 +46,8 @@ class BellsSeeder extends Seeder
                     'type' => 'main',
                     'week_day' => $weekDay,
                     'date' => null,
-                    'building' => $building
+                    'building' => $building,
+                    'published' => true,
                 ]);
 
                 // Создание периодов для каждого звонка

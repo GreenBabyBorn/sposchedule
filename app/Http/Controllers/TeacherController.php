@@ -11,6 +11,7 @@ use App\Http\Resources\TeacherResource;
 use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use App\Facades\HistoryLogger;
 
 class TeacherController extends Controller
 {
@@ -47,6 +48,7 @@ class TeacherController extends Controller
     public function store(StoreTeacherRequest $request)
     {
         $teacher = Teacher::create($request->all());
+        HistoryLogger::logAction('Добавлен преподаватель', $teacher->toArray());
         return new TeacherResource($teacher);
     }
 
@@ -63,6 +65,7 @@ class TeacherController extends Controller
      */
     public function update(UpdateTeacherRequest $request, Teacher $teacher)
     {
+        HistoryLogger::logAction('Обновлен преподаватель', $teacher->toArray());
         $teacher->update($request->all());
         return new TeacherResource($teacher);
     }
@@ -72,6 +75,7 @@ class TeacherController extends Controller
      */
     public function destroy(Teacher $teacher)
     {
+        HistoryLogger::logAction('Удален преподаватель', $teacher->toArray());
         $teacher->delete();
         return response()->noContent();
     }

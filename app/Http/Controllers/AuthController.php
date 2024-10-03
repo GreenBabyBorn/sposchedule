@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Facades\HistoryLogger;
 
 class AuthController extends Controller
 {
@@ -85,16 +86,19 @@ class AuthController extends Controller
         // Обновление имени, если передано
         if ($request->has('name')) {
             $user->name = $request->name;
+            HistoryLogger::logAction('ФИО было изменено');
         }
 
         // Обновление email, если передано
         if ($request->has('email')) {
             $user->email = $request->email;
+            HistoryLogger::logAction('Почта была изменена');
         }
 
         // Обновление пароля, если передано
         if ($request->has('password')) {
             $user->password = Hash::make($request->password);
+            HistoryLogger::logAction('Пароль был изменен');
         }
 
         // Сохраняем изменения

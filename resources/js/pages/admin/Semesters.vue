@@ -109,7 +109,7 @@ const minDate = ref(new Date());
                         date-format="dd.mm.yy" v-model="dates" selectionMode="range" :manualInput="false" />
                 </div>
 
-                <Button @click.prevent="addSemester">Добавить</Button>
+                <Button :disabled="!years || !indexSemester || dates" @click.prevent="addSemester">Добавить</Button>
             </form>
         </div>
         <div class="">

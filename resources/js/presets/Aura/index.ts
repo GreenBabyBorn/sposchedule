@@ -37,6 +37,7 @@ import skeleton from './skeleton/index.js';
 import progressspinner from './progressspinner/index.js';
 import ripple from './ripple/index.js';
 import tag from './tag/index.js';
+import inplace from './inplace';
 
 export default {
   global,
@@ -45,7 +46,7 @@ export default {
     ripple,
   },
   autocomplete,
-
+  inplace,
   checkbox,
 
   datepicker,

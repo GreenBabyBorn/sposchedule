@@ -15,6 +15,7 @@ use App\Models\Group;
 use App\Models\Schedule;
 use App\Models\Semester;
 use Illuminate\Http\Request;
+use App\Facades\HistoryLogger;
 
 class GroupController extends Controller
 {
@@ -133,6 +134,7 @@ class GroupController extends Controller
         $buildingsIds = array_column($request->buildings, 'name');
         $group->buildings()->sync($buildingsIds);
         $group->refresh();
+        HistoryLogger::logAction('Добавлена группа ' . $group->name, $group->toArray());
         return new GroupResource($group);
     }
 
@@ -150,6 +152,7 @@ class GroupController extends Controller
      */
     public function update(UpdateGroupRequest $request, Group $group)
     {
+        HistoryLogger::logAction('Обновлена группа ' . $group->name, $group->toArray());
         $group->update($request->all());
         if ($request->has('semesters') && is_array($request->semesters)) {
             $semestersIds = array_column($request->semesters, 'id');
@@ -168,6 +171,7 @@ class GroupController extends Controller
      */
     public function destroy(Group $group)
     {
+        HistoryLogger::logAction('Удалена группа ' . $group->name, $group->toArray());
         $group->delete();
         return response()->noContent();
     }

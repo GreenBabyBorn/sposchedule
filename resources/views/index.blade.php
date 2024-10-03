@@ -10,9 +10,9 @@
     <title>Пары РКЭ</title>
     <meta name="description" content="Расписание учебного процесса Рязанского Колледжа Электроники">
     <meta name="keywords" content="Расписание РКЭ, Пары РКЭ, РКЭ, Звонки РКЭ, Рязанский колледж электроники, расписание на завтра РКЭ, обучающимся РКЭ">
-    <meta name="yandex-verification" content="ea9244c5d083efb1" />
     @vite(['resources/js/main.ts'])
-
+    @if (!env('APP_DEBUG'))
+    <meta name="yandex-verification" content="ea9244c5d083efb1" />
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript">
         (function(m, e, t, r, i, k, a) {
@@ -40,6 +40,7 @@
         <div><img src="https://mc.yandex.ru/watch/98521656" style="position:absolute; left:-9999px;" alt="" /></div>
     </noscript>
     <!-- /Yandex.Metrika counter -->
+    @endif
 </head>
 
 <body>

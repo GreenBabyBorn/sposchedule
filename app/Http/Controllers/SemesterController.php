@@ -6,6 +6,7 @@ use App\Http\Requests\Semester\StoreSemesterRequest;
 use App\Http\Requests\Semester\UpdateSemesterRequest;
 use App\Http\Resources\SemesterResource;
 use App\Models\Semester;
+use App\Facades\HistoryLogger;
 
 class SemesterController extends Controller
 {
@@ -23,6 +24,7 @@ class SemesterController extends Controller
     public function store(StoreSemesterRequest $request)
     {
         $semester = Semester::create($request->all());
+        HistoryLogger::logAction('Добавлен семестр', $semester->toArray());
         return new SemesterResource($semester);
     }
 
@@ -40,6 +42,7 @@ class SemesterController extends Controller
     public function update(UpdateSemesterRequest $request, Semester $semester)
     {
         $semester->update($request->all());
+        HistoryLogger::logAction('Обновлен семестр', $semester->toArray());
         return new SemesterResource($semester);
     }
 
@@ -48,7 +51,9 @@ class SemesterController extends Controller
      */
     public function destroy(Semester $semester)
     {
+        HistoryLogger::logAction('Удален семестр', $semester->toArray());
         $semester->delete();
+
         return response()->noContent();
     }
 }

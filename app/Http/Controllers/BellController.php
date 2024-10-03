@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Support\Carbon;
 use App\Models\BellsPeriod;
+use App\Facades\HistoryLogger;
 
 class BellController extends Controller
 {
@@ -158,7 +159,7 @@ class BellController extends Controller
             $newPeriod->bells_id = $presetBell->id; // Привязываем к новому звонку
             $newPeriod->save();
         }
-
+        HistoryLogger::logAction('Сохранена заготовка звонков', $presetBell->toArray());
         return response()->json([
             'message' => 'Звонок успешно сохранен как пресет',
             'preset_bell' => new BellsResource($presetBell)
@@ -332,6 +333,7 @@ class BellController extends Controller
         }
 
         $bell = Bell::create($request->all());
+        HistoryLogger::logAction('Добавлено расписание звонков', $bell->toArray());
         return response()->json($bell, 201);
     }
 
@@ -350,7 +352,7 @@ class BellController extends Controller
         // if ($validator->fails()) {
         //     return response()->json(['errors' => $validator->errors()], 422);
         // }
-
+        HistoryLogger::logAction('Обновлено расписание звонков', $bell->toArray());
         $bell->update($request->all());
         return response()->json($bell);
     }
@@ -359,6 +361,7 @@ class BellController extends Controller
     public function destroy($id)
     {
         $bell = Bell::findOrFail($id);
+        HistoryLogger::logAction('Удалено расписание звонков', $bell->toArray());
         $bell->delete();
         return response()->json(['message' => 'Расписание звонков удалено.']);
     }

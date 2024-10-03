@@ -7,6 +7,7 @@ use App\Http\Requests\Subject\UpdateSubjectRequest;
 use App\Http\Resources\SubjectResource;
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use App\Facades\HistoryLogger;
 
 class SubjectController extends Controller
 {
@@ -35,6 +36,7 @@ class SubjectController extends Controller
     public function store(StoreSubjectRequest $request)
     {
         $subject = Subject::create($request->all());
+        HistoryLogger::logAction('Добавлен предмет', $subject->toArray());
         return new SubjectResource($subject);
     }
 
@@ -51,6 +53,7 @@ class SubjectController extends Controller
      */
     public function update(UpdateSubjectRequest $request, Subject $subject)
     {
+        HistoryLogger::logAction('Обновлен предмет', $subject->toArray());
         $subject->update($request->all());
         return new SubjectResource($subject);
     }

@@ -9,6 +9,7 @@ use App\Models\Lesson;
 use App\Models\Schedule;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use App\Facades\HistoryLogger;
 
 class LessonController extends Controller
 {
@@ -30,7 +31,7 @@ class LessonController extends Controller
             $teachersIds = array_column($request->teachers, 'id');
             $lesson->teachers()->sync($teachersIds);
         }
-
+        HistoryLogger::logAction('Добавлена пара', $lesson->toArray());
         return new LessonResource($lesson);
     }
 
@@ -52,7 +53,7 @@ class LessonController extends Controller
             $teachersIds = array_column($request->teachers, 'id');
             $lesson->teachers()->sync($teachersIds);
         }
-
+        HistoryLogger::logAction('Обновлена пара', $lesson->toArray());
         return new LessonResource($lesson);
     }
 
@@ -62,6 +63,7 @@ class LessonController extends Controller
     public function destroy(Lesson $lesson)
     {
         $schedule_id_of_lesson = $lesson->schedule_id;
+        HistoryLogger::logAction('Удалена пара', $lesson->toArray());
         $lesson->delete();
 
         // Используйте метод find() для поиска расписания по ID

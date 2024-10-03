@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\History;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
+use App\Services\HistoryLogger;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,6 +25,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $this->app->singleton('historyLogger', function ($app) {
+            return new HistoryLogger();
+        });
+
         RateLimiter::for('api', function (Request $request) {
             // Если пользователь авторизован, не применяем ограничение
             if ($request->user()) {
@@ -32,6 +38,8 @@ class AppServiceProvider extends ServiceProvider
             // Применяем ограничение для неавторизованных пользователей
             return Limit::perMinute(60)->by($request->ip());
         });
+
+
 
         JsonResource::withoutWrapping();
     }

@@ -46,6 +46,11 @@ const items = ref([
         icon: 'pi pi-bell',
         route: '/admin/bells'
     },
+    {
+        label: 'История',
+        icon: 'pi pi-list',
+        route: '/admin/history'
+    },
 
 
 ]);

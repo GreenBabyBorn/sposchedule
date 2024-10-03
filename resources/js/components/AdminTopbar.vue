@@ -23,7 +23,8 @@ async function signout() {
 </script>
 
 <template>
-    <div class="fixed h-16 top-0 left-0 w-full z-50 dark:bg-surface-900 bg-surface-200 flex items-center px-6 gap-4">
+    <div style="z-index: 1100;"
+        class="fixed h-16 top-0 left-0 w-full dark:bg-surface-900 bg-surface-200 flex items-center px-6 gap-4">
         <Button @click="onSidebarToggle" icon="pi pi-bars" text severity="contrast" rounded />
         <div class="flex justify-between items-center w-full">
             <RouterLink to="/" class="font-bold text-xl dark:text-white">Пары РКЭ</RouterLink>

@@ -7,6 +7,7 @@ use App\Http\Resources\BellsPeriodResource;
 use App\Models\BellsPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Facades\HistoryLogger;
 
 class BellsPeriodController extends Controller
 {
@@ -42,6 +43,7 @@ class BellsPeriodController extends Controller
         }
 
         $period = BellsPeriod::create($request->all());
+        HistoryLogger::logAction('Добавлен звонок', $period->toArray());
         return new BellsPeriodResource($period);
     }
 
@@ -63,7 +65,7 @@ class BellsPeriodController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
+        HistoryLogger::logAction('Обновлен звонок', $period->toArray());
         $period->update($request->all());
         return new BellsPeriodResource($period);
     }
@@ -72,6 +74,7 @@ class BellsPeriodController extends Controller
     public function destroy($id)
     {
         $period = BellsPeriod::findOrFail($id);
+        HistoryLogger::logAction('Удален звонок', $period->toArray());
         $period->delete();
         return response()->json(['message' => 'Период звонка удален.']);
     }

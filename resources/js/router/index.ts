@@ -2,7 +2,6 @@ import { createWebHistory, createRouter } from 'vue-router';
 import { loadLayoutMiddleware } from '@/router/middleware/loadLayout.middleware';
 import { RouteNamesEnum } from '@/router/router.types';
 import { AppLayoutsEnum } from '@/layouts/layouts.types';
-
 import HomeView from '../pages/Home.vue';
 import GroupsView from '../pages/admin/Groups.vue';
 import SubjectsView from '../pages/admin/Subjects.vue';
@@ -18,6 +17,7 @@ import NotFound from '../pages/NotFound.vue';
 import PrintView from '../pages/PrintChanges.vue';
 import PrintMainView from '../pages/PrintMain.vue';
 import PrintBellsView from '../pages/PrintBells.vue';
+import HistoryView from '../pages/admin/History.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
@@ -79,6 +79,15 @@ const router = createRouter({
       meta: {
         layout: AppLayoutsEnum.default,
         title: 'Авторизация',
+      },
+    },
+    {
+      path: '/admin/history',
+      name: RouteNamesEnum.history,
+      component: HistoryView,
+      meta: {
+        layout: AppLayoutsEnum.admin,
+        title: 'История',
       },
     },
     {

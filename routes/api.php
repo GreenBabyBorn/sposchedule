@@ -12,6 +12,8 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\BellController;
 use App\Http\Controllers\BellsPeriodController;
 use App\Http\Controllers\BuildingController;
+use App\Http\Controllers\HistoryController;
+use App\Models\History;
 
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
@@ -47,6 +49,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::patch('/user', [AuthController::class, 'updateProfile']);
 
+    Route::get('/history', [HistoryController::class, 'index']);
+    Route::delete('/history/{history}', [HistoryController::class, 'destroy']);
 
     Route::post('/bells/presets', [BellController::class, 'saveAsPreset']);
     Route::post('/bells/presets/apply', [BellController::class, 'applyPreset']);
