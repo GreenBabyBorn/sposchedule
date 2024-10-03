@@ -3,13 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="yandex-verification" content="ea9244c5d083efb1" />
-    <meta name="author" content="greenbabyborn">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <meta name="author" content="greenbabyborn">
     <title>Пары РКЭ</title>
-    <meta name="description" content="Пары РКЭ - оффициальное расписание занятий Рязанского Колледжа Электроники">
+    <meta name="description" content="Расписание учебного процесса Рязанского Колледжа Электроники">
+    <meta name="keywords" content="Расписание РКЭ, Пары РКЭ, РКЭ, Звонки РКЭ, Рязанский колледж электроники, расписание на завтра РКЭ, обучающимся РКЭ">
+    <meta name="yandex-verification" content="ea9244c5d083efb1" />
     @vite(['resources/js/main.ts'])
 
     <!-- Yandex.Metrika counter -->
@@ -43,7 +44,6 @@
 
 <body>
     <div id="app"></div>
-
 </body>
 
 </html>
