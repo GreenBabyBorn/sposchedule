@@ -283,7 +283,7 @@ function printPage() {
 <style scoped>
 @media print {
     @page {
-        size: landscape;
+        /* size: landscape; */
     }
 
     .controls {

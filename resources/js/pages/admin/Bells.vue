@@ -360,6 +360,9 @@ watchEffect(() => {
                         <Select show-clear v-model="selectedPreset" placeholder="Применить заготовку"
                             option-label="name_preset" :options="bellsPresets"></Select>
                     </div>
+                    <Button target="_blank" icon="pi pi-print" as="router-link" :to="{
+                        path: '/print/bells',
+                    }" />
 
                     <Dialog v-model:visible="visible" modal header="Создание заготовки" :style="{ width: '25rem' }">
 

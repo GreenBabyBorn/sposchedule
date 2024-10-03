@@ -66,6 +66,23 @@ export function usePublicBellsQuery(building, date) {
     },
   });
 }
+export function usePublicBellsPrintQuery(buildings, date) {
+  const enabled = computed(() => Boolean(date?.value || buildings?.value));
+
+  return useQuery({
+    queryKey: ['bells', date, buildings],
+    enabled: enabled,
+    retry: 0,
+    queryFn: async () => {
+      const queryParams = new URLSearchParams();
+      if (date?.value) queryParams.append('date', date.value);
+      if (buildings?.value) queryParams.append('buildings', buildings.value);
+      return (
+        await axios.get(`/api/bells/public/print?${queryParams.toString()}`)
+      ).data;
+    },
+  });
+}
 
 export function useStorePeriod() {
   const queryClient = useQueryClient();

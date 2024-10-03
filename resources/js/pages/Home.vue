@@ -77,7 +77,7 @@ const buildings = computed(() => {
 const { data: courses, isFetched: coursesFetched } = useCoursesQuery(building);
 
 const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup, searchedCabinet, searchedTeacher, searchedSubject);
-searchedTeacher
+
 const updateQueryParams = () => {
     router.replace({
         query: {
@@ -108,12 +108,8 @@ const queryString = ref()
 
 watch(() => route.query, () => {
     queryString.value = route.query as any
-    // const filteredQuery = Object.fromEntries(
-    //     Object.entries(route?.query).filter(([key, value]) => value !== null && value !== undefined)
-    // );
-    // queryString.value = new URLSearchParams(filteredQuery as any).toString()
 })
-// const queryString = new URLSearchParams(filteredQuery as any).toString();
+
 watch([isoDate, selectedCourse, selectedGroup, building], () => {
     updateQueryParams();
 
@@ -352,6 +348,12 @@ const getIndexesFromBells = computed(() => {
                                 date: isoDate
                             }
                         }" />
+                    <Button severity="secondary" label="Звонки" target="_blank" icon="pi pi-print" as="router-link" :to="{
+                        path: '/print/bells',
+                        query: {
+                            date: isoDate
+                        }
+                    }" />
                 </div>
             </div>
 
@@ -370,11 +372,8 @@ const getIndexesFromBells = computed(() => {
 
         </div>
         <div :style="{ marginTop: `${headerHeight + 10}px` }" class="flex flex-col gap-4">
-            <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-2xl text-center">Группы
-                на
-                выбранную дату
-                не
-                найдены...</span>
+            <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-2xl text-center">Ничего не
+                найдено...</span>
             <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
             <div class="schedules">
                 <div v-if="isLoading" v-for="item in 32" class="schedule">

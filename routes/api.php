@@ -18,6 +18,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
 Route::get('/bells/public', [BellController::class, 'publicBells']);
+Route::get('/bells/public/print', [BellController::class, 'publicBellsPrint']);
 Route::get('/bells/presets', [BellController::class, 'presetsBells']);
 Route::apiResource('bells', BellController::class)->only(['index', 'show']);
 Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
