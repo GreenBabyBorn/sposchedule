@@ -276,7 +276,7 @@ const getIndexesFromBells = computed(() => {
             indexes.add(period.index);
         });
     });
-    return Array.from(indexes);
+    return Array.from(indexes).sort((a, b) => a - b);
 
 })
 
