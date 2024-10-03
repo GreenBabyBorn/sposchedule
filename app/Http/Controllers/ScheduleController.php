@@ -773,20 +773,27 @@ class ScheduleController extends Controller
             ";
             $params['building'] = $building;
         }
+
         if ($course = $request->input('course')) {
             $query .= " AND g.course = :course ";
             $params['course'] = $course;
         }
+
         if ($groupName = $request->input('group')) {
             $query .= " AND g.name LIKE :group_name ";
             $params['group_name'] = "%{$groupName}%";
         }
+
         if ($cabinet = $request->input('cabinet')) {
-            // Условие для фильтрации по кабинету
             $query .= " AND l.cabinet ILIKE :cabinet ";
-            $params['cabinet'] = "%{$cabinet}%"; // добавляем параметр для поиска по кабинету
+            $params['cabinet'] = "%{$cabinet}%";
         }
-        // Добавляем фильтрацию по преподавателю, если параметр передан
+
+        if ($subject = $request->input('subject')) {
+            $query .= " AND subj.name ILIKE :subject ";
+            $params['subject'] = "%{$subject}%";
+        }
+
         if ($teacher = $request->input('teacher')) {
             $query .= "
         AND EXISTS (
@@ -798,6 +805,8 @@ class ScheduleController extends Controller
     ";
             $params['teacher_name'] = "%{$teacher}%";
         }
+
+
 
         // Завершаем запрос
         $query .= "GROUP BY g.name, s.id ORDER BY s.type DESC";

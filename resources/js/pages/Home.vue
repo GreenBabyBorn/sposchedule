@@ -13,7 +13,6 @@ import { useGroupsPublicQuery } from '@/queries/groups';
 import { useSchedulePublicStore } from '@/stores/schedulePublic';
 import Skeleton from 'primevue/skeleton';
 import { usePublicBellsQuery } from '@/queries/bells';
-import PublicRowPeriodBell from '@/components/bells/PublicRowPeriodBell.vue';
 import { useAuthStore } from '@/stores/auth';
 import { useBuildingsQuery } from '@/queries/buildings';
 import InputText from 'primevue/inputtext';
@@ -47,6 +46,13 @@ const debouncedTeacherFn = useDebounceFn(() => {
     searchedTeacher.value = teacher.value
 }, 500, { maxWait: 1000 })
 
+const subject = ref('')
+const searchedSubject = ref('')
+
+const debouncedSubjectFn = useDebounceFn(() => {
+    searchedSubject.value = subject.value
+}, 500, { maxWait: 1000 })
+
 const coursesWithLabel = computed(() => {
     return courses.value?.map(course => ({
         label: `${course.course} курс`,
@@ -70,7 +76,7 @@ const buildings = computed(() => {
 
 const { data: courses, isFetched: coursesFetched } = useCoursesQuery(building);
 
-const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup, searchedCabinet, searchedTeacher);
+const { data: changesSchedules, isFetched, error, isError, isLoading } = usePublicSchedulesQuery(isoDate, building, selectedCourse, selectedGroup, searchedCabinet, searchedTeacher, searchedSubject);
 searchedTeacher
 const updateQueryParams = () => {
     router.replace({
@@ -330,6 +336,9 @@ const getIndexesFromBells = computed(() => {
                     </InputText>
                     <InputText class="w-full md:w-auto" @input="debouncedTeacherFn" v-model="teacher"
                         placeholder="Поиск по преподавателю">
+                    </InputText>
+                    <InputText class="w-full md:w-auto" @input="debouncedSubjectFn" v-model="subject"
+                        placeholder="Поиск по предмету">
                     </InputText>
                     <Button severity="secondary" label="Основное" target="_blank" icon="pi pi-print" as="router-link"
                         :to="{
