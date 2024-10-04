@@ -14,8 +14,8 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
   const date = ref(null);
   const course = ref(null);
 
-  function setSchedules(scheduless) {
-    schedules.value = toRaw(scheduless ?? []);
+  function setSchedules(newSchedules) {
+    schedules.value = toRaw(newSchedules ?? []);
   }
   function setSchedulesChanges(scheduless) {
     schedulesChanges.value = toRaw(scheduless ?? []);

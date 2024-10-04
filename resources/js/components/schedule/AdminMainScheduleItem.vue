@@ -10,7 +10,7 @@ import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/les
 import { useToast } from 'primevue/usetoast';
 import { reactive, ref, toRef, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
-import Teachers from '@/pages/admin/Teachers.vue';
+
 
 const toast = useToast();
 
@@ -22,18 +22,15 @@ const props = defineProps({
     published: { required: false, type: Boolean },
 });
 
-// Применение toRef для индивидуальных props
-const group = toRef(props, 'group');
-const semester = toRef(props, 'semester');
-const weekDay = toRef(props, 'weekDay');
-const items = toRef(props, 'item');
+const group = toRef(() => props.group);
+const semester = toRef(() => props.semester);
+const weekDay = toRef(() => props.weekDay);
+const items = toRef(() => props.item);
 
 const { data: subjects } = useSubjectsQuery();
 
 const subjectForTeacher = ref()
 const { data: teachers } = useTeachersQuery();
-
-
 
 const { mutateAsync: updateLesson, isPending: isUpdated } = useUpdateLesson();
 async function editLesson(item) {
@@ -168,12 +165,12 @@ async function createLesson(weekType, schedule_id, item?) {
     }
     if (!lessonData || Object.keys(lessonData).length === 0) {
 
-        showToast('Ошибка', 'Недозаполненно');
+        // showToast('Ошибка', 'Недозаполненно');
         return;
     }
-
+    if (!lessonData.subject) return
     try {
-        console.log(lessonData)
+        // console.log(lessonData)
         await storeLesson({
             body: {
                 ...lessonData,
@@ -283,11 +280,10 @@ const hideAddNewLesson = ref(false)
                                 </span></td>
                             <td>
                                 <div v-if="item['ЧИСЛ']" class="table-subrow">
-                                    <Select v-if="item['ЧИСЛ'].subject" filter @change="editLesson(item['ЧИСЛ'])"
-                                        v-model="item['ЧИСЛ'].subject" class="w-full text-left" :options="subjects"
-                                        optionLabel="name">
+                                    <Select filter @change="editLesson(item['ЧИСЛ'])" v-model="item['ЧИСЛ'].subject"
+                                        class="w-full text-left" :options="subjects" optionLabel="name">
                                     </Select>
-                                    <span v-else class="text-red-400">Предмет был удален</span>
+
                                 </div>
 
                                 <div class="table-subrow" v-if="item.lesson">
@@ -299,10 +295,9 @@ const hideAddNewLesson = ref(false)
                                 </div>
 
                                 <div v-if="item['ЗНАМ']" class="table-subrow">
-                                    <Select v-if="item['ЗНАМ'].subject" filter @change="editLesson(item['ЗНАМ'])"
-                                        v-model="item['ЗНАМ'].subject" class="w-full text-left" :options="subjects"
-                                        optionLabel="name"></Select>
-                                    <span v-else class="text-red-400">Предмет был удален</span>
+                                    <Select filter @change="editLesson(item['ЗНАМ'])" v-model="item['ЗНАМ'].subject"
+                                        class="w-full text-left" :options="subjects" optionLabel="name"></Select>
+
                                 </div>
 
                             </td>
@@ -363,8 +358,7 @@ const hideAddNewLesson = ref(false)
                                         severity="danger"></Button>
                                 </div>
                                 <div class="table-subrow" v-if="item['ЧИСЛ']">
-                                    <Button text
-                                        :disabled="!item['ЧИСЛ'].cabinet || !item['ЧИСЛ'].building || !item['ЧИСЛ'].subject"
+                                    <Button text :disabled="!item['ЧИСЛ'].subject"
                                         @click="createLesson('ЧИСЛ', item.schedule_id, item)" icon="pi pi-check"
                                         v-if="!item['ЧИСЛ'].id"></Button>
 
@@ -373,8 +367,7 @@ const hideAddNewLesson = ref(false)
                                 </div>
 
                                 <div class="table-subrow" v-if="item['ЗНАМ']">
-                                    <Button text
-                                        :disabled="!item['ЗНАМ'].cabinet || !item['ЗНАМ'].building || !item['ЗНАМ'].subject"
+                                    <Button text :disabled="!item['ЗНАМ'].subject"
                                         @click="createLesson('ЗНАМ', item.schedule_id, item)" icon="pi pi-check"
                                         v-if="!item['ЗНАМ'].id"></Button>
 
