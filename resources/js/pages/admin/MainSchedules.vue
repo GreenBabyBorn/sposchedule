@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import ScheduleItem from '../../components/schedule/AdminMainScheduleItem.vue'
 import Select from 'primevue/select';
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch, watchEffect } from 'vue'
 import { useGroupsQuery } from '@/queries/groups';
 import { useMainSchedulesQuery } from '@/queries/schedules';
 import { useScheduleStore } from '@/stores/schedule'
@@ -49,25 +49,17 @@ watch(mainSchedules, (newData) => {
     }
 });
 
-// Инициализация при монтировании компонента
-// Функция восстановления значений из query или localStorage
-const restoreQueryParams = () => {
-    if (route.query.group) {
-        // Если группы нет в query, используем из localStorage
-        selectedMainGroupName.value = route.query.group;
-        storedParams.value.group = route.query.group as string; // Сохраняем в localStorage
-    } else if (storedParams.value.group) {
-        selectedMainGroupName.value = storedParams.value.group;
+watchEffect(() => {
+    if (isFetched.value) {
+        if (route.query.group) {
+            // Если группы нет в query, используем из localStorage
+            selectedMainGroupName.value = route.query.group;
+            storedParams.value.group = route.query.group as string; // Сохраняем в localStorage
+        } else if (storedParams.value.group) {
+            selectedMainGroupName.value = storedParams.value.group;
+        }
     }
-
-};
-
-// Инициализация при монтировании компонента
-onMounted(() => {
-    restoreQueryParams();
-    updateQueryParams()
-
-});
+})
 
 </script>
 
