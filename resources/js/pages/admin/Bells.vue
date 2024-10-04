@@ -19,13 +19,9 @@ import { useBellsStore } from '@/stores/bells';
 import { storeToRefs } from 'pinia';
 import { useBuildingsQuery } from '@/queries/buildings';
 import ToggleButton from 'primevue/togglebutton';
-
 import Dialog from 'primevue/dialog';
 import router from '@/router';
 import { useRoute } from 'vue-router';
-
-
-
 
 const toast = useToast();
 

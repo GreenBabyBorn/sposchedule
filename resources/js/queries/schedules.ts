@@ -205,3 +205,33 @@ export function usePublicSchedulesQuery(
     },
   });
 }
+
+export function useAnalyticsSchedulesQuery(start_date, end_date, groups_ids) {
+  // Условие enabled проверяет только наличие параметра date
+  const enabled = computed(() => Boolean(end_date?.value && start_date?.value));
+
+  return useQuery({
+    enabled: enabled,
+
+    queryKey: ['schedulesAnalytics', start_date, end_date, groups_ids],
+    queryFn: async () => {
+      // Формируем параметры запроса в зависимости от их наличия
+      const queryParams = new URLSearchParams();
+      if (start_date?.value && end_date?.value) {
+        queryParams.append('start_date', start_date.value);
+        queryParams.append('end_date', end_date.value);
+      }
+
+      if (groups_ids?.value) queryParams.append('group_ids', groups_ids.value);
+
+      // Выполняем запрос с параметрами
+      return (
+        (
+          await axios.get(
+            `/api/groups/schedules/hours?${queryParams.toString()}`
+          )
+        ).data || []
+      );
+    },
+  });
+}

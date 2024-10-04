@@ -695,4 +695,292 @@ class ScheduleController extends Controller
 
         return response()->json($response);
     }
+
+    public function getLessonCountsByDateRange(Request $request)
+    {
+        // Получаем диапазон дат
+        $startDate = Carbon::parse($request->input('start_date'));
+        $endDate = Carbon::parse($request->input('end_date'));
+        $groupIds = $request->input('group_ids'); // Массив ID групп
+
+        // Проверка входных данных
+        if (!$startDate || !$endDate) {
+            return response()->json(['error' => 'Необходимо указать диапазон дат'], 400);
+        }
+
+        // Если группы не указаны, выбираем все группы
+        if (is_string($groupIds)) {
+            $groupIds = explode(',', $groupIds); // Преобразуем строку в массив
+        }
+
+        // Если groupIds пустой, выбираем все группы
+        if (empty($groupIds)) {
+            $groupIds = DB::table('groups')->pluck('id')->toArray(); // Получаем все ID групп
+        }
+
+        // Получаем дни недели для диапазона дат
+        $weekDayMapping = [
+            0 => 'ВС',
+            1 => 'ПН',
+            2 => 'ВТ',
+            3 => 'СР',
+            4 => 'ЧТ',
+            5 => 'ПТ',
+            6 => 'СБ',
+        ];
+
+        // Массив для хранения итогового результата
+        $finalGroups = [];
+
+        // Проходим по каждому дню в указанном диапазоне
+        $currentDate = $startDate->copy();
+        while ($currentDate->lte($endDate)) {
+            $weekDay = $weekDayMapping[$currentDate->dayOfWeek];
+
+            // Получаем семестр для текущей даты
+            $semester = DB::table('semesters')
+                ->where('start', '<=', $currentDate)
+                ->where('end', '>=', $currentDate)
+                ->first();
+
+            if (!$semester) {
+                // Если семестр не найден для текущей даты, переходим к следующей дате
+                $currentDate->addDay();
+                continue;
+            }
+
+            // Рассчитываем номер недели и тип недели
+            $semesterStart = Carbon::parse($semester->start);
+            $weekNumber = $semesterStart->diffInWeeks($currentDate);
+            $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
+
+            // Основной SQL-запрос для текущей даты
+            $query = "
+                SELECT g.name as group_name, 
+                       subj.name as subject_name,
+                       COUNT(l.id) as lesson_count,
+                       l.week_type as lesson_week_type
+                FROM groups g
+                LEFT JOIN schedules s ON g.id = s.group_id
+                LEFT JOIN lessons l ON s.id = l.schedule_id
+                LEFT JOIN subjects subj ON l.subject_id = subj.id
+                WHERE s.published = true
+                AND (
+                    (s.type = 'changes' AND s.date = :date)
+                    OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
+                )
+                AND g.id IN (" . implode(',', array_map('intval', $groupIds)) . ")
+                GROUP BY g.name, subj.name, l.week_type
+                ORDER BY g.name;
+            ";
+
+            // Массив параметров для SQL-запроса
+            $params = [
+                'date' => $currentDate->toDateString(),
+                'week_day' => $weekDay,
+                'semester_id' => $semester->id,
+            ];
+
+            // Выполняем SQL-запрос для текущей даты
+            $results = DB::select($query, $params);
+
+            // Обрабатываем результат
+            foreach ($results as $result) {
+                // Проверяем, если группа уже существует в итоговом массиве
+                if (!isset($finalGroups[$result->group_name])) {
+                    $finalGroups[$result->group_name] = [
+                        'group_name' => $result->group_name,
+                        'subjects' => [],
+                    ];
+                }
+
+                // Проверяем, существует ли предмет в группе
+                if (!isset($finalGroups[$result->group_name]['subjects'][$result->subject_name])) {
+                    $finalGroups[$result->group_name]['subjects'][$result->subject_name] = 0; // Инициализация количества уроков
+                }
+
+                // Добавляем количество уроков к предмету
+                if ($result->lesson_week_type === $weekType || $result->lesson_week_type === null) {
+                    $finalGroups[$result->group_name]['subjects'][$result->subject_name] = $finalGroups[$result->group_name]['subjects'][$result->subject_name] + $result->lesson_count * 2;
+                }
+            }
+
+            // Переходим к следующему дню
+            $currentDate->addDay();
+        }
+
+        // Преобразуем ассоциативный массив в индексированный для вывода в формате [{group_name: "Группа 1", subjects: {...}}, {...}]
+        $finalGroupsArray = array_values($finalGroups);
+
+        // Возвращаем результат
+        return response()->json($finalGroupsArray);
+    }
+
+
+
+
+    /**
+     * Возвращает массив дат с расписанием по дням из диапазона дат
+     * @param \Illuminate\Http\Request $request
+     * @return mixed|\Illuminate\Http\JsonResponse
+     */
+    public function getSchedulesByDateRange(Request $request)
+    {
+        // Получаем диапазон дат
+        $startDate = Carbon::parse($request->input('start_date'));
+        $endDate = Carbon::parse($request->input('end_date'));
+        $groupIds = $request->input('group_ids'); // Массив ID групп
+
+        // Проверка входных данных
+        if (is_string($groupIds)) {
+            $groupIds = explode(',', $groupIds); // Преобразуем строку в массив
+        }
+
+        if (!$startDate || !$endDate) {
+            return response()->json(['error' => 'Необходимо указать диапазон дат'], 400);
+        }
+
+        if (empty($groupIds)) {
+            return response()->json(['error' => 'Необходимо указать хотя бы одну группу'], 400);
+        }
+
+        // Получаем дни недели для диапазона дат
+        $weekDayMapping = [
+            0 => 'ВС',
+            1 => 'ПН',
+            2 => 'ВТ',
+            3 => 'СР',
+            4 => 'ЧТ',
+            5 => 'ПТ',
+            6 => 'СБ',
+        ];
+
+        // Массив для хранения итогового результата
+        $finalSchedules = [];
+
+        // Проходим по каждому дню в указанном диапазоне
+        $currentDate = $startDate->copy();
+        while ($currentDate->lte($endDate)) {
+            $weekDay = $weekDayMapping[$currentDate->dayOfWeek];
+
+            // Получаем семестр для текущей даты
+            $semester = DB::table('semesters')
+                ->where('start', '<=', $currentDate)
+                ->where('end', '>=', $currentDate)
+                ->first();
+
+            if (!$semester) {
+                // Если семестр не найден для текущей даты, переходим к следующей дате
+                $currentDate->addDay();
+                continue;
+            }
+
+            // Рассчитываем номер недели и тип недели
+            $semesterStart = Carbon::parse($semester->start);
+            $weekNumber = $semesterStart->diffInWeeks($currentDate);
+            $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
+
+            // Основной SQL-запрос для текущей даты
+            $query = "
+                SELECT g.name as group_name, 
+                       s.id as schedule_id, 
+                       s.week_day, 
+                       s.type, 
+                       s.updated_at,
+                       json_agg(
+                           json_build_object(
+                               'id', l.id, 
+                               'index', l.index, 
+                               'subject_name', subj.name, 
+                               'week_type', l.week_type, 
+                               'cabinet', l.cabinet,
+                               'building', l.building,
+                               'message', l.message,
+                               'teachers', (
+                                   SELECT json_agg(
+                                       json_build_object(
+                                           'id', t.id, 
+                                           'name', t.name
+                                       )
+                                   )
+                                   FROM lesson_teacher lt
+                                   JOIN teachers t ON lt.teacher_id = t.id
+                                   WHERE lt.lesson_id = l.id
+                               )
+                           )
+                       ) as lessons
+                FROM groups g
+                LEFT JOIN schedules s ON g.id = s.group_id
+                LEFT JOIN lessons l ON s.id = l.schedule_id
+                LEFT JOIN subjects subj ON l.subject_id = subj.id
+                WHERE s.published = true
+                AND (
+                    (s.type = 'changes' AND s.date = :date)
+                    OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
+                )
+                AND g.id IN (" . implode(',', array_map('intval', $groupIds)) . ")
+                GROUP BY g.name, s.id, s.week_day, s.type, s.updated_at
+                ORDER BY s.type DESC;
+            ";
+
+            // Массив параметров для SQL-запроса
+            $params = [
+                'date' => $currentDate->toDateString(),
+                'week_day' => $weekDay,
+                'semester_id' => $semester->id,
+            ];
+
+            // Выполняем SQL-запрос для текущей даты
+            $schedules = DB::select($query, $params);
+
+            // Преобразуем JSON в массив и обрабатываем результат
+            $groupSchedules = [];
+
+            foreach ($schedules as $schedule) {
+                $schedule->lessons = json_decode($schedule->lessons, true);
+
+                // Фильтруем занятия по текущему типу недели (ЧИСЛ или ЗНАМ)
+                $filteredLessons = [];
+                foreach ($schedule->lessons as $lesson) {
+                    if ($lesson['week_type'] === $weekType || $lesson['week_type'] === null) {
+                        $filteredLessons[] = $lesson;
+                    }
+                }
+
+                if (empty($filteredLessons)) {
+                    continue;
+                }
+
+                // Сортируем занятия по индексу
+                usort($filteredLessons, function ($a, $b) {
+                    return $a['index'] <=> $b['index'];
+                });
+
+                // Если для группы еще нет расписания или текущее расписание имеет тип 'changes', заменяем
+                if (!isset($groupSchedules[$schedule->group_name]) || $schedule->type === 'changes') {
+                    $groupSchedules[$schedule->group_name] = [
+                        'group_name' => $schedule->group_name,
+                        'schedule' => [
+                            'week_day' => $schedule->week_day,
+                            'type' => $schedule->type,
+                            'lessons' => $filteredLessons
+                        ]
+                    ];
+                }
+            }
+
+            // Добавляем расписания для каждой группы на текущую дату
+            if (!empty($groupSchedules)) {
+                $finalSchedules[$currentDate->toDateString()] = array_values($groupSchedules);
+            }
+
+            // Переходим к следующему дню
+            $currentDate->addDay();
+        }
+
+        // Возвращаем результат
+        return response()->json($finalSchedules);
+    }
+
+
 }

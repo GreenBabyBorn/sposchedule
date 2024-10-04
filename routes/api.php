@@ -13,11 +13,14 @@ use App\Http\Controllers\BellController;
 use App\Http\Controllers\BellsPeriodController;
 use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\HistoryController;
-use App\Models\History;
 
 Route::post('/login', [AuthController::class, 'login']);
 // Route::post('/register', [AuthController::class, 'register']);
 Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
+
+
+Route::get('/groups/schedules/hours', [ScheduleController::class, 'getLessonCountsByDateRange']);
+Route::get('/groups/schedules/range', [ScheduleController::class, 'getSchedulesByDateRange']);
 
 Route::get('/bells/public', [BellController::class, 'publicBells']);
 Route::get('/bells/public/print', [BellController::class, 'publicBellsPrint']);

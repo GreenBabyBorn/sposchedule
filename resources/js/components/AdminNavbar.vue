@@ -47,12 +47,15 @@ const items = ref([
         route: '/admin/bells'
     },
     {
+        label: 'Аналитика',
+        icon: 'pi pi-chart-bar',
+        route: '/admin/analytics'
+    },
+    {
         label: 'История',
         icon: 'pi pi-list',
         route: '/admin/history'
     },
-
-
 ]);
 </script>
 
