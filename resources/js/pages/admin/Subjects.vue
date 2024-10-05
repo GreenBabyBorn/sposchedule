@@ -119,7 +119,8 @@ const filters = ref({
         </div>
         <div class="">
             <form class="flex flex-wrap  items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <InputText :invalid="newSubjectError" placeholder="Пример: Математика" v-model="newSubjectName">
+                <InputText :invalid="newSubjectError" placeholder="Пример: Математика" v-model="newSubjectName"
+                    class="w-full md:w-60">
                 </InputText>
                 <Button type="submit" @click.prevent="addSubject" :disabled="!newSubjectName"
                     label="Добавить предмет"></Button>

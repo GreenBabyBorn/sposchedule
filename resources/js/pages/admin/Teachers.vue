@@ -124,7 +124,7 @@ const filters = ref({
         </div>
         <div class="">
             <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <InputText :invalid="newTeacherError" placeholder="ФИО" v-model="newTeacherName">
+                <InputText :invalid="newTeacherError" placeholder="ФИО" v-model="newTeacherName" class="w-full md:w-60">
                 </InputText>
 
                 <Button type="submit" @click.prevent="addTeacher" :disabled="!newTeacherName">Добавить

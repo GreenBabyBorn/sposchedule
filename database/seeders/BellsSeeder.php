@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Bell;
 use App\Models\BellsPeriod;
+use App\Models\Building;
 
 class BellsSeeder extends Seeder
 {
@@ -14,7 +15,7 @@ class BellsSeeder extends Seeder
         $weekDays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
 
         // Корпуса
-        $buildings = range(1, 6);
+        $buildings = Building::all()->pluck('name')->toArray();
 
         // Расписание звонков
         $schedules = [

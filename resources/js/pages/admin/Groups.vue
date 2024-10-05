@@ -51,39 +51,7 @@ const { mutateAsync: updateGroup, isPending: isUpdated } = useUpdateGroup()
 
 const onRowEditSave = async (event) => {
     let { newData, index } = event;
-    // let deletedSubjects = groups.value[index].semesters.filter(obj1 =>
-    //     !newData.semesters.some(obj2 => obj2.id === obj1.id)
-    // );
-    // let newSubjects = newData.semesters.filter(obj2 =>
-    //     !groups.value[index].semesters.some(obj1 => obj1.id === obj2.id)
-    // );
-    // if (deletedSubjects.length) {
-    //     for (let i = 0; i < deletedSubjects.length; i++) {
 
-    //         try {
-    //             await destroySemesterForGroup({ id: groups.value[index].id, semester_id: deletedSubjects[i].id })
-    //         }
-    //         catch (e) {
-    //             toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-    //             return
-    //         }
-    //     }
-    //     // queryClient.invalidateQueries({ queryKey: ['teachers'] })
-    // }
-
-    // console.log(deletedSubjects, newSubjects)
-    // if (newSubjects.length) {
-    //     for (let i = 0; i < newSubjects.length; i++) {
-    //         try {
-    //             await storeSemesterForGroup({ id: groups.value[index].id, semester_id: newSubjects[i].id })
-    //         }
-    //         catch (e) {
-    //             toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-    //             return
-    //         }
-    //     }
-    //     // queryClient.invalidateQueries({ queryKey: ['teachers'] })
-    // }
 
     try {
         await updateGroup({
@@ -94,17 +62,6 @@ const onRowEditSave = async (event) => {
         toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
         return
     }
-    // let { newData, index } = event;
-
-    // try {
-    //     await updateGroup({
-    //         id: newData.id, body: newData
-    //     })
-    // }
-    // catch (e) {
-    //     toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-    //     return
-    // }
 };
 
 
@@ -270,12 +227,14 @@ const selectedBuildings = ref()
         </div>
         <div class="">
             <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <InputText :invalid="newGroupError" placeholder="Пример: ИС-401" v-model="newGroupName"></InputText>
+                <InputText :invalid="newGroupError" placeholder="Пример: ИС-401" v-model="newGroupName"
+                    class="w-full md:w-56">
+                </InputText>
                 <MultiSelect v-model="selectedSemesters" display="chip" :options="semesters" optionLabel="name" filter
-                    placeholder="Выбрать семестры" :maxSelectedLabels="3" class="" />
+                    :maxSelectedLabels="3" placeholder="Выбрать семестры" class="w-full md:w-60" />
                 <MultiSelect filter auto-filter-focus v-model="selectedBuildings" option-label="name"
-                    :options="buildings" placeholder="Корпус">
-                </MultiSelect>
+                    :options="buildings" placeholder="Корпус" class="w-full md:w-36" />
+
                 <Button type="submit" @click.prevent="addGroup" :disabled="!newGroupName">Добавить группу</Button>
                 <Button icon="pi pi-file-import" outlined type="submit"
                     @click.prevent="importGroupsState = !importGroupsState" label="Импорт"></Button>

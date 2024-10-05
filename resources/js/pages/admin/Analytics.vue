@@ -24,7 +24,7 @@ const start_date = computed(() => rangeDates.value?.[0] ? useDateFormat(rangeDat
 const end_date = computed(() => rangeDates.value?.[1] ? useDateFormat(rangeDates?.value?.[1], 'DD.MM.YYYY').value : null)
 const groups_ids = computed(() => selectedGroups.value?.map(group => group.id))
 
-const { data } = useAnalyticsSchedulesQuery(start_date, end_date, groups_ids)
+const { data, isLoading } = useAnalyticsSchedulesQuery(start_date, end_date, groups_ids)
 </script>
 
 <template>
@@ -35,17 +35,17 @@ const { data } = useAnalyticsSchedulesQuery(start_date, end_date, groups_ids)
 
         <div class="">
             <form class="flex flex-wrap items-center gap-2 p-4 rounded-lg dark:bg-surface-800">
-                <div class="flex flex-wrap items-center gap-2">
-                    <MultiSelect v-model="selectedGroups" display="chip" :options="groups" optionLabel="name" filter
-                        placeholder="Выбрать группы" :maxSelectedLabels="3" class="" />
+                <div class="flex flex-wrap items-center gap-2 justify-start">
+                    <MultiSelect v-model="selectedGroups" :options="groups" optionLabel="name" filter
+                        placeholder="Выбрать группы" :maxSelectedLabels="3" class="w-full md:w-60" />
                     <DatePicker v-model="rangeDates" append-to="self" placeholder="Период" date-format="dd.mm.yy"
-                        selectionMode="range" :manualInput="false" />
+                        selectionMode="range" :manualInput="false" class="w-full md:w-60" />
 
                 </div>
             </form>
         </div>
         <div class="">
-            <DataTable :value="data" rowGroupMode="rowspan" tableStyle="min-width: 50rem">
+            <DataTable :loading="isLoading" :value="data" rowGroupMode="rowspan" tableStyle="min-width: 50rem">
                 <Column field="group_name" header="Группа" style="min-width: 200px">
                     <template #body="slotProps">
                         {{ slotProps.data.group_name }}

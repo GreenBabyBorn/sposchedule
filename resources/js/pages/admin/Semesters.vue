@@ -100,7 +100,7 @@ const minDate = ref(new Date());
                 <div class="">
                     <label for=" semester" class=" block mb-1">Номер семестра</label>
                     <InputNumber placeholder="Номер семестра" v-model="indexSemester" inputId="semester" mode="decimal"
-                        :min="1" :max="100" fluid>
+                        :min="1" :max="100" fluid class="w-full md:w-36">
                     </InputNumber>
                 </div>
                 <div class="">
@@ -109,7 +109,7 @@ const minDate = ref(new Date());
                         date-format="dd.mm.yy" v-model="dates" selectionMode="range" :manualInput="false" />
                 </div>
 
-                <Button :disabled="!years || !indexSemester || dates" @click.prevent="addSemester">Добавить</Button>
+                <Button :disabled="!years || !indexSemester || !dates" @click.prevent="addSemester">Добавить</Button>
             </form>
         </div>
         <div class="">

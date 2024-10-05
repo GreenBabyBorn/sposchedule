@@ -84,9 +84,9 @@ const newBuilding = reactive({
         </div>
         <div class="">
             <form class="flex flex-wrap items-center gap-4 p-4 rounded-lg dark:bg-surface-800">
-                <InputText v-model="newBuilding.name" placeholder="Название корпуса">
+                <InputText v-model="newBuilding.name" placeholder="Название корпуса" class="w-full md:w-60">
                 </InputText>
-                <InputText v-model="newBuilding.location" placeholder="Адрес">
+                <InputText v-model="newBuilding.location" placeholder="Адрес" class="w-full md:w-60">
                 </InputText>
 
                 <Button :disabled="!newBuilding.name" type="submit" @click.prevent="addSubject">Добавить

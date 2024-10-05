@@ -47,7 +47,7 @@ export default {
   labelContainer: 'overflow-hidden flex flex-auto cursor-pointer',
   label: ({ props }) => ({
     class: [
-      ' leading-2',
+      'text-base leading-[normal]',
 
       // Spacing
       {

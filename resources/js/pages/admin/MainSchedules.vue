@@ -51,13 +51,14 @@ watch(mainSchedules, (newData) => {
 
 watchEffect(() => {
     if (isFetched.value) {
-        if (route.query.group) {
+        if (route.query.group && groups.value?.find(item => item.name === route.query.group)) {
             // Если группы нет в query, используем из localStorage
             selectedMainGroupName.value = route.query.group;
             storedParams.value.group = route.query.group as string; // Сохраняем в localStorage
-        } else if (storedParams.value.group) {
+        } else if (storedParams.value.group && groups.value?.find(item => item.name === storedParams.value.group)) {
             selectedMainGroupName.value = storedParams.value.group;
         }
+
     }
 })
 
