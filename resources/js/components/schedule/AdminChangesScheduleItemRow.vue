@@ -59,7 +59,7 @@ const editLesson = (lesson: any) => {
             </div>
             <div v-if="lesson.teachers" class="table-subrow">
                 <div class="" v-if="!isEdit">
-                    <span v-for="teacher in lesson.teachers">{{ teacher.name }}</span>
+                    <span class="opacity-50" v-for="teacher in lesson.teachers">{{ teacher.name + ' ' }}</span>
                 </div>
                 <MultiSelect filter v-model="lesson.teachers" v-else placeholder="Выберите преподавателя"
                     @change="editLesson(lesson)" :options="teachers" class="w-full" option-label="name" />

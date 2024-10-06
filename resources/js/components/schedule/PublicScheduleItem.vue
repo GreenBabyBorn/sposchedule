@@ -15,10 +15,10 @@ const lessons: any = toRef<any>(() => props.lessons)
 </script>
 
 <template>
-    <div class="schedule-item">
-        <div class="mb-2 flex flex-wrap  justify-between items-center"> <span
-                class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
-                    props.group_name }}</span>
+    <article class="schedule-item">
+        <div class="mb-2 flex flex-wrap  justify-between items-center">
+            <h2 class="text-xl text-left font-medium text-surface-800 dark:text-white/80">{{
+                props.group_name }}</h2>
             <span>{{ props.week_type }}</span>
             <span :class="{
                 'text-green-400 ': props.type
@@ -53,15 +53,13 @@ const lessons: any = toRef<any>(() => props.lessons)
                                     <span class="text-sm text-left text-red-400">Предмет был удален</span>
                                 </div>
                                 <span>{{ item.cabinet }}</span>
-
-
                             </div>
 
                             <div class="dark:text-surface-500 flex justify-between items-center" v-if="item.id">
                                 <div class="flex flex-wrap gap-1 justify-start" v-if="item.id">
                                     <span class="dark:text-surface-500 text-sm" v-for="teacher in item.teachers">{{
                                         teacher.name
-                                        }}</span>
+                                    }}</span>
                                 </div>
                                 <span v-if="item.building" class="text-sm">{{ item.building }} корпус</span>
                             </div>
@@ -77,9 +75,7 @@ const lessons: any = toRef<any>(() => props.lessons)
                 Расписание не найдено
             </span>
         </div>
-
-
-    </div>
+    </article>
 </template>
 
 <style scoped>

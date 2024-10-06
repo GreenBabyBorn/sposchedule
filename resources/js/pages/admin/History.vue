@@ -12,7 +12,7 @@ import { useToast } from 'primevue/usetoast';
 
 const toast = useToast()
 const selectedHistories = ref([]);
-const { data: histories } = useHistoryQuery()
+const { data: histories, isLoading } = useHistoryQuery()
 
 
 const { mutateAsync: destroyHistory } = useDestroyHistory()
@@ -48,7 +48,7 @@ const filters = ref({
         </div>
 
         <div class="">
-            <DataTable v-model:selection="selectedHistories" paginator :rows="10"
+            <DataTable :loading="isLoading" v-model:selection="selectedHistories" paginator :rows="10"
                 :globalFilterFields="['action', 'details', 'created_at']" v-model:filters="filters" :value="histories"
                 tableStyle="min-width: 50rem">
                 <!-- <template #header>

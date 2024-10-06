@@ -9,6 +9,7 @@ import { useDateFormat } from '@vueuse/core'
 import { useToast } from 'primevue/usetoast';
 import DatePicker from 'primevue/datepicker';
 import { useStoreSemester, useSemestersQuery, useUpdateSemester, useDestroySemester, } from '@/queries/semesters';
+import { useConfirm } from 'primevue/useconfirm';
 
 const { data: semesters } = useSemestersQuery()
 
@@ -80,7 +81,30 @@ const deleteSemesters = async () => {
 
 const minDate = ref(new Date());
 
+const confirm = useConfirm();
+const confirmDelete = () => {
+    confirm.require({
+        message: 'Удаление семестра может сломать расписание',
+        header: 'Вы уверены?',
+        icon: 'pi pi-info-circle',
+        rejectLabel: 'Отмена',
+        rejectProps: {
+            label: 'Отмена',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Удалить',
+            severity: 'danger'
+        },
+        accept: async () => {
+            await deleteSemesters()
+        },
+        reject: () => {
 
+        }
+    });
+};
 
 </script>
 
@@ -121,7 +145,7 @@ const minDate = ref(new Date());
                 <template #header>
                     <div class="flex justify-between">
                         <Button severity="danger" :disabled="!selectedSemesters.length || !semesters.length"
-                            type="button" icon="pi pi-trash" label="Удалить" outlined @click="deleteSemesters" />
+                            type="button" icon="pi pi-trash" label="Удалить" outlined @click="confirmDelete" />
                     </div>
                 </template>
                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
