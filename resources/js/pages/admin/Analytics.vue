@@ -25,6 +25,12 @@ const end_date = computed(() => rangeDates.value?.[1] ? useDateFormat(rangeDates
 const groups_ids = computed(() => selectedGroups.value?.map(group => group.id))
 
 const { data, isLoading } = useAnalyticsSchedulesQuery(start_date, end_date, groups_ids)
+
+const dt = ref();
+
+const exportCSV = () => {
+    dt.value.exportCSV();
+};
 </script>
 
 <template>
@@ -45,13 +51,21 @@ const { data, isLoading } = useAnalyticsSchedulesQuery(start_date, end_date, gro
             </form>
         </div>
         <div class="">
-            <DataTable :loading="isLoading" :value="data" rowGroupMode="rowspan" tableStyle="min-width: 50rem">
+            <DataTable ref="dt" :loading="isLoading" :value="data" rowGroupMode="rowspan" tableStyle="min-width: 50rem">
+                <template #header>
+                    <div style="text-align: left">
+                        <Button :disabled="!data" icon="pi pi-external-link" label="Экспорт в CSV"
+                            @click="exportCSV()" />
+                    </div>
+                </template>
                 <Column field="group_name" header="Группа" style="min-width: 200px">
                     <template #body="slotProps">
                         {{ slotProps.data.group_name }}
                     </template>
                 </Column>
-                <Column field="subjects.[]" header="Предметы" style="min-width: 200px">
+                <Column :exportable="true"
+                    :field="row => Object.entries(row.subjects).map(([subject, hours]) => `${subject} - ${hours} ак. ч.`).join('\n ')"
+                    header="Предметы" style="min-width: 200px">
                     <template #body="slotProps">
                         <div v-for="(value, key, index) in slotProps.data.subjects" class="">
                             <p class="leading-normal">
