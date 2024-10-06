@@ -53,7 +53,7 @@ const exportCSV = () => {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
-    link.setAttribute('download', 'Экспорт.csv');
+    link.setAttribute('download', `Экспорт ${start_date.value} - ${end_date.value}.csv`);
     link.click();
 };
 </script>
