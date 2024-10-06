@@ -29,7 +29,32 @@ const { data, isLoading } = useAnalyticsSchedulesQuery(start_date, end_date, gro
 const dt = ref();
 
 const exportCSV = () => {
-    dt.value.exportCSV();
+    // Формируем данные для экспорта
+    const exportData = [];
+
+    data.value.forEach(row => {
+        Object.entries(row.subjects).forEach(([subject, hours]) => {
+            exportData.push({
+                group_name: row.group_name,
+                subject,
+                hours
+            });
+        });
+    });
+
+    // Формируем CSV строку
+    const csvContent = [
+        ['Группа', 'Предмет', 'Часы'], // Заголовки
+        ...exportData.map(item => [item.group_name, item.subject, item.hours].join(',')) // Данные
+    ].join('\n');
+
+    // Создаем ссылку для скачивания файла
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'Экспорт.csv');
+    link.click();
 };
 </script>
 
