@@ -287,9 +287,14 @@ const getIndexesFromBells = computed(() => {
 
 <template>
     <div class="relative max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
-        <RouterLink replace title="В панель управления" v-if="isAuth"
-            class=" pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 fixed bottom-6 right-6 z-50"
-            :to="{ path: '/admin/schedules/changes', query: queryString }"></RouterLink>
+        <div class="fixed bottom-6 right-6 z-50 flex gap-2 flex-col">
+            <a title="К звонкам" class="pi pi-bell text-white dark:text-surface-900 bg-primary-500 rounded-full p-4"
+                href="#bells"></a>
+            <RouterLink replace title="В панель управления" v-if="isAuth"
+                class=" pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4 "
+                :to="{ path: '/admin/schedules/changes', query: queryString }"></RouterLink>
+        </div>
+
         <div ref="headerRef"
             class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
 
@@ -394,7 +399,7 @@ const getIndexesFromBells = computed(() => {
             </div>
         </div>
         <div class="flex flex-col gap-2 items-center w-full">
-            <h1 class="text-2xl font-bold text-center py-2">Звонки</h1>
+            <h1 id="bells" class="text-2xl font-bold text-center py-2">Звонки</h1>
             <span v-if="publicBells?.type" :class="{
                 'text-green-400 ': publicBells?.type
                     !== 'main',
