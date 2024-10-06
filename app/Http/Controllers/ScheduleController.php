@@ -37,7 +37,10 @@ class ScheduleController extends Controller
         $data = $request->all();
         // Создаем расписание с преобразованной датой
         $schedule = Schedule::create($data);
-        HistoryLogger::logAction('Добавлено расписание', $schedule->toArray());
+        HistoryLogger::logAction(
+            "Добавлено " . ($schedule->type === 'main' ? 'основное' : 'измененное') .
+            " расписание на " . ($schedule->week_day ?? $schedule->date) . " для группы " . $schedule->group?->name
+        );
         return $schedule;
     }
 
@@ -55,7 +58,10 @@ class ScheduleController extends Controller
     public function update(UpdateScheduleRequest $request, Schedule $schedule)
     {
         $schedule->update($request->all());
-        HistoryLogger::logAction('Обновлено расписание', $schedule->toArray());
+        HistoryLogger::logAction(
+            action: "Обновлено " . ($schedule->type === 'main' ? 'основное' : 'измененное') .
+            " расписание на " . ($schedule->week_day ?? $schedule->date) . " для группы " . $schedule->group?->name
+        );
         return new ScheduleResource($schedule);
     }
 
@@ -64,7 +70,10 @@ class ScheduleController extends Controller
      */
     public function destroy(Schedule $schedule)
     {
-        HistoryLogger::logAction('Удалено расписание', $schedule->toArray());
+        HistoryLogger::logAction(
+            "Удалено " . ($schedule->type === 'main' ? 'основное' : 'измененное') .
+            " расписание на " . ($schedule->week_day ?? $schedule->date) . " для группы " . $schedule->group?->name
+        );
         $schedule->delete();
         return response()->noContent();
     }

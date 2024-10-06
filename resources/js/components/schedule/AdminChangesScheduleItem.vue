@@ -411,7 +411,7 @@ const enabledEdir = useStorage('enableEdit', false)
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-    font-size: 0.8rem;
+    /* font-size: 0.8rem; */
     /* Чтобы все столбцы имели фиксированную ширину */
 }
 

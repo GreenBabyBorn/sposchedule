@@ -455,7 +455,7 @@ const hideAddNewLesson = ref(false)
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-    font-size: 0.8rem;
+    /* font-size: 0.8rem; */
     position: relative;
     /* Чтобы все столбцы имели фиксированную ширину */
 }

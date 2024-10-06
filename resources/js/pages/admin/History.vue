@@ -61,7 +61,7 @@ const filters = ref({
                 <!-- <Column selectionMode="multiple" headerStyle="width: 3rem"></Column> -->
                 <Column field="id" header="ID"></Column>
                 <Column field="action" header="Действие"></Column>
-                <Column field="details" header="Подробности">
+                <!-- <Column field="details" header="Подробности">
                     <template #body="slotProps">
                         <Inplace>
                             <template #display>Показать</template>
@@ -72,7 +72,7 @@ const filters = ref({
                             </template>
                         </Inplace>
                     </template>
-                </Column>
+                </Column> -->
                 <Column field="created_at" header="Дата">
                     <template #body="slotProps">
                         {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}
