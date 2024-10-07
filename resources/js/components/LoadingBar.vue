@@ -26,7 +26,7 @@ const requestDuration = computed(() => loadingStore.requestDuration);
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    z-index: 1000;
+    z-index: 5000;
 }
 
 .loading-progress {
