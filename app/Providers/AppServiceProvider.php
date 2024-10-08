@@ -25,10 +25,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->app->singleton('historyLogger', function ($app) {
-            return new HistoryLogger();
-        });
-
         RateLimiter::for('api', function (Request $request) {
             // Если пользователь авторизован, не применяем ограничение
             if ($request->user()) {
@@ -39,7 +35,9 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->ip());
         });
 
-
+        $this->app->singleton('historyLogger', function ($app) {
+            return new HistoryLogger();
+        });
 
         JsonResource::withoutWrapping();
     }

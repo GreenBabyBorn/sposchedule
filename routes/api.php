@@ -14,38 +14,40 @@ use App\Http\Controllers\BellsPeriodController;
 use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\HistoryController;
 
-Route::post('/login', [AuthController::class, 'login']);
-// Route::post('/register', [AuthController::class, 'register']);
-Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
+Route::middleware('throttle:api')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    // Route::post('/register', [AuthController::class, 'register']);
+    Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
+    Route::get('/groups/schedules/hours', [ScheduleController::class, 'getLessonCountsByDateRange']);
+    Route::get('/groups/schedules/range', [ScheduleController::class, 'getSchedulesByDateRange']);
 
-Route::get('/groups/schedules/hours', [ScheduleController::class, 'getLessonCountsByDateRange']);
-Route::get('/groups/schedules/range', [ScheduleController::class, 'getSchedulesByDateRange']);
+    Route::get('/bells/public', [BellController::class, 'publicBells']);
+    Route::get('/bells/public/print', [BellController::class, 'publicBellsPrint']);
+    Route::get('/bells/presets', [BellController::class, 'presetsBells']);
+    Route::apiResource('bells', BellController::class)->only(['index', 'show']);
+    Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
+    Route::get('/schedules/changes/print', [ScheduleController::class, 'getScheduleByDatePrint']);
+    Route::get('/schedules/main/semester/{semester}/print', [ScheduleController::class, 'getSchedulesMainPrint']);
+    Route::get('/groups/courses', [GroupController::class, 'getCourses']);
+    Route::get('/groups/public', [GroupController::class, 'indexPublic']);
+    Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
+    Route::get('/schedules/changes', [ScheduleController::class, 'getScheduleByDate']);
+    Route::apiResource('groups', GroupController::class)->only(['index', 'show']);
+    Route::apiResource('lessons', LessonController::class)->only(['index', 'show']);
+    Route::apiResource('schedules', ScheduleController::class)->only(['index', 'show']);
+    Route::apiResource('subjects', SubjectController::class)->only(['index', 'show']);
+    Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']);
+    Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
 
-Route::get('/bells/public', [BellController::class, 'publicBells']);
-Route::get('/bells/public/print', [BellController::class, 'publicBellsPrint']);
-Route::get('/bells/presets', [BellController::class, 'presetsBells']);
-Route::apiResource('bells', BellController::class)->only(['index', 'show']);
-Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
-Route::get('/schedules/changes/print', [ScheduleController::class, 'getScheduleByDatePrint']);
-Route::get('/schedules/main/semester/{semester}/print', [ScheduleController::class, 'getSchedulesMainPrint']);
-Route::get('/groups/courses', [GroupController::class, 'getCourses']);
-Route::get('/groups/public', [GroupController::class, 'indexPublic']);
-Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
-Route::get('/schedules/changes', [ScheduleController::class, 'getScheduleByDate']);
-Route::apiResource('groups', GroupController::class)->only(['index', 'show']);
-Route::apiResource('lessons', LessonController::class)->only(['index', 'show']);
-Route::apiResource('schedules', ScheduleController::class)->only(['index', 'show']);
-Route::apiResource('subjects', SubjectController::class)->only(['index', 'show']);
-Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']);
-Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
+    Route::apiResource('buildings', BuildingController::class)->parameters([
+        'buildings' => 'name'
+    ]);
+});
 
-Route::apiResource('buildings', BuildingController::class)->parameters([
-    'buildings' => 'name'
-]);
 
 // Маршруты, требующие аутентификации
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
