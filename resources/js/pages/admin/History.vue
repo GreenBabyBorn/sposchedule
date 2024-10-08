@@ -90,7 +90,7 @@ const filters = ref({
                 </Column> -->
                 <Column field="created_at" header="Дата">
                     <template #body="slotProps">
-                        {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}
+                        {{ useDateFormat(slotProps.data.created_at, 'DD.MM.YY HH:mm:ss') }}
                     </template>
                 </Column>
                 <Column field="user_name" header="Пользователь">
