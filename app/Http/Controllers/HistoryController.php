@@ -10,7 +10,8 @@ class HistoryController extends Controller
 {
     public function index()
     {
-        return HistoryResource::collection(History::orderBy('id', 'desc')->get());
+        $perPage = 10;
+        return HistoryResource::collection(History::orderBy('id', 'desc')->paginate($perPage));
     }
     public function destroy(History $history)
     {

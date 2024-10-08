@@ -1,10 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 
-export function useHistoryQuery() {
+export function useHistoryQuery(page: any, rows: any) {
   return useQuery({
-    queryKey: ['history'],
-    queryFn: async () => (await axios.get('/api/history')).data,
+    queryKey: ['history', page, rows],
+    queryFn: async () => {
+      const response = await axios.get('/api/history', {
+        params: { page: page.value, rows: rows.value },
+      });
+      return response.data;
+    },
   });
 }
 

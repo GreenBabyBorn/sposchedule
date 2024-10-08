@@ -7,12 +7,21 @@ import Column from 'primevue/column';
 import { FilterMatchMode } from '@primevue/core/api';
 import Inplace from 'primevue/inplace';
 import { useDestroyHistory, useHistoryQuery } from '@/queries/history';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 
 const toast = useToast()
 const selectedHistories = ref([]);
-const { data: histories, isLoading } = useHistoryQuery()
+const currentPage = ref(1);  // Текущая страница
+const rowsPerPage = ref(10); // Количество записей на странице
+
+// Вызываем запрос с параметрами пагинации
+const { data: histories, isLoading, refetch } = useHistoryQuery(currentPage, rowsPerPage);
+
+// Следим за изменениями пагинации
+watch([currentPage, rowsPerPage], () => {
+    refetch();
+});
 
 
 const { mutateAsync: destroyHistory } = useDestroyHistory()
@@ -48,9 +57,15 @@ const filters = ref({
         </div>
 
         <div class="">
-            <DataTable :loading="isLoading" v-model:selection="selectedHistories" paginator :rows="10"
-                :globalFilterFields="['action', 'details', 'created_at']" v-model:filters="filters" :value="histories"
-                tableStyle="min-width: 50rem">
+
+            <DataTable :loading="isLoading" v-model:selection="selectedHistories" paginator :rows="rowsPerPage"
+                :first="(currentPage - 1) * rowsPerPage" :totalRecords="histories?.meta?.total" lazy
+                :globalFilterFields="['action', 'details', 'created_at']" v-model:filters="filters"
+                :value="histories?.data" :onPage="(event) => {
+
+                    currentPage = event.page + 1;
+                    rowsPerPage = event.rows;
+                }" tableStyle="min-width: 50rem">
                 <!-- <template #header>
                     <div class="flex flex-wrap items-center gap-2  justify-between">
                         <Button severity="danger" :disabled="!selectedHistories.length || !histories.length"
