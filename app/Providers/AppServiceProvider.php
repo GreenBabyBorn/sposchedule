@@ -30,9 +30,9 @@ class AppServiceProvider extends ServiceProvider
             if ($request->user()) {
                 return Limit::none(); // Отключает ограничение для авторизованного пользователя
             }
-
+            $key = $request->ip() . '|' . $request->header('User-Agent');
             // Применяем ограничение для неавторизованных пользователей
-            return Limit::perMinute(60)->by($request->ip());
+            return Limit::perMinute(60)->by($key);
         });
 
         $this->app->singleton('historyLogger', function ($app) {
