@@ -106,7 +106,6 @@ const monthDeclensions = {
 function printPage() {
     window.print();
 }
-
 </script>
 
 <template>
@@ -117,7 +116,7 @@ function printPage() {
     <div class="main" v-if="changesSchedules?.['1-5']">
         <div class="top">
             <div class="flex justify-between">
-                <div>Исполнитель: <span :contenteditable="isAuth" class="underline">{{ user?.name
+                <div> <span contenteditable class="underline">Исполнитель: {{ user?.name
                         }}</span></div>
                 <div :contenteditable="isAuth" class="text-right">
                     СОГЛАСОВАНО <br>
@@ -199,7 +198,7 @@ function printPage() {
     <div v-if="changesSchedules?.['6']" class="main">
         <div class="top">
             <div class="flex justify-between">
-                <div>Исполнитель: <span contenteditable class="underline">{{ user?.name
+                <div><span contenteditable class="underline">Исполнитель: {{ user?.name
                         }}</span></div>
                 <div contenteditable class="text-right">
                     СОГЛАСОВАНО <br>

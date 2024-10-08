@@ -25,8 +25,8 @@ const password = reactive({
 async function updateProfile() {
     try {
         await updateUser({
-            name: user.value.name,
-            email: user.value.email,
+            name: user.value?.name,
+            email: user.value?.email,
         })
         toast.add({ severity: 'success', summary: 'Успешно', detail: 'Информация обновлена', life: 3000, closable: true });
     }
