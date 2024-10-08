@@ -774,6 +774,8 @@ class ScheduleController extends Controller
                 LEFT JOIN lessons l ON s.id = l.schedule_id
                 LEFT JOIN subjects subj ON l.subject_id = subj.id
                 WHERE s.published = true
+                AND subj.name IS NOT NULL
+                AND l.message IS NULL
                 AND (
                     (s.type = 'changes' AND s.date = :date)
                     OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
