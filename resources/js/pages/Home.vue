@@ -296,7 +296,7 @@ const headerHidden = ref(false)
         </div>
 
         <nav ref="headerRef" :class="{ '-translate-y-full': headerHidden }"
-            class="transition-all fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
+            class="transition-transform fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
 
             <div class="flex flex-col flex-wrap gap-4 justify-between ">
 
@@ -374,12 +374,11 @@ const headerHidden = ref(false)
                 </div>
             </div>
 
-            <div
-                class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-2 ">
-                <button @click="headerHidden = !headerHidden"
-                    :class="{ 'pi-angle-down': headerHidden, 'pi-angle-up': !headerHidden }"
-                    class="pi  flex items-center justify-center leading-none"></button>
-            </div>
+
+            <button @click="headerHidden = !headerHidden"
+                :class="{ 'pi-angle-down': headerHidden, 'pi-angle-up': !headerHidden }"
+                class="pi absolute -bottom-10 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-2 flex items-center justify-center leading-none"></button>
+
         </nav>
         <div :style="{ marginTop: `${headerHidden ? '0' : headerHeight + 10}px` }" class="flex flex-col gap-4">
             <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-center">Ничего не
