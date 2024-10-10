@@ -375,7 +375,7 @@ const headerHidden = ref(false)
             </div>
 
             <div
-                class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-1 ">
+                class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-2 ">
                 <button @click="headerHidden = !headerHidden"
                     :class="{ 'pi-angle-down': headerHidden, 'pi-angle-up': !headerHidden }"
                     class="pi  flex items-center justify-center leading-none"></button>
