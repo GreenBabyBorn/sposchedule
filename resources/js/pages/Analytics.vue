@@ -49,7 +49,7 @@ const exportCSV = () => {
     ].join('\n');
 
     // Создаем ссылку для скачивания файла
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=windows-1251;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);

@@ -50,10 +50,10 @@ const updateQueryParams = () => {
     router.replace({
         query: {
             ...route.query,
-            date: isoDate.value || null,
-            building: building.value || null,
-            course: selectedCourse.value || null,
-            group: selectedGroup.value || null,
+            date: isoDate.value || undefined,
+            building: building.value || undefined,
+            course: selectedCourse.value || undefined,
+            group: selectedGroup.value || undefined,
         },
     });
 };
