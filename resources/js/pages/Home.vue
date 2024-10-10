@@ -283,11 +283,22 @@ const getIndexesFromBells = computed(() => {
 })
 
 const headerHidden = ref(false)
+const printBtnItems = [
+    {
+        label: 'Изменения',
+        icon: 'pi pi-print'
+    },
+    {
+        label: 'Звонки',
+        icon: 'pi pi-print'
+    },
+
+];
 </script>
 
 <template>
     <div class="relative max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4 scroll-smooth">
-        <div class=" fixed bottom-6 right-6 z-50 flex gap-2 flex-col">
+        <div class=" fixed bottom-8 right-8 z-50 flex gap-2 flex-col">
             <a title="К звонкам" class="pi pi-bell text-white dark:text-surface-900 bg-primary-500 rounded-full p-4"
                 href="#bells"></a>
             <RouterLink replace title="В панель управления" v-if="isAuth"
@@ -298,7 +309,7 @@ const headerHidden = ref(false)
         <nav ref="headerRef" :class="{ '-translate-y-full': headerHidden }"
             class="transition-transform fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
 
-            <div class="flex flex-col flex-wrap gap-4 justify-between ">
+            <div class="flex flex-col flex-wrap gap-4 justify-between w-full">
 
                 <div class="flex flex-wrap gap-2 items-center">
                     <div class="flex flex-col md:w-auto w-full">
@@ -328,7 +339,17 @@ const headerHidden = ref(false)
                         <Button title="Фильтры" @click="toggleFilters" severity="secondary" text
                             icon="pi pi-sliders-h"></Button>
                     </div>
+                    <div class="ml-auto self-center">
 
+                        <div v-if="schedulesChanges?.last_updated"
+                            class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap">
+                            <span class="text-xs text-surface-400 leading-none ">Последние обновление:</span>
+                            <time title="Последние обновление" class="text-sm text-right text-surface-400"
+                                :datetime="schedulesChanges?.last_updated">{{
+                                    useDateFormat(schedulesChanges?.last_updated,
+                                        'DD.MM.YYYY HH:mm') }}</time>
+                        </div>
+                    </div>
                 </div>
 
                 <div v-show="showFilters" class="flex flex-wrap gap-2 items-center">
@@ -341,38 +362,29 @@ const headerHidden = ref(false)
                     <InputText class="w-full md:w-auto" @input="debouncedSubjectFn" v-model="subject"
                         placeholder="Поиск по предмету">
                     </InputText>
-                    <Button severity="secondary" label="Основное" target="_blank" icon="pi pi-print" as="router-link"
-                        :to="{
+                    <Button size="small" severity="secondary" label="Основное" target="_blank" icon="pi pi-print"
+                        as="router-link" :to="{
 
                             path: '/print/main',
                         }" />
-                    <Button severity="secondary" label="Изменения" target="_blank" icon="pi pi-print" as="router-link"
-                        :to="{
+                    <Button size="small" severity="secondary" label="Изменения" target="_blank" icon="pi pi-print"
+                        as="router-link" :to="{
                             path: '/print/changes',
                             query: {
                                 date: isoDate
                             }
                         }" />
-                    <Button severity="secondary" label="Звонки" target="_blank" icon="pi pi-print" as="router-link" :to="{
-                        path: '/print/bells',
-                        query: {
-                            date: isoDate
-                        }
-                    }" />
+                    <Button size="small" severity="secondary" label="Звонки" target="_blank" icon="pi pi-print"
+                        as="router-link" :to="{
+                            path: '/print/bells',
+                            query: {
+                                date: isoDate
+                            }
+                        }" />
                 </div>
             </div>
 
-            <div class="my-auto">
 
-                <div v-if="schedulesChanges?.last_updated"
-                    class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap">
-                    <span class="text-xs text-surface-400 leading-none text-nowrap">Последние обновление:</span>
-                    <time title="Последние обновление" class="text-sm text-right text-surface-400"
-                        :datetime="schedulesChanges?.last_updated">{{
-                            useDateFormat(schedulesChanges?.last_updated,
-                                'DD.MM.YYYY HH:mm') }}</time>
-                </div>
-            </div>
 
 
             <button @click="headerHidden = !headerHidden"
@@ -380,7 +392,7 @@ const headerHidden = ref(false)
                 class="pi absolute -bottom-10 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-2 flex items-center justify-center leading-none"></button>
 
         </nav>
-        <div :style="{ marginTop: `${headerHidden ? '0' : headerHeight + 10}px` }" class="flex flex-col gap-4">
+        <div :style="{ marginTop: `${headerHidden ? '20' : headerHeight + 20}px` }" class="flex flex-col gap-4">
             <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-center">Ничего не
                 найдено...</span>
             <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>

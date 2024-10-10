@@ -18,7 +18,6 @@ import textarea from './textarea/index.js';
 import togglebutton from './togglebutton/index.js';
 import toggleswitch from './toggleswitch/index.js';
 import button from './button/index.js';
-import splitbutton from './splitbutton/index.js';
 import datatable from './datatable/index.js';
 import paginator from './paginator/index.js';
 import divider from './divider/index.js';
@@ -38,6 +37,8 @@ import progressspinner from './progressspinner/index.js';
 import ripple from './ripple/index.js';
 import tag from './tag/index.js';
 import inplace from './inplace';
+import splitbutton from './splitbutton';
+import tieredmenu from './tieredmenu';
 
 export default {
   global,
@@ -64,13 +65,12 @@ export default {
 
   select,
   selectbutton,
-
+  splitbutton,
   textarea,
   togglebutton,
   toggleswitch,
   button,
 
-  splitbutton,
   datatable,
 
   paginator,
@@ -87,7 +87,7 @@ export default {
   menubar,
   megamenu,
   panelmenu,
-
+  tieredmenu,
   toast,
 
   chip,
