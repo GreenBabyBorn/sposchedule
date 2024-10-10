@@ -282,12 +282,12 @@ const getIndexesFromBells = computed(() => {
 
 })
 
-
+const headerHidden = ref(false)
 </script>
 
 <template>
-    <div class="relative max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4">
-        <div class="fixed bottom-6 right-6 z-50 flex gap-2 flex-col">
+    <div class="relative max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4 scroll-smooth">
+        <div class=" fixed bottom-6 right-6 z-50 flex gap-2 flex-col">
             <a title="К звонкам" class="pi pi-bell text-white dark:text-surface-900 bg-primary-500 rounded-full p-4"
                 href="#bells"></a>
             <RouterLink replace title="В панель управления" v-if="isAuth"
@@ -295,8 +295,8 @@ const getIndexesFromBells = computed(() => {
                 :to="{ path: '/admin/schedules/changes', query: queryString }"></RouterLink>
         </div>
 
-        <div ref="headerRef"
-            class="fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
+        <nav ref="headerRef" :class="{ '-translate-y-full': headerHidden }"
+            class="transition-all fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800">
 
             <div class="flex flex-col flex-wrap gap-4 justify-between ">
 
@@ -374,10 +374,15 @@ const getIndexesFromBells = computed(() => {
                 </div>
             </div>
 
-
-        </div>
-        <div :style="{ marginTop: `${headerHeight + 10}px` }" class="flex flex-col gap-4">
-            <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-2xl text-center">Ничего не
+            <div
+                class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-1 ">
+                <button @click="headerHidden = !headerHidden"
+                    :class="{ 'pi-angle-down': headerHidden, 'pi-angle-up': !headerHidden }"
+                    class="pi  flex items-center justify-center leading-none"></button>
+            </div>
+        </nav>
+        <div :style="{ marginTop: `${headerHidden ? '0' : headerHeight + 10}px` }" class="flex flex-col gap-4">
+            <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-center">Ничего не
                 найдено...</span>
             <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
             <div class="schedules">
