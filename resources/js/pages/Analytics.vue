@@ -49,7 +49,8 @@ const exportCSV = () => {
     ].join('\n');
 
     // Создаем ссылку для скачивания файла
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=ansi;' });
+    const BOM = '\uFEFF';  // Byte Order Mark
+    const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.setAttribute('href', url);
