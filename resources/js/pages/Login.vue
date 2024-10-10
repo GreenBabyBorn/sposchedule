@@ -47,11 +47,11 @@ const debouncedAuth = useDebounceFn(auth, 300);
 <template>
     <LoadingBar />
     <div class="">
-
         <form @submit.prevent="debouncedAuth()" class="flex flex-col justify-center items-center h-screen gap-4">
             <div class=" flex flex-col gap-4 rounded-lg px-4 py-8 bg-surface-100 dark:bg-surface-900 max-w-72">
                 <h1 class=" text-center dark:text-surface-100 text-2xl mb-4">Авторизация</h1>
-                <InputText :invalid="isError" placeholder="Электронная почта" v-model="credentials.email"></InputText>
+                <InputText autofocus :invalid="isError" placeholder="Электронная почта" v-model="credentials.email">
+                </InputText>
                 <Password :invalid="isError" fluid placeholder="Пароль" v-model="credentials.password" :feedback="false"
                     toggleMask>
                 </Password>

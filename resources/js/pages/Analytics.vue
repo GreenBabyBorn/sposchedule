@@ -59,7 +59,7 @@ const exportCSV = () => {
 </script>
 
 <template>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 mx-auto px-4 py-4">
         <div class="flex flex-wrap justify-between items-baseline">
             <h1 class="text-2xl">Аналитика</h1>
         </div>

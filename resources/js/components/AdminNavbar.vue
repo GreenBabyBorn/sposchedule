@@ -49,7 +49,7 @@ const items = ref([
     {
         label: 'Аналитика',
         icon: 'pi pi-chart-bar',
-        route: '/admin/analytics'
+        route: '/analytics'
     },
     {
         label: 'История',

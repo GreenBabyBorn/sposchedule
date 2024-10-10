@@ -18,7 +18,7 @@ import PrintView from '../pages/PrintChanges.vue';
 import PrintMainView from '../pages/PrintMain.vue';
 import PrintBellsView from '../pages/PrintBells.vue';
 import HistoryView from '../pages/admin/History.vue';
-import AnalyticsView from '../pages/admin/Analytics.vue';
+import AnalyticsView from '../pages/Analytics.vue';
 import { useAuthStore } from '@/stores/auth';
 
 const router = createRouter({
@@ -83,11 +83,11 @@ const router = createRouter({
       },
     },
     {
-      path: '/admin/analytics',
+      path: '/analytics',
       name: RouteNamesEnum.analytics,
       component: AnalyticsView,
       meta: {
-        layout: AppLayoutsEnum.admin,
+        layout: AppLayoutsEnum.public,
         title: 'Аналитика',
       },
     },
