@@ -24,10 +24,10 @@ class ScheduleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return ScheduleResource::collection(Schedule::all());
-    }
+    // public function index()
+    // {
+    //     return ScheduleResource::collection(Schedule::all());
+    // }
 
     /**
      * Store a newly created resource in storage.
@@ -328,7 +328,7 @@ class ScheduleController extends Controller
                    'teachers', (
                        SELECT json_agg(
                            json_build_object(
-                               'id', t.id, 
+                               
                                'name', t.name
                            )
                        )

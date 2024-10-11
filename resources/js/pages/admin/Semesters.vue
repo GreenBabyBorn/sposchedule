@@ -124,7 +124,7 @@ const confirmDelete = () => {
                 <div class="">
                     <label for=" semester" class=" block mb-1">Номер семестра</label>
                     <InputNumber placeholder="Номер семестра" v-model="indexSemester" inputId="semester" mode="decimal"
-                        :min="1" :max="100" fluid class="w-full md:w-36">
+                        :min="1" :max="100" fluid class="">
                     </InputNumber>
                 </div>
                 <div class="">

@@ -16,10 +16,10 @@ class LessonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        return LessonResource::collection(Lesson::all());
-    }
+    // public function index()
+    // {
+    //     return LessonResource::collection(Lesson::all());
+    // }
 
     /**
      * Store a newly created resource in storage.

@@ -26,13 +26,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            // Если пользователь авторизован, не применяем ограничение
-            if ($request->user()) {
-                return Limit::none(); // Отключает ограничение для авторизованного пользователя
-            }
-            $key = $request->ip() . '|' . $request->header('User-Agent');
-            // Применяем ограничение для неавторизованных пользователей
-            return Limit::perMinute(60)->by($key);
+
+            // if ($request->user()) {
+            //     return Limit::none();
+            // }
+            return Limit::none();
+            // return Limit::perMinute(60)->by($request->ip());
         });
 
         $this->app->singleton('historyLogger', function ($app) {

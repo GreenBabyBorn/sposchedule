@@ -34,8 +34,8 @@ Route::middleware('throttle:api')->group(function () {
     Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
     Route::get('/schedules/changes', [ScheduleController::class, 'getScheduleByDate']);
     Route::apiResource('groups', GroupController::class)->only(['index', 'show']);
-    Route::apiResource('lessons', LessonController::class)->only(['index', 'show']);
-    Route::apiResource('schedules', ScheduleController::class)->only(['index', 'show']);
+    Route::apiResource('lessons', LessonController::class)->only(['show']);
+    Route::apiResource('schedules', ScheduleController::class)->only(['show']);
     Route::apiResource('subjects', SubjectController::class)->only(['index', 'show']);
     Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']);
     Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
@@ -47,7 +47,7 @@ Route::middleware('throttle:api')->group(function () {
 
 
 // Маршруты, требующие аутентификации
-Route::middleware(['auth:sanctum', 'throttle:api'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
