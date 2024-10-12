@@ -27,11 +27,11 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api', function (Request $request) {
 
-            // if ($request->user()) {
-            //     return Limit::none();
-            // }
-            return Limit::none();
-            // return Limit::perMinute(60)->by($request->ip());
+            if ($request->user()) {
+                return Limit::none();
+            }
+            // return Limit::none();
+            return Limit::perMinute(60)->by($request->ip());
         });
 
         $this->app->singleton('historyLogger', function ($app) {

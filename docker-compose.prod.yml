@@ -1,5 +1,4 @@
 services:
-
     # PHP Service
     app:
         build:
@@ -17,14 +16,14 @@ services:
         networks:
             - app-network
 
-    # Nginx Service
+    # Node Service (запускается только при сборке фронтенда)
     node:
         build:
             context: .
             dockerfile: node/Dockerfile
         volumes:
             - .:/var/www
-
+    # Nginx Service
     webserver:
         image: nginx:latest
         restart: unless-stopped
@@ -38,7 +37,7 @@ services:
         networks:
             - app-network
 
-    # MySQL Service
+    # PostgreSQL Service
     db:
         image: postgres:13.0
         restart: always
@@ -58,5 +57,6 @@ networks:
     app-network:
         driver: bridge
 
+# Docker Volumes
 volumes:
     db:

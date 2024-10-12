@@ -384,12 +384,31 @@ const printBtnItems = [
                 </div>
             </div>
 
+            <button class="absolute  left-1/2 -translate-x-1/2" style="bottom: -24px;"
+                @click="headerHidden = !headerHidden">
+                <svg class="relative" width="112" height="24" viewBox="0 0 28 6" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+
+                    <path
+                        d="M3.57628e-07 0L27.8028 0C20.64 0 20.1127 5.32394 13.883 5.32394C7.65323 5.32394 6.71518 0 3.57628e-07 0Z"
+                        class="fill-surface-100 dark:fill-surface-800" />
 
 
+                </svg>
+                <span class="pi absolute top-0 left-1/2 -translate-x-1/2"
+                    :class="{ 'pi-angle-down': headerHidden, 'pi-angle-up': !headerHidden }"></span>
+            </button>
 
-            <button @click="headerHidden = !headerHidden"
+
+            <!-- <button @click="headerHidden = !headerHidden"
                 :class="{ 'pi-angle-down': headerHidden, 'pi-angle-up': !headerHidden }"
-                class="pi absolute -bottom-10 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-2 flex items-center justify-center leading-none"></button>
+                class="pi absolute -bottom-9 left-1/2 -translate-x-1/2 bg-surface-100 dark:bg-surface-800 rounded-full p-2 flex items-center justify-center leading-none">
+                <svg width="28" height="6" viewBox="0 0 28 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M3.57628e-07 0L27.8028 0C20.64 0 20.1127 5.32394 13.883 5.32394C7.65323 5.32394 6.71518 0 3.57628e-07 0Z"
+                        fill="white" />
+                </svg>
+            </button> -->
 
         </nav>
         <div :style="{ marginTop: `${headerHidden ? '20' : headerHeight + 20}px` }" class="flex flex-col gap-4">
