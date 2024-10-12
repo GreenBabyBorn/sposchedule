@@ -31,7 +31,7 @@ axios.interceptors.response.use(
     // Если произошла ошибка, проверяем код статуса
     if (
       error.response &&
-      error?.request?.responseURL.includes('/api/user') &&
+      // error?.request?.responseURL.includes('/api/user') &&
       error.response.status === 401
     ) {
       // console.log(error);

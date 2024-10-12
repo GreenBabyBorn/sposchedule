@@ -144,7 +144,20 @@ const buildings = computed(() => {
     })) || [];
 })
 
+function handleDatePickerBtns(day) {
+    switch (day) {
+        case 'today':
+            date.value = new Date();
+            break
 
+        case 'tomorrow':
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            date.value = tomorrow;
+            break
+
+    }
+}
 </script>
 
 <template>
@@ -164,6 +177,15 @@ const buildings = computed(() => {
                             }).value]
                                 }}</small>
                             <small>{{ schedulesChanges?.week_type }}</small>
+                        </div>
+                    </template>
+                    <template #footer="slotProps">
+                        <div class="flex justify-between pt-1">
+
+                            <Button @click="handleDatePickerBtns('today')" severity="secondary" size="small"
+                                label="Сегодня"></Button>
+                            <Button @click="handleDatePickerBtns('tomorrow')" severity="secondary" size="small"
+                                label="Завтра"></Button>
                         </div>
                     </template>
                 </DatePicker>

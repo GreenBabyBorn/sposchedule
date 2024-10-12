@@ -283,17 +283,32 @@ const getIndexesFromBells = computed(() => {
 })
 
 const headerHidden = ref(false)
-const printBtnItems = [
-    {
-        label: 'Изменения',
-        icon: 'pi pi-print'
-    },
-    {
-        label: 'Звонки',
-        icon: 'pi pi-print'
-    },
+// const printBtnItems = [
+//     {
+//         label: 'Изменения',
+//         icon: 'pi pi-print'
+//     },
+//     {
+//         label: 'Звонки',
+//         icon: 'pi pi-print'
+//     },
 
-];
+// ];
+
+function handleDatePickerBtns(day) {
+    switch (day) {
+        case 'today':
+            date.value = new Date();
+            break
+
+        case 'tomorrow':
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            date.value = tomorrow;
+            break
+
+    }
+}
 </script>
 
 <template>
@@ -322,6 +337,15 @@ const printBtnItems = [
                                     }).value]
                                         }}</small>
                                     <small>{{ schedulesChanges?.week_type }}</small>
+                                </div>
+                            </template>
+                            <template #footer="slotProps">
+                                <div class="flex justify-between pt-1">
+
+                                    <Button @click="handleDatePickerBtns('today')" severity="secondary" size="small"
+                                        label="Сегодня"></Button>
+                                    <Button @click="handleDatePickerBtns('tomorrow')" severity="secondary" size="small"
+                                        label="Завтра"></Button>
                                 </div>
                             </template>
                         </DatePicker>
@@ -412,7 +436,7 @@ const printBtnItems = [
 
         </nav>
         <div :style="{ marginTop: `${headerHidden ? '20' : headerHeight + 20}px` }" class="flex flex-col gap-4">
-            <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-center">Ничего не
+            <span v-if="isFetched && !schedulesChanges?.schedules.length" class="text-2xl text-center">Ничего не
                 найдено...</span>
             <span class="text-2xl" v-else-if="isError">Расписание ещё не выложили, либо в расписании ошибка.</span>
             <div class="schedules">
