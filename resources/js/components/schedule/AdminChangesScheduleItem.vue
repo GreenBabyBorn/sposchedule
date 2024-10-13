@@ -1,22 +1,16 @@
 <script setup lang="ts">
 import MultiSelect from 'primevue/multiselect';
-
 import Select from 'primevue/select';
-
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import Button from 'primevue/button';
-
-
-// import { useSubjectsQuery } from '@/queries/subjects';
-// import { useTeachersQuery } from '@/queries/teachers';
+import { useSubjectsQuery } from '@/queries/subjects';
+import { useTeachersQuery } from '@/queries/teachers';
 import { useFromMainToChangesSchedule, useStoreSchedule, useStoreScheduleChange, useUpdateSchedule } from '@/queries/schedules';
 import { useDestroyLesson, useStoreLesson, useUpdateLesson } from '@/queries/lessons';
 import { useToast } from 'primevue/usetoast';
-import { onUpdated, reactive, ref, toRef, watch } from 'vue';
+import { computed, onUpdated, reactive, ref, toRef, watch } from 'vue';
 import ToggleButton from 'primevue/togglebutton';
-
-
 import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
 import { useNow, useStorage } from '@vueuse/core';
 
@@ -34,18 +28,11 @@ const props = defineProps({
     subjects: { required: true }
 })
 const lessons: any = toRef<any>(() => props.lessons)
-const teachers: any = toRef<any>(() => props.teachers)
-const subjects: any = toRef<any>(() => props.subjects)
+// const teachers: any = toRef<any>(() => props.teachers)
+// const subjects: any = toRef<any>(() => props.subjects)
 const dateRef: any = toRef<any>(() => props.date)
 const semester: any = toRef<any>(() => props.semester)
 const group: any = toRef<any>(() => props.group)
-
-
-
-// const {  teachers, subjects } = toRef<any>(props).value
-// const lessons: any = ref(props.lessons)
-// const teachers: any = ref(props.teachers)
-// const subjects: any = ref(props.subjects)
 
 const published = ref(props.published)
 
@@ -284,6 +271,13 @@ const isOneDayDifference = (inputDate) => {
 };
 
 const enabledEdir = useStorage('enableEdit', false)
+
+const { data: subjects } = useSubjectsQuery({ teachers: true })
+const { data: teachers } = useTeachersQuery()
+
+const teachersFromSubject = computed(() => {
+    return newLesson.subject?.teachers
+})
 </script>
 
 <template>
@@ -357,14 +351,14 @@ const enabledEdir = useStorage('enableEdit', false)
                         </div>
                     </td>
                     <td v-show="!newLessonMessageState">
-                        <div class="table-subrow"><Select :resetFilterOnHide="true" :autoFilterFocus="true" filter
-                                placeholder="Предмет" v-model="newLesson.subject" class="w-full text-left"
-                                :options="subjects" optionLabel="name" />
+                        <div class="table-subrow"><Select :resetFilterOnHide="true" filter placeholder="Предмет"
+                                v-model="newLesson.subject" class="w-full text-left" :options="subjects"
+                                optionLabel="name" />
                         </div>
                         <div class="table-subrow">
                             <MultiSelect :resetFilterOnHide="true" :autoFilterFocus="true" filter
                                 placeholder="Преподаватели" v-model="newLesson.teachers" class="w-full"
-                                :options="teachers" optionLabel="name" />
+                                :options="teachersFromSubject" optionLabel="name" />
 
                         </div>
                     </td>
@@ -403,10 +397,6 @@ const enabledEdir = useStorage('enableEdit', false)
 </template>
 
 <style scoped>
-.schedule-item {
-    /* width: 450px; */
-}
-
 .schedule-table {
     width: 100%;
     border-collapse: collapse;
@@ -422,9 +412,6 @@ const enabledEdir = useStorage('enableEdit', false)
     text-align: center;
 }
 
-.schedule-table th {}
-
-.schedule-table th>div {}
 
 /* Подстроки в ячейках */
 .table-subrow {
@@ -469,11 +456,5 @@ tbody tr {
 tbody tr:last-child {
     border-bottom: none;
 
-}
-
-tbody>tr:last-child {
-
-    /* border-top: 2px rgb(0, 153, 255) solid; */
-    /* background: rgba(255, 255, 255, 0.062); */
 }
 </style>

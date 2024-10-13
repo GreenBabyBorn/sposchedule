@@ -22,7 +22,7 @@ class GroupResource extends JsonResource
             'name' => $this->name,
             'buildings' => $this->buildings,
             'semesters' => SemesterResource::collection($this->semesters),
-            'created_at' => $this->created_at,
+            // 'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
     }

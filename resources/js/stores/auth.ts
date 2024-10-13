@@ -8,21 +8,21 @@ export const useAuthStore = defineStore('useAuthStore', () => {
   const token = ref(localStorage.getItem('token'));
 
   if (token.value) {
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
+    // axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
   }
 
   const register = async credentials => {
     const response = await axios.post('/api/register', credentials);
     token.value = response.data.token;
     localStorage.setItem('token', token.value);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
+    // axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
   };
 
   const login = async credentials => {
     const response = await axios.post('/api/login', credentials);
     token.value = response.data.token;
     localStorage.setItem('token', token.value);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
+    // axios.defaults.headers.common['Authorization'] = `Bearer ${token.value}`;
   };
 
   const logout = async () => {

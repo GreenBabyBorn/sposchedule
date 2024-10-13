@@ -28,7 +28,7 @@ axios.interceptors.response.use(
         if (error.response && error.response.status === 429) {
             // Показываем сообщение об ошибке
             // alert('Превышен лимит запросов. Попробуйте позже.');
-            toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Превышен лимит запросов. Попробуйте позже.', life: 3000, closable: true });
+            toast.add({ severity: 'error', summary: 'Ошибка', detail: error.response?.data?.message, life: 1000, closable: true });
         }
         return Promise.reject(error);
     }

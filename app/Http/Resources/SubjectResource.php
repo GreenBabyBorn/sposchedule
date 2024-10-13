@@ -14,11 +14,19 @@ class SubjectResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return [
+        // Получение query параметра, например "with_teachers", если он присутствует
+        $includeTeachers = $request->query('teachers', false);
+
+        // Базовый массив, который всегда возвращается
+        return  [
             'id' => $this->id,
             'name' => $this->name,
-            'created_at' => $this->created_at,
+            'teachers' => $this->when(
+                $includeTeachers,
+                TeacherResource::collection($this->teachers)
+            ),
             'updated_at' => $this->updated_at,
         ];
+
     }
 }

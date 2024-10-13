@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 import DatePicker from 'primevue/datepicker';
 import ChangesScheduleItem from '@/components/schedule/AdminChangesScheduleItem.vue';
 import { computed, onMounted, ref, watch } from "vue";
@@ -60,8 +59,6 @@ const updateQueryParams = () => {
 
 const { data: changesSchedules, isError, isSuccess } = useChangesSchedulesQuery(isoDate, building, selectedCourse, selectedGroup);
 
-
-
 watch(changesSchedules, (newData) => {
 
     if (newData) {
@@ -85,9 +82,7 @@ watch(building, () => {
 }, { flush: 'sync' })
 
 watch(course, () => {
-
     selectedGroup.value = null
-
 }, { flush: 'sync' })
 
 onMounted(() => {
@@ -98,7 +93,6 @@ onMounted(() => {
         // Если дата есть в query параметрах, используем ее
         const [day, month, year] = (route.query.date as string).split('.').map(Number);
         date.value = new Date(year, month - 1, day);
-
     }
 
     else {
@@ -118,8 +112,6 @@ onMounted(() => {
         selectedGroup.value = route.query.group as string;
     }
 
-
-
     updateQueryParams();
 })
 
@@ -132,7 +124,6 @@ const reducedWeekDays = {
     'суббота': 'СБ',
     'воскресенье': 'ВС',
 }
-
 
 const { data: groups } = useGroupsPublicQuery(selectedGroup, building, course);
 
@@ -157,7 +148,7 @@ function handleDatePickerBtns(day) {
             break
 
     }
-}
+}   
 </script>
 
 <template>

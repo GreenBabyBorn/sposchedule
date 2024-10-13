@@ -1,10 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 
-export function useSubjectsQuery() {
+export function useSubjectsQuery(query?: object) {
   return useQuery({
-    queryKey: ['subjects'],
-    queryFn: async () => (await axios.get('/api/subjects')).data,
+    queryKey: ['subjects', query],
+    queryFn: async () =>
+      (
+        await axios.get('/api/subjects', {
+          params: query,
+        })
+      ).data,
   });
 }
 

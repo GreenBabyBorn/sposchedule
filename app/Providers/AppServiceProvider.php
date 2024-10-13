@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\ServiceProvider;
 use App\Services\HistoryLogger;
+use Symfony\Component\HttpFoundation\Response;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,7 +32,11 @@ class AppServiceProvider extends ServiceProvider
                 return Limit::none();
             }
             // return Limit::none();
-            return Limit::perMinute(60)->by($request->ip());
+            return Limit::perMinute(60)->by($request->ip())->response(function () {
+                return response()->json([
+                    'message' => 'Превышен лимит запросов, попробуйте позже.',
+                ], Response::HTTP_TOO_MANY_REQUESTS);
+            });
         });
 
         $this->app->singleton('historyLogger', function ($app) {

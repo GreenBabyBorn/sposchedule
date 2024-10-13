@@ -189,6 +189,15 @@ router.beforeEach(loadLayoutMiddleware);
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
+  if (authStore.token) {
+    try {
+      await authStore.fetchUser();
+    } catch (error) {
+      // Если произошла ошибка при загрузке данных пользователя, перенаправляем на страницу входа
+      // authStore.logout();
+      return next('/admin/login');
+    }
+  }
   // Если пользователь уже авторизован и пытается попасть на страницу входа, перенаправляем его на админскую страницу
   if (to.path === '/admin/login' && authStore.token) {
     return next('/admin/schedules/changes');
@@ -200,15 +209,6 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // Если у пользователя есть токен, но данные пользователя еще не загружены, загружаем их
-  if (authStore.token && !authStore.user) {
-    try {
-      await authStore.fetchUser();
-    } catch (error) {
-      // Если произошла ошибка при загрузке данных пользователя, перенаправляем на страницу входа
-      // authStore.logout();
-      return next('/admin/login');
-    }
-  }
 
   // Разрешаем переход на целевой маршрут
   next();

@@ -51,8 +51,8 @@ const editLesson = (lesson: any) => {
         <td v-if="!lesson?.message">
             <div v-if="lesson.subject" class="table-subrow">
                 <span v-if="!isEdit">{{ lesson.subject.name }}</span>
-                <Select v-model="lesson.subject" v-else filter @change="editLesson(lesson)" class="w-full text-left"
-                    :options="subjects" option-label="name" />
+                <Select data-key="name" v-model="lesson.subject" v-else filter @change="editLesson(lesson)"
+                    class="w-full text-left" :options="subjects" option-label="name" />
             </div>
             <div v-else>
                 <span class="text-red-400">Предмет был удален</span>
@@ -61,8 +61,9 @@ const editLesson = (lesson: any) => {
                 <div class="" v-if="!isEdit">
                     <span class="opacity-50" v-for="teacher in lesson.teachers">{{ teacher.name + ' ' }}</span>
                 </div>
-                <MultiSelect filter v-model="lesson.teachers" v-else placeholder="Выберите преподавателя"
-                    @change="editLesson(lesson)" :options="teachers" class="w-full" option-label="name" />
+                <MultiSelect data-key="name" filter v-model="lesson.teachers" v-else
+                    placeholder="Выберите преподавателя" @change="editLesson(lesson)" :options="teachers" class="w-full"
+                    option-label="name" />
             </div>
         </td>
         <td v-show="!lesson.message">
