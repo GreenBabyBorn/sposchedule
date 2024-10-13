@@ -173,7 +173,11 @@ router.beforeEach(async (to, from, next) => {
     authStore.user = response.data;
     if (to.path === '/admin/login') return next(from.path);
   } catch (e) {
-    if (e.response.status === 401 && to.path !== '/admin/login') {
+    if (
+      e.response.status === 401 &&
+      to.path !== '/admin/login' &&
+      to.meta.layout === 'admin'
+    ) {
       next('/admin/login');
       return;
     }
