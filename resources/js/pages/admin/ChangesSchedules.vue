@@ -10,8 +10,8 @@ import router from '@/router';
 import { useRoute } from 'vue-router';
 import Select from 'primevue/select';
 import Button from 'primevue/button';
-import { useTeachersQuery } from '@/queries/teachers';
-import { useSubjectsQuery } from '@/queries/subjects';
+// import { useTeachersQuery } from '@/queries/teachers';
+// import { useSubjectsQuery } from '@/queries/subjects';
 import { useBuildingsQuery } from '@/queries/buildings';
 import { useGroupsPublicQuery } from '@/queries/groups';
 
@@ -20,8 +20,8 @@ const scheduleStore = useScheduleStore();
 const { course, date, queryParams, schedulesChanges } = storeToRefs(scheduleStore);
 const { setSchedulesChanges } = scheduleStore;
 
-const { data: subjects } = useSubjectsQuery()
-const { data: teachers } = useTeachersQuery()
+// const { data: subjects } = useSubjectsQuery()
+// const { data: teachers } = useTeachersQuery()
 
 const isoDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
@@ -200,10 +200,10 @@ function handleDatePickerBtns(day) {
             <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
         </span>
         <div v-if="isSuccess" class="schedules">
-            <ChangesScheduleItem :key="index" :subjects="subjects" :teachers="teachers" class="schedule"
-                v-for="(item, index) in schedulesChanges?.schedules" :date="isoDate" :schedule="item?.schedule"
-                :semester="item?.semester" :type="item?.schedule?.type" :group="item?.group"
-                :lessons="item?.schedule?.lessons" :week_type="item?.week_type" :published="item?.schedule?.published">
+            <ChangesScheduleItem :key="index" class="schedule" v-for="(item, index) in schedulesChanges?.schedules"
+                :date="isoDate" :schedule="item?.schedule" :semester="item?.semester" :type="item?.schedule?.type"
+                :group="item?.group" :lessons="item?.schedule?.lessons" :week_type="item?.week_type"
+                :published="item?.schedule?.published">
             </ChangesScheduleItem>
         </div>
     </div>

@@ -24,8 +24,8 @@ const props = defineProps({
     lessons: { required: true },
     schedule: { required: true, type: Object },
     published: { required: false, type: Boolean },
-    teachers: { required: true },
-    subjects: { required: true }
+    // teachers: { required: true },
+    // subjects: { required: true }
 })
 const lessons: any = toRef<any>(() => props.lessons)
 // const teachers: any = toRef<any>(() => props.teachers)
@@ -272,12 +272,22 @@ const isOneDayDifference = (inputDate) => {
 
 const enabledEdir = useStorage('enableEdit', false)
 
-const { data: subjects } = useSubjectsQuery({ teachers: true })
 const { data: teachers } = useTeachersQuery()
 
+const { data: subjects } = useSubjectsQuery({ teachers: true })
 const teachersFromSubject = computed(() => {
-    return newLesson.subject?.teachers
-})
+    // Учителя, связанные с текущим предметом
+    const subjectTeachers = newLesson.subject?.teachers || [];
+
+    // Фильтруем всех учителей, чтобы исключить тех, кто уже есть в subjectTeachers
+    const filteredTeachers = teachers.value.filter(teacher =>
+        !subjectTeachers.some(subjectTeacher => subjectTeacher.id === teacher.id)
+    );
+
+    // Возвращаем объединённый массив: сначала учителя из предмета, затем остальные учителя
+    return [...subjectTeachers, ...filteredTeachers];
+});
+
 </script>
 
 <template>
