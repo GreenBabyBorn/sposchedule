@@ -7,7 +7,7 @@ import MultiSelect from 'primevue/multiselect';
 import Button from 'primevue/button';
 import { useDateFormat } from '@vueuse/core'
 import { useToast } from 'primevue/usetoast';
-import { useTeachersQuery, useDestroyTeacher, useStoreTeacher, useUpdateTeacher, useStoreSubjectForTeacher, useDestroySubjectForTeacher } from '../../queries/teachers'
+import { useTeachersQuery, useDestroyTeacher, useStoreTeacher, useUpdateTeacher } from '../../queries/teachers'
 import { useSubjectsQuery, } from '../../queries/subjects'
 import Chip from 'primevue/chip';
 import { useQueryClient } from '@tanstack/vue-query';
@@ -25,47 +25,11 @@ const editingRows = ref([]);
 const selectedTeachers = ref([]);
 
 const { mutateAsync: updateTeacher, isPending: isUpdated } = useUpdateTeacher()
-const { mutateAsync: storeSubjectForTeacher } = useStoreSubjectForTeacher()
-const { mutateAsync: destroySubjectForTeacher } = useDestroySubjectForTeacher()
+// const { mutateAsync: storeSubjectForTeacher } = useStoreSubjectForTeacher()
+// const { mutateAsync: destroySubjectForTeacher } = useDestroySubjectForTeacher()
 const queryClient = useQueryClient();
 const onRowEditSave = async (event) => {
     let { newData, index } = event;
-
-    let deletedSubjects = teachers.value[index].subjects.filter(obj1 =>
-        !newData.subjects.some(obj2 => obj2.id === obj1.id)
-    );
-    let newSubjects = newData.subjects.filter(obj2 =>
-        !teachers.value[index].subjects.some(obj1 => obj1.id === obj2.id)
-    );
-    if (deletedSubjects.length) {
-        for (let i = 0; i < deletedSubjects.length; i++) {
-
-            try {
-                await destroySubjectForTeacher({ id: teachers.value[index].id, subject_id: deletedSubjects[i].id })
-            }
-            catch (e) {
-                toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-                return
-            }
-        }
-        queryClient.invalidateQueries({ queryKey: ['teachers'] })
-    }
-
-    // console.log(deletedSubjects, newSubjects)
-    if (newSubjects.length) {
-        for (let i = 0; i < newSubjects.length; i++) {
-            console.log({ id: teachers.value[index].id, subject_id: newSubjects[i].id })
-            try {
-                await storeSubjectForTeacher({ id: teachers.value[index].id, subject_id: newSubjects[i].id })
-            }
-            catch (e) {
-                toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
-                return
-            }
-        }
-        queryClient.invalidateQueries({ queryKey: ['teachers'] })
-    }
-
     try {
         await updateTeacher({ id: newData.id, body: newData })
     }

@@ -20,6 +20,7 @@ import PrintBellsView from '../pages/PrintBells.vue';
 import HistoryView from '../pages/admin/History.vue';
 import AnalyticsView from '../pages/Analytics.vue';
 import { useAuthStore } from '@/stores/auth';
+import axios from 'axios';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -188,29 +189,33 @@ router.beforeEach(loadLayoutMiddleware);
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-
-  if (authStore.token) {
-    try {
-      await authStore.fetchUser();
-    } catch (error) {
-      // Если произошла ошибка при загрузке данных пользователя, перенаправляем на страницу входа
-      // authStore.logout();
-      return next('/admin/login');
+  // if (to.meta.layout === 'admin') {
+  try {
+    const response = await axios.get('/api/user');
+    authStore.user = response.data;
+    if (to.path === '/admin/login') return next(from.path);
+  } catch (e) {
+    if (e.response.status === 401 && to.path !== '/admin/login') {
+      next('/admin/login');
+      return;
     }
   }
-  // Если пользователь уже авторизован и пытается попасть на страницу входа, перенаправляем его на админскую страницу
-  if (to.path === '/admin/login' && authStore.token) {
-    return next('/admin/schedules/changes');
-  }
+  // }
 
-  // Если пользователь не авторизован и пытается получить доступ к админским страницам, перенаправляем на страницу входа
-  if (to.meta.layout === 'admin' && !authStore.token) {
-    return next('/admin/login');
-  }
+  // try {
+  //   await authStore.fetchUser();
+  // } catch (error) {
+  //   return next('/admin/login');
+  // }
 
-  // Если у пользователя есть токен, но данные пользователя еще не загружены, загружаем их
+  // if (to.path === '/admin/login') {
+  //   return next('/admin/schedules/changes');
+  // }
 
-  // Разрешаем переход на целевой маршрут
+  // if (to.meta.layout === 'admin') {
+  //   return next('/admin/login');
+  // }
+
   next();
 });
 

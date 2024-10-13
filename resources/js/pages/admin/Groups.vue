@@ -45,13 +45,9 @@ const courses = [
 ]
 
 const { mutateAsync: updateGroup, isPending: isUpdated } = useUpdateGroup()
-// const { mutateAsync: storeSemesterForGroup } = useStoreSemesterForGroup()
-// const { mutateAsync: destroySemesterForGroup } = useDestroySemesterForGroup()
-
 
 const onRowEditSave = async (event) => {
     let { newData, index } = event;
-
 
     try {
         await updateGroup({

@@ -67,6 +67,10 @@ class TeacherController extends Controller
     {
         HistoryLogger::logAction('Обновлен преподаватель', $teacher->toArray());
         $teacher->update($request->all());
+        if ($request->has('subjects') && is_array($request->subjects)) {
+            $subjectsIds = array_column($request->subjects, 'id');
+            $teacher->subjects()->sync($subjectsIds);
+        }
         return new TeacherResource($teacher);
     }
 

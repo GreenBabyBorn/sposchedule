@@ -9,6 +9,9 @@ import router from '@/router';
 import LoadingBar from '../components/LoadingBar.vue';
 import { useDebounceFn } from '@vueuse/core';
 
+import Checkbox from 'primevue/checkbox';
+
+
 const authStore = useAuthStore()
 const { isAuth } = storeToRefs(authStore)
 const { login } = authStore
@@ -16,6 +19,7 @@ const { login } = authStore
 const credentials = reactive({
     email: '',
     password: '',
+    remember: false
 })
 
 watch(credentials, () => {
@@ -55,6 +59,11 @@ const debouncedAuth = useDebounceFn(auth, 300);
                 <Password :invalid="isError" fluid placeholder="Пароль" v-model="credentials.password" :feedback="false"
                     toggleMask>
                 </Password>
+                <div class="flex gap-2 items-center">
+
+                    <Checkbox inputId="remember" v-model="credentials.remember" :binary="true" />
+                    <label class="dark:text-surface-400 text-slate-800 " for="remember"> Запомнить меня </label>
+                </div>
                 <Button :disabled="!credentials.email || !credentials.password" type="submit" label="Войти"></Button>
                 <span class="text-red-400 w-full" v-if="isError">{{ error?.message }}</span>
             </div>

@@ -20,31 +20,31 @@ export function useStoreTeacher() {
   return storeTeacherMutation;
 }
 
-export function useStoreSubjectForTeacher() {
-  const queryClient = useQueryClient();
-  let storeTeacherMutation = useMutation({
-    mutationFn: ({ id, subject_id }: any) =>
-      axios.post(`/api/teachers/${id}/subjects`, { subject_id }),
-    onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['teachers'] });
-    },
-  });
-  return storeTeacherMutation;
-}
+// export function useStoreSubjectForTeacher() {
+//   const queryClient = useQueryClient();
+//   let storeTeacherMutation = useMutation({
+//     mutationFn: ({ id, subject_id }: any) =>
+//       axios.post(`/api/teachers/${id}/subjects`, { subject_id }),
+//     onSuccess: () => {
+//       // queryClient.invalidateQueries({ queryKey: ['teachers'] });
+//     },
+//   });
+//   return storeTeacherMutation;
+// }
 
-export function useDestroySubjectForTeacher() {
-  const queryClient = useQueryClient();
-  let storeTeacherMutation = useMutation({
-    mutationFn: ({ id, subject_id }: any) =>
-      axios.delete(`/api/teachers/${id}/subjects`, {
-        data: { subject_id },
-      }),
-    onSuccess: () => {
-      // queryClient.invalidateQueries({ queryKey: ['teachers'] });
-    },
-  });
-  return storeTeacherMutation;
-}
+// export function useDestroySubjectForTeacher() {
+//   const queryClient = useQueryClient();
+//   let storeTeacherMutation = useMutation({
+//     mutationFn: ({ id, subject_id }: any) =>
+//       axios.delete(`/api/teachers/${id}/subjects`, {
+//         data: { subject_id },
+//       }),
+//     onSuccess: () => {
+//       // queryClient.invalidateQueries({ queryKey: ['teachers'] });
+//     },
+//   });
+//   return storeTeacherMutation;
+// }
 
 export function useUpdateTeacher() {
   const queryClient = useQueryClient();

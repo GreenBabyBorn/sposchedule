@@ -123,9 +123,9 @@ const confirmDelete = () => {
                 </div>
                 <div class="">
                     <label for=" semester" class=" block mb-1">Номер семестра</label>
-                    <InputNumber placeholder="Номер семестра" v-model="indexSemester" inputId="semester" mode="decimal"
-                        :min="1" :max="100" fluid class="">
-                    </InputNumber>
+                    <InputText v-keyfilter.int placeholder="Номер семестра" v-model="indexSemester" inputId="semester"
+                        fluid class="">
+                    </InputText>
                 </div>
                 <div class="">
                     <label for="dates" class="block mb-1">Начало - Конец семестра</label>
@@ -137,9 +137,9 @@ const confirmDelete = () => {
             </form>
         </div>
         <div class="">
-            <DataTable :loading="isUpdated || isDestroyed || isStored" v-model:selection="selectedSemesters"
-                v-model:editingRows="editingRows" :value="semesters" editMode="row" dataKey="id"
-                @row-edit-save="onRowEditSave" :pt="{
+            <DataTable paginator :rows="10" :loading="isUpdated || isDestroyed || isStored"
+                v-model:selection="selectedSemesters" v-model:editingRows="editingRows" :value="semesters"
+                editMode="row" dataKey="id" @row-edit-save="onRowEditSave" :pt="{
                     table: { style: 'min-width: 50rem' }
                 }">
                 <template #header>
@@ -156,8 +156,7 @@ const confirmDelete = () => {
                 </Column>
                 <Column field="index" header="Семестр">
                     <template #editor="{ data, field }">
-                        <InputNumber v-model="data[field]" inputId="minmax-buttons" mode="decimal" showButtons :min="0"
-                            :max="100" fluid />
+                        <InputText v-keyfilter.int v-model="data[field]" inputId="minmax-buttons" />
                     </template>
                 </Column>
                 <Column field="start" header="Начало семестра">

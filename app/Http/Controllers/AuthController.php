@@ -43,7 +43,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($credentials)) {
+        if (!Auth::attempt($credentials, $request->remember ? true : false)) {
             return response()->json(['message' => 'Неверный логин или пароль'], 401);
         }
 
@@ -59,12 +59,12 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        // Получаем текущего пользователя
+        Auth::guard('web')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         $user = $request->user();
 
-        // Удаляем все токены, или можно удалить только один
         if($user) {
-
             $user->tokens()->delete();
         }
 
@@ -77,7 +77,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         // Валидация данных
-        $validatedData = $request->validate([
+        $request->validate([
             'name' => 'sometimes|string|max:255', // Поле может быть передано, но не обязательно
             'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id, // Уникальный email, игнорируем текущего пользователя
             'password' => 'sometimes|string|min:6|confirmed', // Обновление пароля, если передан
