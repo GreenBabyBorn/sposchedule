@@ -64,15 +64,16 @@ const items = ref([
         class=" transition-transform fixed z-50 w-80 top-16 left-0 basis-80 flex-grow-0 lg:min-h-screen md:bg-surface-200 md:dark:bg-surface-950">
         <div class="flex flex-col py-4 px-4">
             <Menu :model="items" class="w-full p-4">
-
                 <template #item="{ item, props }">
                     <RouterLink v-if="item.route" v-slot="{ href, navigate }" :to="item.route" custom>
-                        <a :href="href" v-bind="props.action" @click="navigate">
+                        <a :class="{ '!text-primary-500 font-bold': $route.path === item.route }" :href="href"
+                            v-bind="props.action" @click="navigate">
                             <span :class="item.icon" />
                             <span class="ml-2">{{ item.label }}</span>
                         </a>
                     </RouterLink>
-                    <a v-else :href="item.url" :target="item.target" v-bind="props.action">
+                    <a v-else :class="{ '!text-primary-500 font-bold': $route.path === item.route }" :href="item.url"
+                        :target="item.target" v-bind="props.action">
                         <span :class="item.icon" />
                         <span class="ml-2">{{ item.label }}</span>
                     </a>
@@ -80,7 +81,6 @@ const items = ref([
             </Menu>
         </div>
     </div>
-
 </template>
 
 <style>

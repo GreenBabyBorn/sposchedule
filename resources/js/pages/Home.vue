@@ -357,8 +357,8 @@ function handleDatePickerBtns(day) {
                         placeholder="Курс"></Select>
                     <div class="flex gap-2">
 
-                        <Select append-to="self" :autoFilterFocus="true" emptyFilterMessage="Группы не найдены" filter
-                            showClear v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
+                        <Select append-to="self" emptyFilterMessage="Группы не найдены" filter showClear
+                            v-model="selectedGroup" optionValue="name" :options="groups" optionLabel="name"
                             placeholder="Группа" class="w-full" />
                         <Button title="Фильтры" @click="toggleFilters" severity="secondary" text
                             icon="pi pi-sliders-h"></Button>
