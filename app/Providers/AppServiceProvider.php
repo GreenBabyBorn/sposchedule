@@ -28,15 +28,15 @@ class AppServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api', function (Request $request) {
 
-            if ($request->user()) {
-                return Limit::none();
-            }
+            // if ($request->user()) {
+            //     return Limit::none();
+            // }
             // return Limit::none();
-            return Limit::perMinute(60)->by($request->ip())->response(function () {
-                return response()->json([
-                    'message' => 'Превышен лимит запросов, попробуйте позже.',
-                ], Response::HTTP_TOO_MANY_REQUESTS);
-            });
+            // return Limit::perMinute(60)->by($request->ip())->response(function () {
+            //     return response()->json([
+            //         'message' => 'Превышен лимит запросов, попробуйте позже.',
+            //     ], Response::HTTP_TOO_MANY_REQUESTS);
+            // });
         });
 
         $this->app->singleton('historyLogger', function ($app) {
