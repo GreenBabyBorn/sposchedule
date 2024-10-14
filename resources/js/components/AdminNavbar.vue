@@ -61,7 +61,7 @@ const items = ref([
 
 <template>
     <div :class="{ 'active-navbar': isNavbarActive }"
-        class="transition-transform fixed z-50 w-80 top-16 left-0 basis-80 flex-grow-0 lg:min-h-screen bg-surface-200 dark:bg-surface-950">
+        class=" transition-transform fixed z-50 w-80 top-16 left-0 basis-80 flex-grow-0 lg:min-h-screen md:bg-surface-200 md:dark:bg-surface-950">
         <div class="flex flex-col py-4 px-4">
             <Menu :model="items" class="w-full p-4">
 
