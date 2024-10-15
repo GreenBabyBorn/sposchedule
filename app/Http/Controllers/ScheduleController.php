@@ -276,6 +276,7 @@ class ScheduleController extends Controller
         return response()->json($finalSchedules);
     }
 
+
     public function getPublicSchedules(Request $request)
     {
         // Получаем дату и преобразуем её в объект Carbon
@@ -312,42 +313,50 @@ class ScheduleController extends Controller
         $weekNumber = $semesterStart->diffInWeeks($carbonDate);
         $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
 
+        // Шаг 1: Получаем все группы, у которых есть изменения на выбранную дату
+        $groupsWithChanges = DB::table('schedules')
+            ->select('group_id')
+            ->where('published', true)
+            ->where('type', 'changes')
+            ->where('date', $carbonDate->toDateString())
+            ->pluck('group_id')
+            ->toArray();
+
         // Основной SQL-запрос
         $query = "
-    SELECT g.name as group_name, 
-           s.id as schedule_id, s.week_day, s.type, s.updated_at,
-           json_agg(
-               json_build_object(
-                   'id', l.id, 
-                   'index', l.index, 
-                   'subject_name', subj.name, 
-                   'week_type', l.week_type, 
-                   'cabinet', l.cabinet,
-                   'building', l.building,
-                   'message', l.message,
-                   'teachers', (
-                       SELECT json_agg(
-                           json_build_object(
-                               
-                               'name', t.name
+            SELECT g.name as group_name, 
+                   s.id as schedule_id, s.week_day, s.type, s.updated_at,
+                   json_agg(
+                       json_build_object(
+                           'id', l.id, 
+                           'index', l.index, 
+                           'subject_name', subj.name, 
+                           'week_type', l.week_type, 
+                           'cabinet', l.cabinet,
+                           'building', l.building,
+                           'message', l.message,
+                           'teachers', (
+                               SELECT json_agg(
+                                   json_build_object(
+                                       'name', t.name
+                                   )
+                               )
+                               FROM lesson_teacher lt
+                               JOIN teachers t ON lt.teacher_id = t.id
+                               WHERE lt.lesson_id = l.id
                            )
                        )
-                       FROM lesson_teacher lt
-                       JOIN teachers t ON lt.teacher_id = t.id
-                       WHERE lt.lesson_id = l.id
-                   )
-               )
-           ) as lessons
-    FROM groups g
-    LEFT JOIN schedules s ON g.id = s.group_id
-    LEFT JOIN lessons l ON s.id = l.schedule_id
-    LEFT JOIN subjects subj ON l.subject_id = subj.id
-    WHERE s.published = true
-    AND (
-        (s.type = 'changes' AND s.date = :date)
-        OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
-    )
-";
+                   ) as lessons
+            FROM groups g
+            LEFT JOIN schedules s ON g.id = s.group_id
+            LEFT JOIN lessons l ON s.id = l.schedule_id
+            LEFT JOIN subjects subj ON l.subject_id = subj.id
+            WHERE s.published = true
+            AND (
+                (s.type = 'changes' AND s.date = :date)
+                OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
+            )
+        ";
 
         // Массив параметров для SQL-запроса
         $params = [
@@ -392,20 +401,23 @@ class ScheduleController extends Controller
 
         if ($teacher = $request->input('teacher')) {
             $query .= "
-        AND EXISTS (
-            SELECT 1 FROM lesson_teacher lt
-            JOIN teachers t ON lt.teacher_id = t.id
-            WHERE lt.lesson_id = l.id
-            AND t.name ILIKE :teacher_name
-        )
-    ";
+                AND EXISTS (
+                    SELECT 1 FROM lesson_teacher lt
+                    JOIN teachers t ON lt.teacher_id = t.id
+                    WHERE lt.lesson_id = l.id
+                    AND t.name ILIKE :teacher_name
+                )
+            ";
             $params['teacher_name'] = "%{$teacher}%";
         }
 
-
+        // Добавляем условие, что если у группы есть изменения, то основное расписание не учитывать
+        if (!empty($groupsWithChanges)) {
+            $query .= " AND (s.type = 'changes' OR g.id NOT IN (" . implode(',', $groupsWithChanges) . "))";
+        }
 
         // Завершаем запрос
-        $query .= "GROUP BY g.name, s.id ORDER BY s.type DESC";
+        $query .= " GROUP BY g.name, s.id ORDER BY s.type DESC";
 
         // Выполняем SQL-запрос
         $schedules = DB::select($query, $params);
@@ -417,7 +429,7 @@ class ScheduleController extends Controller
             'schedules' => []
         ];
 
-        // Массив для отслеживания выбранного расписания для каждой группы
+        // Массив для отслеживания расписаний для каждой группы
         $groupSchedules = [];
 
         foreach ($schedules as $schedule) {
@@ -435,6 +447,7 @@ class ScheduleController extends Controller
             if (empty($filteredLessons)) {
                 continue;
             }
+
             // Сортируем занятия по индексу
             usort($filteredLessons, function ($a, $b) {
                 return $a['index'] <=> $b['index'];
@@ -445,17 +458,15 @@ class ScheduleController extends Controller
                 $finalSchedules['last_updated'] = $schedule->updated_at;
             }
 
-            // Если для группы еще нет расписания или текущее расписание имеет тип 'changes', заменяем
-            if (!isset($groupSchedules[$schedule->group_name]) || $schedule->type === 'changes') {
-                $groupSchedules[$schedule->group_name] = [
-                    'group_name' => $schedule->group_name,
-                    'schedule' => [
-                        'week_day' => $schedule->week_day,
-                        'type' => $schedule->type,
-                        'lessons' => $filteredLessons // Используем отфильтрованные занятия
-                    ]
-                ];
-            }
+            // Сохраняем расписание для группы
+            $groupSchedules[$schedule->group_name] = [
+                'group_name' => $schedule->group_name,
+                'schedule' => [
+                    'week_day' => $schedule->week_day,
+                    'type' => $schedule->type,
+                    'lessons' => $filteredLessons // Используем отфильтрованные занятия
+                ]
+            ];
         }
 
         // Добавляем расписания для каждой группы в финальный массив
@@ -467,128 +478,6 @@ class ScheduleController extends Controller
         });
 
         // Возвращаем результат
-        return response()->json($finalSchedules);
-    }
-
-    public function getScheduleByDatePrint(Request $request)
-    {
-        // Получаем дату из запроса
-        $date = $request->input('date');
-
-        // Преобразуем дату в объект Carbon
-        $carbonDate = Carbon::parse($date);
-
-        // Получаем день недели в формате, соответствующем полю week_day в расписании ('ПН', 'ВТ', ...)
-        $weekDayMapping = [
-            0 => 'ВС',
-            1 => 'ПН',
-            2 => 'ВТ',
-            3 => 'СР',
-            4 => 'ЧТ',
-            5 => 'ПТ',
-            6 => 'СБ',
-        ];
-
-        $weekDay = $weekDayMapping[$carbonDate->dayOfWeek];
-
-        // Продолжаем с группами
-        $groupsQuery = Group::query();
-        $course = $request->input('course');
-        if ($course) {
-            $groupsQuery->where('course', $course);
-        }
-        $groups = $groupsQuery->get();
-
-        // Получаем все изменения расписания (type = 'changes') для выбранного дня недели
-        $changes = Schedule::where('type', 'changes')
-            ->where('date', $carbonDate)
-            ->get();
-
-        // Определяем семестр
-        $semester = Semester::where('start', '<=', $carbonDate)
-            ->where('end', '>=', $carbonDate)
-            ->first();
-
-        if (!$semester) {
-            return response()->json([
-                'error' => 404,
-                'message' => 'Семестра на данную дату не найдено'
-            ], 404);
-        }
-
-        // Определяем номер недели с начала семестра
-        $semesterStart = Carbon::parse($semester->start);
-        $weekNumber = $semesterStart->diffInWeeks($carbonDate);
-
-        // Если неделя четная - ЧИСЛ, нечетная - ЗНАМ
-        $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
-
-        // Массив для хранения финального расписания, сгруппированного по зданиям
-        $finalSchedules = [
-            '1-5' => [
-                'week_type' => $weekType,
-                'schedules' => []
-            ],
-            '6' => [
-                'week_type' => $weekType,
-                'schedules' => []
-            ],
-        ];
-
-        foreach ($groups as $group) {
-            // Получаем изменения для текущей группы и текущего дня недели
-            $groupChanges = $changes->where('group_id', $group->id);
-
-            // Создаем временное хранилище для расписания
-            $groupSchedule = [];
-
-            // Заменяем или дополняем слоты изменениями (changes)
-            foreach ($groupChanges as $change) {
-                if ($change->published) {
-                    $groupSchedule = [
-                        'id' => $change->id,
-                        'week_type' => $change->week_type,
-                        'lessons' => LessonResource::collection(Lesson::where('schedule_id', $change->id)
-                            ->orderBy('index')
-                            ->get()),
-                    ];
-                }
-            }
-
-            // Если нет изменений или расписаний, пропускаем текущую группу
-            if (empty($groupSchedule)) {
-                continue;
-            }
-
-            // Получаем все здания, связанные с текущей группой
-            $buildings = $group->buildings;
-
-            foreach ($buildings as $building) {
-                // Группируем расписания по зданию (building)
-                $buildingKey = $building->name == '6' ? '6' : '1-5';
-
-                // Проверяем, существует ли семестр
-                $filteredSemester = $group->semesters->filter(function ($semester) use ($carbonDate) {
-                    $start = Carbon::parse($semester->start);
-                    $end = Carbon::parse($semester->end);
-                    return $carbonDate->between($start, $end);
-                })->first();
-
-                // Если семестр найден, передаем его в SemesterResource, если нет — передаем null или другое значение
-                array_push($finalSchedules[$buildingKey]['schedules'], [
-                    'semester' => $filteredSemester ? new SemesterResource($filteredSemester) : null, // Проверка на null
-                    'group' => new SkinnyGroup($group),
-                    'schedule' => $groupSchedule,
-                ]);
-            }
-        }
-
-        // Фильтруем пустые расписания, чтобы выводить только те здания, в которых есть расписания
-        $finalSchedules = array_filter($finalSchedules, function ($buildingSchedule) {
-            return !empty($buildingSchedule['schedules']);
-        });
-
-        // Возвращаем финальное расписание
         return response()->json($finalSchedules);
     }
 
