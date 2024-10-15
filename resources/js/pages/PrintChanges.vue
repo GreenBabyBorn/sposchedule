@@ -12,8 +12,20 @@ const route = useRoute();
 const date = ref(null)
 
 onMounted(() => {
-    const [day, month, year] = (route.query.date as string).split('.').map(Number);
-    date.value = new Date(year, month - 1, day)
+    const dateQuery = route.query?.date as string;
+
+    if (dateQuery) {
+        const [day, month, year] = dateQuery.split('.').map(Number);
+
+        // Проверяем, что все значения (day, month, year) действительно числа
+        if (day && month && year) {
+            date.value = new Date(year, month - 1, day);
+        } else {
+            date.value = new Date(); // Если дата не валидна, устанавливаем текущую дату
+        }
+    } else {
+        date.value = new Date(); // Если query параметр отсутствует, устанавливаем текущую дату
+    }
 })
 
 const isoDate = computed(() => {
