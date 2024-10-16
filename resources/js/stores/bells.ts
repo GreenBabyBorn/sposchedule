@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, toRaw, watch } from 'vue';
+import { ref, toRaw } from 'vue';
 
 export const useBellsStore = defineStore('useBellsStore', () => {
   const bells = ref();

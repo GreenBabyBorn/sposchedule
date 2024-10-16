@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
-import { computed } from 'vue';
 
 export function useBuildingsQuery() {
   return useQuery({
@@ -15,7 +14,7 @@ export function useBuildingsQuery() {
 
 export function useStoreBuilding() {
   const queryClient = useQueryClient();
-  let storeBuildingMutation = useMutation({
+  const storeBuildingMutation = useMutation({
     mutationFn: (body: object) => axios.post('/api/buildings', body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buildings'] });
@@ -26,7 +25,7 @@ export function useStoreBuilding() {
 
 export function useUpdateBuilding() {
   const queryClient = useQueryClient();
-  let updateuildingMutation = useMutation({
+  const updateuildingMutation = useMutation({
     mutationFn: ({ name, body }: any) =>
       axios.patch(`/api/buildings/${name}`, body),
     onSuccess: () => {
@@ -38,7 +37,7 @@ export function useUpdateBuilding() {
 
 export function useDestroyBuilding() {
   const queryClient = useQueryClient();
-  let destroyuildingMutation = useMutation({
+  const destroyuildingMutation = useMutation({
     mutationFn: name => axios.delete(`/api/buildings/${name}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buildings'] });

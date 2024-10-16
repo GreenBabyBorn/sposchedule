@@ -24,7 +24,7 @@ export function useSemesterShowQuery(id) {
 
 export function useStoreSemester() {
   const queryClient = useQueryClient();
-  let storeSemesterMutation = useMutation({
+  const storeSemesterMutation = useMutation({
     mutationFn: (body: object) =>
       axios.post('/api/semesters', {
         ...body,
@@ -38,7 +38,7 @@ export function useStoreSemester() {
 
 export function useUpdateSemester() {
   const queryClient = useQueryClient();
-  let updateSemesterMutation = useMutation({
+  const updateSemesterMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/semesters/${id}`, body),
     onSuccess: () => {
@@ -50,7 +50,7 @@ export function useUpdateSemester() {
 
 export function useDestroySemester() {
   const queryClient = useQueryClient();
-  let destroySemesterMutation = useMutation({
+  const destroySemesterMutation = useMutation({
     mutationFn: id => axios.delete(`/api/semesters/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['semesters'], exact: true });

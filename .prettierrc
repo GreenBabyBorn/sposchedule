@@ -10,5 +10,6 @@
     "proseWrap": "preserve",
     "htmlWhitespaceSensitivity": "css",
     "endOfLine": "lf",
-    "vueIndentScriptAndStyle": true
+    "vueIndentScriptAndStyle": true,
+    "jsxBracketSameLine": false
   }

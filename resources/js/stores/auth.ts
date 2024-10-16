@@ -6,11 +6,11 @@ export const useAuthStore = defineStore('useAuthStore', () => {
   const user = ref(null);
 
   const register = async credentials => {
-    const response = await axios.post('/api/register', credentials);
+    await axios.post('/api/register', credentials);
   };
 
   const login = async credentials => {
-    const response = await axios.post('/api/login', credentials);
+    await axios.post('/api/login', credentials);
   };
 
   const logout = async () => {

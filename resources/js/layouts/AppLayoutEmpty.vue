@@ -1,11 +1,10 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <template>
-    <slot />
+  <slot />
 </template>
 <style>
-body {
+  body {
     background: none;
-}
+  }
 </style>

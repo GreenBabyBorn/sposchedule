@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
-import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { computed } from 'vue';
 
@@ -21,6 +20,7 @@ export function useBellsQuery(type, building, weekDay?, date?) {
         Boolean(building.value)
       );
     }
+    return false;
     // return Boolean(type.value) || Boolean(variant.value) || Boolean(date.value);
   });
   const weekDayOrDate = computed(() =>
@@ -86,7 +86,7 @@ export function usePublicBellsPrintQuery(buildings, date) {
 
 export function useStorePeriod() {
   const queryClient = useQueryClient();
-  let storePeriodMutation = useMutation({
+  const storePeriodMutation = useMutation({
     mutationFn: (body: object) =>
       axios.post('/api/bells-periods', {
         ...body,
@@ -100,7 +100,7 @@ export function useStorePeriod() {
 
 export function useStorePresetBell() {
   const queryClient = useQueryClient();
-  let storePeriodMutation = useMutation({
+  const storePeriodMutation = useMutation({
     mutationFn: (body: object) =>
       axios.post('/api/bells/presets', {
         ...body,
@@ -113,7 +113,7 @@ export function useStorePresetBell() {
 }
 export function useApplyPreset() {
   const queryClient = useQueryClient();
-  let storePeriodMutation = useMutation({
+  const storePeriodMutation = useMutation({
     mutationFn: (body: object) =>
       axios.post('/api/bells/presets/apply', {
         ...body,
@@ -134,7 +134,7 @@ export function usePresetsBells() {
 }
 export function useStoreBell() {
   const queryClient = useQueryClient();
-  let storePeriodMutation = useMutation({
+  const storePeriodMutation = useMutation({
     mutationFn: (body: object) =>
       axios.post('/api/bells', {
         ...body,
@@ -147,7 +147,7 @@ export function useStoreBell() {
 }
 export function useUpdateBell() {
   const queryClient = useQueryClient();
-  let storePeriodMutation = useMutation({
+  const storePeriodMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/bells/${id}`, {
         ...body,
@@ -161,7 +161,7 @@ export function useUpdateBell() {
 }
 export function useUpdateBellPeriod() {
   const queryClient = useQueryClient();
-  let storePeriodMutation = useMutation({
+  const storePeriodMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/bells-periods/${id}`, body),
     onSuccess: () => {
@@ -173,7 +173,7 @@ export function useUpdateBellPeriod() {
 
 export function useDestroyBellPeriod() {
   const queryClient = useQueryClient();
-  let destroyPeriodMutation = useMutation({
+  const destroyPeriodMutation = useMutation({
     mutationFn: (id: number) => axios.delete(`/api/bells-periods/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bells'] });
@@ -183,7 +183,7 @@ export function useDestroyBellPeriod() {
 }
 export function useDestroyBells() {
   const queryClient = useQueryClient();
-  let destroyPeriodMutation = useMutation({
+  const destroyPeriodMutation = useMutation({
     mutationFn: (id: number) => axios.delete(`/api/bells/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bells-presets'] });

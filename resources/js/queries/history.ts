@@ -19,7 +19,7 @@ export function useHistoryQuery(page, rows, searchTerm) {
 
 export function useDestroyHistory() {
   const queryClient = useQueryClient();
-  let destroySemesterMutation = useMutation({
+  const destroySemesterMutation = useMutation({
     mutationFn: (id: any) => axios.delete(`/api/history/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['history'] });

@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
-import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { computed } from 'vue';
 
@@ -21,7 +20,7 @@ export function useMainSchedulesQuery(mainGroup, mainSemester) {
 }
 export function useStoreSchedule() {
   const queryClient = useQueryClient();
-  let updateSemesterMutation = useMutation({
+  const updateSemesterMutation = useMutation({
     mutationFn: ({ body }: any) => axios.post(`/api/schedules`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
@@ -108,7 +107,7 @@ export function usePrintMainSchedulesQuery(semester_id, course, buildings) {
 
 export function useStoreScheduleChange() {
   const queryClient = useQueryClient();
-  let updateSemesterMutation = useMutation({
+  const updateSemesterMutation = useMutation({
     mutationFn: ({ body }: any) => axios.post(`/api/schedules`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
@@ -118,7 +117,7 @@ export function useStoreScheduleChange() {
 }
 export function useFromMainToChangesSchedule() {
   const queryClient = useQueryClient();
-  let updateSemesterMutation = useMutation({
+  const updateSemesterMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/schedules/${id}/changes`, body),
     onSuccess: () => {
@@ -129,7 +128,7 @@ export function useFromMainToChangesSchedule() {
 }
 export function useUpdateSchedule() {
   const queryClient = useQueryClient();
-  let updateSemesterMutation = useMutation({
+  const updateSemesterMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/schedules/${id}`, body),
     onSuccess: () => {

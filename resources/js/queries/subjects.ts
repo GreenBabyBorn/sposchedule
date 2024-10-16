@@ -15,7 +15,7 @@ export function useSubjectsQuery(query?: object) {
 
 export function useStoreSubject() {
   const queryClient = useQueryClient();
-  let storeSubjectMutation = useMutation({
+  const storeSubjectMutation = useMutation({
     mutationFn: (name: string) =>
       axios.post('/api/subjects', {
         name,
@@ -29,7 +29,7 @@ export function useStoreSubject() {
 
 export function useUpdateSubject() {
   const queryClient = useQueryClient();
-  let updateSubjectMutation = useMutation({
+  const updateSubjectMutation = useMutation({
     mutationFn: ({ id, body }: any) => axios.patch(`/api/subjects/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subjects'] });
@@ -40,7 +40,7 @@ export function useUpdateSubject() {
 
 export function useDestroySubject() {
   const queryClient = useQueryClient();
-  let destroySubjectMutation = useMutation({
+  const destroySubjectMutation = useMutation({
     mutationFn: id => axios.delete(`/api/subjects/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subjects'], exact: true });

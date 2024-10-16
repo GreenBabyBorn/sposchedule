@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
-import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
 import { computed } from 'vue';
 
@@ -44,7 +43,7 @@ export function useGroupsPublicQuery(name?, building?, course?) {
 
 export function useStoreGroup() {
   const queryClient = useQueryClient();
-  let storeGroupMutation = useMutation({
+  const storeGroupMutation = useMutation({
     mutationFn: (body: object) =>
       axios.post('/api/groups', {
         ...body,
@@ -58,7 +57,7 @@ export function useStoreGroup() {
 
 export function useUpdateGroup() {
   const queryClient = useQueryClient();
-  let updateGroupMutation = useMutation({
+  const updateGroupMutation = useMutation({
     mutationFn: ({ id, body }: any) => axios.patch(`/api/groups/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
@@ -69,7 +68,7 @@ export function useUpdateGroup() {
 
 export function useDestroyGroup() {
   const queryClient = useQueryClient();
-  let destroyGroupMutation = useMutation({
+  const destroyGroupMutation = useMutation({
     mutationFn: id => axios.delete(`/api/groups/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });

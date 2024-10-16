@@ -1,29 +1,31 @@
 <script setup lang="ts">
-import AdminNav from '../components/AdminNavbar.vue'
-import AdminTopbar from '../components/AdminTopbar.vue'
-import Toast from 'primevue/toast';
-import ConfirmDialog from 'primevue/confirmdialog';
-import LoadingBar from '../components/LoadingBar.vue';
+  import AdminNav from '../components/AdminNavbar.vue';
+  import AdminTopbar from '../components/AdminTopbar.vue';
+  import Toast from 'primevue/toast';
+  import ConfirmDialog from 'primevue/confirmdialog';
+  import LoadingBar from '../components/LoadingBar.vue';
 
-import { useAppStore } from '@/stores/app';
-const { isNavbarActive } = useAppStore();
+  import { useAppStore } from '@/stores/app';
+  const { isNavbarActive } = useAppStore();
 </script>
 
 <template>
-  <Toast></Toast>
-  <ConfirmDialog></ConfirmDialog>
+  <Toast />
+  <ConfirmDialog />
   <div class="h-screen">
     <LoadingBar />
-    <AdminTopbar></AdminTopbar>
-    <AdminNav></AdminNav>
-    <main :class="{ 'md:ml-80': !isNavbarActive }"
-      class="pt-24 transition-all min-w-0 basis-full bg-surface-0 dark:text-surface-0 dark:bg-surface-950 p-6">
+    <AdminTopbar />
+    <AdminNav />
+    <main
+      :class="{ 'md:ml-80': !isNavbarActive }"
+      class="pt-24 transition-all min-w-0 basis-full bg-surface-0 dark:text-surface-0 dark:bg-surface-950 p-6"
+    >
       <slot />
     </main>
   </div>
 </template>
 <style>
-body {
-  @apply bg-white dark:bg-surface-950;
-}
+  body {
+    @apply bg-white dark:bg-surface-950;
+  }
 </style>

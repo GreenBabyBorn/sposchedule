@@ -1,7 +1,9 @@
-name: Deploy Application
+name: Deploy Application to dev environment
 
 on:
   push:
+    branches:
+      - dev
 
 jobs:
   deploy:
@@ -10,5 +12,5 @@ jobs:
       - name: Переходим в папку проекта и пересобираем
         run: |
           cd /home/green/sposchedule
-          git pull
+          git pull origin dev
           docker compose -f docker-compose.prod.yml -p sposchedule up -d --build

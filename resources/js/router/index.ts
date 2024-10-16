@@ -11,7 +11,7 @@ const router = createRouter({
     {
       path: '/404',
       name: 'NotFound',
-      component: () => import('@/pages/NotFound.vue'),
+      component: () => import('@/pages/NotFoundView.vue'),
       meta: {
         layout: AppLayoutsEnum.public,
         title: '404',
@@ -23,14 +23,14 @@ const router = createRouter({
     },
     {
       path: '/',
-      component: () => import('@/pages/Home.vue'),
+      component: () => import('@/pages/HomeView.vue'),
       meta: {
         layout: AppLayoutsEnum.public,
       },
     },
     {
       path: '/print/changes',
-      component: () => import('@/pages/PrintChanges.vue'),
+      component: () => import('@/pages/PrintChangesView.vue'),
       meta: {
         layout: AppLayoutsEnum.empty,
         title: 'Изменения',
@@ -38,7 +38,7 @@ const router = createRouter({
     },
     {
       path: '/print/main',
-      component: () => import('@/pages/PrintMain.vue'),
+      component: () => import('@/pages/PrintMainView.vue'),
       meta: {
         layout: AppLayoutsEnum.empty,
         title: 'Основное',
@@ -46,7 +46,7 @@ const router = createRouter({
     },
     {
       path: '/print/bells',
-      component: () => import('@/pages/PrintBells.vue'),
+      component: () => import('@/pages/PrintBellsView.vue'),
       meta: {
         layout: AppLayoutsEnum.empty,
         title: 'Звонки',
@@ -55,7 +55,7 @@ const router = createRouter({
     {
       path: '/admin/login',
       name: RouteNamesEnum.auth,
-      component: () => import('@/pages/Login.vue'),
+      component: () => import('@/pages/LoginView.vue'),
       meta: {
         layout: AppLayoutsEnum.default,
         title: 'Авторизация',
@@ -64,7 +64,7 @@ const router = createRouter({
     {
       path: '/analytics',
       name: RouteNamesEnum.analytics,
-      component: () => import('@/pages/Analytics.vue'),
+      component: () => import('@/pages/AnalyticsView.vue'),
       meta: {
         layout: AppLayoutsEnum.public,
         title: 'Аналитика',
@@ -73,7 +73,7 @@ const router = createRouter({
     {
       path: '/admin/history',
       name: RouteNamesEnum.history,
-      component: () => import('@/pages/admin/History.vue'),
+      component: () => import('@/pages/admin/HistoryView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'История',
@@ -82,7 +82,7 @@ const router = createRouter({
     {
       path: '/admin/user',
       name: RouteNamesEnum.user,
-      component: () => import('@/pages/admin/User.vue'),
+      component: () => import('@/pages/admin/UserView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Пользователь',
@@ -91,7 +91,7 @@ const router = createRouter({
     {
       path: '/admin/bells',
       name: RouteNamesEnum.bells,
-      component: () => import('@/pages/admin/Bells.vue'),
+      component: () => import('@/pages/admin/BellsView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Звонки',
@@ -100,7 +100,7 @@ const router = createRouter({
     {
       path: '/admin/groups',
       name: RouteNamesEnum.groups,
-      component: () => import('@/pages/admin/Groups.vue'),
+      component: () => import('@/pages/admin/GroupsView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Группы',
@@ -109,7 +109,7 @@ const router = createRouter({
     {
       path: '/admin/schedules/main',
       name: RouteNamesEnum.schedules,
-      component: () => import('@/pages/admin/MainSchedules.vue'),
+      component: () => import('@/pages/admin/MainSchedulesView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Основное расписание',
@@ -118,7 +118,7 @@ const router = createRouter({
     {
       path: '/admin/schedules/changes',
       name: RouteNamesEnum.schedulesChanges,
-      component: () => import('@/pages/admin/ChangesSchedules.vue'),
+      component: () => import('@/pages/admin/ChangesSchedulesView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Расписание',
@@ -127,7 +127,7 @@ const router = createRouter({
     {
       path: '/admin/subjects',
       name: RouteNamesEnum.subjects,
-      component: () => import('@/pages/admin/Subjects.vue'),
+      component: () => import('@/pages/admin/SubjectsView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Предметы',
@@ -136,7 +136,7 @@ const router = createRouter({
     {
       path: '/admin/teachers',
       name: RouteNamesEnum.teachers,
-      component: () => import('@/pages/admin/Teachers.vue'),
+      component: () => import('@/pages/admin/TeachersView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Преподаватели',
@@ -145,7 +145,7 @@ const router = createRouter({
     {
       path: '/admin/semesters',
       name: RouteNamesEnum.semesters,
-      component: () => import('@/pages/admin/Semesters.vue'),
+      component: () => import('@/pages/admin/SemestersView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Семестры',
@@ -154,7 +154,7 @@ const router = createRouter({
     {
       path: '/admin/buildings',
       name: RouteNamesEnum.buildings,
-      component: () => import('@/pages/admin/Buildings.vue'),
+      component: () => import('@/pages/admin/BuildingsView.vue'),
       meta: {
         layout: AppLayoutsEnum.admin,
         title: 'Корпуса',
@@ -167,7 +167,6 @@ router.beforeEach(loadLayoutMiddleware);
 
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
-
   try {
     const response = await axios.get('/api/user');
     authStore.user = response.data;
@@ -186,8 +185,13 @@ router.beforeEach(async (to, from, next) => {
   next();
 });
 
+interface RouteMeta {
+  title?: string;
+  description?: string;
+}
+
 router.beforeEach(to => {
-  const { title, description }: any = to.meta;
+  const { title, description }: RouteMeta = to.meta as RouteMeta;
   const defaultTitle = 'Пары РКЭ';
   const defaultDescription = 'Расписание РКЭ';
 

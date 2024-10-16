@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
-import { ref, toRaw, watch } from 'vue';
+import { ref, toRaw } from 'vue';
 import { useRoute } from 'vue-router';
 
 export const useScheduleStore = defineStore('useScheduleStore', () => {
   const route = useRoute();
-  const selectedMainGroupName: any = ref(null);
-  const selectedMainSemester: any = ref(null);
+  const selectedMainGroupName = ref(null);
+  const selectedMainSemester = ref(null);
   const queryParams = ref(route.query);
   const schedules = ref();
 

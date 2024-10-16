@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
-import { computed } from 'vue';
 
 export function useTeachersQuery() {
   return useQuery({
@@ -11,7 +10,7 @@ export function useTeachersQuery() {
 
 export function useStoreTeacher() {
   const queryClient = useQueryClient();
-  let storeTeacherMutation = useMutation({
+  const storeTeacherMutation = useMutation({
     mutationFn: (body: object) => axios.post('/api/teachers', body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teachers'] });
@@ -20,35 +19,9 @@ export function useStoreTeacher() {
   return storeTeacherMutation;
 }
 
-// export function useStoreSubjectForTeacher() {
-//   const queryClient = useQueryClient();
-//   let storeTeacherMutation = useMutation({
-//     mutationFn: ({ id, subject_id }: any) =>
-//       axios.post(`/api/teachers/${id}/subjects`, { subject_id }),
-//     onSuccess: () => {
-//       // queryClient.invalidateQueries({ queryKey: ['teachers'] });
-//     },
-//   });
-//   return storeTeacherMutation;
-// }
-
-// export function useDestroySubjectForTeacher() {
-//   const queryClient = useQueryClient();
-//   let storeTeacherMutation = useMutation({
-//     mutationFn: ({ id, subject_id }: any) =>
-//       axios.delete(`/api/teachers/${id}/subjects`, {
-//         data: { subject_id },
-//       }),
-//     onSuccess: () => {
-//       // queryClient.invalidateQueries({ queryKey: ['teachers'] });
-//     },
-//   });
-//   return storeTeacherMutation;
-// }
-
 export function useUpdateTeacher() {
   const queryClient = useQueryClient();
-  let updateTeacherMutation = useMutation({
+  const updateTeacherMutation = useMutation({
     mutationFn: ({ id, body }: any) => axios.patch(`/api/teachers/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teachers'] });
@@ -59,7 +32,7 @@ export function useUpdateTeacher() {
 
 export function useDestroyTeacher() {
   const queryClient = useQueryClient();
-  let destroyTeacherMutation = useMutation({
+  const destroyTeacherMutation = useMutation({
     mutationFn: id => axios.delete(`/api/teachers/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teachers'], exact: true });
