@@ -474,7 +474,6 @@
                   v-model="newLesson['ЧИСЛ'].subject"
                   :reset-filter-on-hide="true"
                   :focus-on-hover="false"
-                  :auto-filter-focus="true"
                   filter
                   class="w-full text-left"
                   :options="subjects"
@@ -486,7 +485,6 @@
                   v-model="newLesson['ЗНАМ'].subject"
                   :reset-filter-on-hide="true"
                   :focus-on-hover="false"
-                  :auto-filter-focus="true"
                   filter
                   class="w-full text-left"
                   :options="subjects"
@@ -499,7 +497,7 @@
                 <MultiSelect
                   v-model="newLesson['ЧИСЛ'].teachers"
                   :reset-filter-on-hide="true"
-                  :auto-filter-focus="true"
+                 
                   filter
                   placeholder="Выберите преподавателя"
                   class="w-full"

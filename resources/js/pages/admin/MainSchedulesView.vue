@@ -85,7 +85,6 @@
         <Select
           v-model="selectedMainGroupName"
           fluid
-          :auto-filter-focus="true"
           filter
           :options="groups"
           option-value="name"

@@ -230,7 +230,6 @@
         />
         <Select
           v-model="selectedGroup"
-          :auto-filter-focus="true"
           empty-filter-message="Группы не найдены"
           filter
           show-clear
