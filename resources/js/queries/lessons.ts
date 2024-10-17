@@ -7,6 +7,7 @@ export function useUpdateLesson() {
     mutationFn: ({ id, body }: any) => axios.patch(`/api/lessons/${id}`, body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
     },
   });
   return updateSemesterMutation;
