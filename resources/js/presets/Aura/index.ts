@@ -39,6 +39,7 @@ import tag from './tag/index.js';
 import inplace from './inplace';
 import splitbutton from './splitbutton';
 import tieredmenu from './tieredmenu';
+import blockui from './blockui/index.js';
 
 export default {
   global,
@@ -49,7 +50,7 @@ export default {
   autocomplete,
   inplace,
   checkbox,
-
+  blockui,
   datepicker,
   floatlabel,
   iconfield,

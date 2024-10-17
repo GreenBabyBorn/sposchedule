@@ -316,7 +316,7 @@
     return differenceInDays > 0 && parsedDate < today;
   };
 
-  const enabledEdir = useStorage('enableEdit', false);
+  const enabledEdit = useStorage('enableEdit', false);
 
   const { data: teachers } = useTeachersQuery();
 
@@ -341,17 +341,17 @@
 <template>
   <div
     :class="{
-      'opacity-50': isOneDayDifference(dateRef) && !Boolean(enabledEdir),
+      'opacity-50': isOneDayDifference(dateRef) && !Boolean(enabledEdit),
     }"
     :title="
-      isOneDayDifference(dateRef) && !Boolean(enabledEdir)
+      isOneDayDifference(dateRef) && !Boolean(enabledEdit)
         ? 'Редактирование для прошедших дней отключено'
         : 'Редактировать'
     "
     class="schedule-item"
   >
     <div
-      class="rounded p-2 dark:bg-surface-800 flex flex-wrap justify-between items-center"
+      class="rounded-t p-2 dark:bg-surface-800 flex flex-wrap justify-between items-center"
     >
       <div class="flex items-center gap-2">
         <span
@@ -361,11 +361,12 @@
         </span>
 
         <Button
-          :disabled="isOneDayDifference(dateRef) && !Boolean(enabledEdir)"
+          :disabled="isOneDayDifference(dateRef) && !Boolean(enabledEdit)"
           severity="secondary"
           text
           icon="pi pi-pen-to-square"
           @click="isEdit = !isEdit"
+          :class="{ 'border !border-primary-500 ': isEdit }"
         />
       </div>
 
@@ -374,7 +375,7 @@
         <ToggleButton
           v-model="published"
           :disabled="
-            !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdir))
+            !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
           "
           class="text-sm"
           fluid

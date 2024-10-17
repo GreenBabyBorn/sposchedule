@@ -16,6 +16,7 @@
   import { useBuildingsQuery } from '@/queries/buildings';
   import { useGroupsPublicQuery } from '@/queries/groups';
   import { reducedWeekDays, dateRegex } from '@/composables/constants';
+  import BlockUI from 'primevue/blockui';
 
   const route = useRoute();
   const scheduleStore = useScheduleStore();
@@ -59,6 +60,7 @@
   const {
     data: changesSchedules,
     isError,
+    isFetching,
     isSuccess,
   } = useChangesSchedulesQuery(
     isoDate,
@@ -103,8 +105,6 @@
   );
 
   onMounted(() => {
-    // Восстанавливаем значения сначала из query параметров, если они есть
-
     if (route.query.date && dateRegex.test(route.query.date as string)) {
       // Если дата есть в query параметрах, используем ее
       const [day, month, year] = (route.query.date as string)
@@ -169,7 +169,7 @@
     <div
       class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800"
     >
-      <div class="flex gap-2 items-center flex-wrap">
+      <div class="flex gap-2 items-center flex-wrap w-full">
         <DatePicker
           v-model="date"
           append-to="self"
@@ -249,6 +249,27 @@
             },
           }"
         />
+        <div class="ml-auto self-center">
+          <div
+            v-if="schedulesChanges?.last_updated"
+            class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap"
+          >
+            <span class="text-xs text-surface-400 leading-none"
+              >Последние обновление:</span
+            >
+            <time
+              title="Последние обновление"
+              class="text-sm text-right text-surface-400"
+              :datetime="schedulesChanges?.last_updated"
+              >{{
+                useDateFormat(
+                  schedulesChanges?.last_updated,
+                  'DD.MM.YYYY HH:mm:ss'
+                )
+              }}</time
+            >
+          </div>
+        </div>
       </div>
     </div>
 
@@ -257,20 +278,22 @@
       добавления
       <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
     </span>
-    <div v-if="isSuccess" class="schedules">
-      <ChangesScheduleItem
-        v-for="(item, index) in schedulesChanges?.schedules"
-        :key="index"
-        class="schedule"
-        :date="isoDate"
-        :schedule="item?.schedule"
-        :semester="item?.semester"
-        :type="item?.schedule?.type"
-        :group="item?.group"
-        :lessons="item?.schedule?.lessons"
-        :week-type="item?.week_type"
-        :published="item?.schedule?.published"
-      />
+    <div v-if="isSuccess">
+      <BlockUI class="schedules" :blocked="isFetching">
+        <ChangesScheduleItem
+          v-for="(item, index) in schedulesChanges?.schedules"
+          :key="index"
+          class="schedule"
+          :date="isoDate"
+          :schedule="item?.schedule"
+          :semester="item?.semester"
+          :type="item?.schedule?.type"
+          :group="item?.group"
+          :lessons="item?.schedule?.lessons"
+          :week-type="item?.week_type"
+          :published="item?.schedule?.published"
+        />
+      </BlockUI>
     </div>
   </div>
 </template>

@@ -497,7 +497,6 @@
                 <MultiSelect
                   v-model="newLesson['ЧИСЛ'].teachers"
                   :reset-filter-on-hide="true"
-                 
                   filter
                   placeholder="Выберите преподавателя"
                   class="w-full"
