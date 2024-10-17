@@ -240,7 +240,7 @@ class ScheduleController extends Controller
         // }
 
         // Завершаем запрос
-        $query .= " GROUP BY g.id, g.name, s.id ORDER BY g.id";
+        $query .= " GROUP BY g.id, g.name, s.id ORDER BY g.id, g.name";
 
         // Выполняем SQL-запрос
         $schedules = DB::select($query, $params);
@@ -609,7 +609,7 @@ class ScheduleController extends Controller
         }
 
         // Завершаем запрос
-        $query .= " GROUP BY g.name, s.id ORDER BY s.type ASC";
+        $query .= " GROUP BY g.name, s.id ORDER BY s.type ASC, g.name";
 
         // Выполняем SQL-запрос
         $schedules = DB::select($query, $params);
