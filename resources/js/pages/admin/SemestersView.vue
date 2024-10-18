@@ -130,7 +130,7 @@
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-end gap-4 p-4 rounded-lg dark:bg-surface-800"
+        class="flex flex-wrap items-end gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
       >
         <div class="">
           <label for="years" class="block mb-1">Учебный год</label>

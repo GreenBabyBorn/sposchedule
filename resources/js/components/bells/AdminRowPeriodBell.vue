@@ -35,13 +35,24 @@
       period_from: formatTime(period.period_from),
       period_to: formatTime(period.period_to),
     };
-
-    if (period.period_from_after && period.period_to_after) {
+    console.log(period.has_break);
+    if (
+      period.has_break &&
+      period.period_from_after &&
+      period.period_to_after
+    ) {
       body.period_from_after = formatTime(period.period_from_after);
       body.period_to_after = formatTime(period.period_to_after);
+    } else if (
+      period.has_break &&
+      !period?.period_from_after &&
+      !period?.period_to_after
+    ) {
+      body.period_from_after = period.period_from;
+      body.period_to_after = period.period_to;
     } else {
-      delete body.period_from_after;
-      delete body.period_to_after;
+      body.period_from_after = null;
+      body.period_to_after = null;
     }
 
     try {
@@ -76,7 +87,9 @@
 </script>
 
 <template>
-  <tr class="">
+  <tr
+    class="border dark:border-surface-700 border-surface-400 bg-surface-100 dark:bg-surface-800"
+  >
     <td class="text-center text-lg">
       {{ period.index }}
     </td>

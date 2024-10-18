@@ -167,7 +167,7 @@
       <h1 class="text-2xl">Расписание (изменения)</h1>
     </div>
     <div
-      class="flex items-center justify-between gap-4 p-4 rounded-lg dark:bg-surface-800"
+      class="flex items-center justify-between gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
     >
       <div class="flex gap-2 items-center flex-wrap w-full">
         <DatePicker

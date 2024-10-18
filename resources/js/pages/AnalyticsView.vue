@@ -82,7 +82,7 @@
 
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-2 p-4 rounded-lg dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-2 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
       >
         <div class="flex flex-wrap items-center gap-2 justify-start">
           <MultiSelect

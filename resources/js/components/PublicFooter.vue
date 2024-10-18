@@ -1,7 +1,7 @@
 <template>
   <footer class="">
     <div
-      class="max-w-screen-xl mx-auto px-4 py-4 flex gap-4 justify-between items-center text-sm opacity-50"
+      class="max-w-screen-xl mx-auto px-4 py-4 flex gap-4 justify-center items-center text-sm opacity-50"
     >
       <a
         href="https://t.me/greenbabyborn"

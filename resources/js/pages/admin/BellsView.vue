@@ -371,7 +371,7 @@
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-2 p-4 rounded-lg dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-2 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
       >
         <div class="flex flex-wrap items-center gap-2">
           <SelectButton
@@ -472,11 +472,13 @@
       </form>
     </div>
     <div class="">
-      <div class="rounded-md">
+      <div class="">
         <div class="overflow-x-auto">
           <table class="w-full border-collapse">
             <thead>
-              <tr>
+              <tr
+                class="border dark:border-surface-700 border-surface-400 bg-surface-100 dark:bg-surface-800"
+              >
                 <th>№</th>
                 <th>Начало - Конец</th>
 
@@ -492,13 +494,15 @@
                 :period="period"
               />
 
-              <tr v-show="showAddNewBellPeriod" class="border-t">
+              <tr
+                v-show="showAddNewBellPeriod"
+                class="border-t-primary-500 border-t border dark:border-surface-700 border-surface-400 bg-surface-100 dark:bg-surface-800"
+              >
                 <td class="">
-                  <div class="max-w-12">
+                  <div class="flex justify-center">
                     <InputText
                       v-model="newPeriod.index"
-                      class="text-center"
-                      fluid
+                      class="text-center max-w-12"
                     />
                   </div>
                 </td>
@@ -574,7 +578,7 @@
         />
       </div>
     </div>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-4 mt-4">
       <h1 class="text-2xl">Заготовки звонков</h1>
       <DataTable
         v-model:editing-rows="editingRows"
