@@ -44,12 +44,12 @@
       body.period_from_after = formatTime(period.period_from_after);
       body.period_to_after = formatTime(period.period_to_after);
     } else if (
-      period.has_break &&
+      !period.has_break &&
       !period?.period_from_after &&
       !period?.period_to_after
     ) {
-      body.period_from_after = period.period_from;
-      body.period_to_after = period.period_to;
+      body.period_from_after = formatTime(period.period_from);
+      body.period_to_after = formatTime(period.period_to);
     } else {
       body.period_from_after = null;
       body.period_to_after = null;
@@ -88,7 +88,7 @@
 
 <template>
   <tr
-    class="border dark:border-surface-700 border-surface-400 bg-surface-100 dark:bg-surface-800"
+    class="border dark:border-surface-700 border-surface-200 bg-surface-100 dark:bg-surface-800"
   >
     <td class="text-center text-lg">
       {{ period.index }}

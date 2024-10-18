@@ -8,6 +8,8 @@ use App\Models\BellsPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Facades\HistoryLogger;
+use App\Http\Requests\StoreBellsPeriodRequest;
+use App\Http\Requests\UpdateBellsPeriodRequest;
 
 class BellsPeriodController extends Controller
 {
@@ -26,45 +28,17 @@ class BellsPeriodController extends Controller
     }
 
     // Создание нового периода звонка
-    public function store(Request $request)
+    public function store(StoreBellsPeriodRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'bells_id' => 'required|exists:bells,id',
-            'index' => 'required|integer|min:0',
-            'has_break' => 'required|boolean',
-            'period_from' => 'required|date_format:H:i',
-            'period_to' => 'required|date_format:H:i',
-            'period_from_after' => 'nullable|date_format:H:i|required_if:has_break,true',
-            'period_to_after' => 'nullable|date_format:H:i|required_if:has_break,true',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $period = BellsPeriod::create($request->all());
         HistoryLogger::logAction('Добавлен звонок', $period->toArray());
         return new BellsPeriodResource($period);
     }
 
     // Обновление периода звонка
-    public function update(Request $request, $id)
+    public function update(UpdateBellsPeriodRequest $request, $id)
     {
         $period = BellsPeriod::findOrFail($id);
-
-        $validator = Validator::make($request->all(), [
-            'bells_id' => 'required|exists:bells,id',
-            'index' => 'required|integer|min:0',
-            'has_break' => 'required|boolean',
-            'period_from' => 'required|date_format:H:i',
-            'period_to' => 'required|date_format:H:i',
-            'period_from_after' => 'nullable|date_format:H:i|required_if:has_break,true',
-            'period_to_after' => 'nullable|date_format:H:i|required_if:has_break,true',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
         HistoryLogger::logAction('Обновлен звонок', $period->toArray());
         $period->update($request->all());
         return new BellsPeriodResource($period);

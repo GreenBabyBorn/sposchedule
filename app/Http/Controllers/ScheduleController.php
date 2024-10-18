@@ -84,6 +84,7 @@ class ScheduleController extends Controller
         $newSchedule->type = 'changes';
         $newSchedule->date = $carbonDate;
         $newSchedule->week_day = null;
+        $newSchedule->published = false;
         $newSchedule->save();
 
         foreach ($schedule->lessons as $lesson) {

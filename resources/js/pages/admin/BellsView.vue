@@ -110,11 +110,7 @@
   watch(buildingsFethed, () => {
     building.value = buildingsFethed.value?.[0].name;
   });
-  watch(data, newData => {
-    if (newData) {
-      setBells(newData);
-    }
-  });
+  watch(data, setBells);
 
   let newPeriod = ref({
     index: 0,
@@ -477,7 +473,7 @@
           <table class="w-full border-collapse">
             <thead>
               <tr
-                class="border dark:border-surface-700 border-surface-400 bg-surface-100 dark:bg-surface-800"
+                class="border dark:border-surface-700 border-surface-200 bg-surface-100 dark:bg-surface-800"
               >
                 <th>№</th>
                 <th>Начало - Конец</th>
@@ -496,7 +492,7 @@
 
               <tr
                 v-show="showAddNewBellPeriod"
-                class="border-t-primary-500 border-t border dark:border-surface-700 border-surface-400 bg-surface-100 dark:bg-surface-800"
+                class="border-t-primary-500 border-t border dark:border-surface-700 border-surface-200 bg-surface-100 dark:bg-surface-800"
               >
                 <td class="">
                   <div class="flex justify-center">

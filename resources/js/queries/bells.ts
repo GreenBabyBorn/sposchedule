@@ -6,23 +6,17 @@ export function useBellsQuery(type, building, weekDay?, date?) {
   const enabled = computed(() => {
     if (weekDay.value) {
       return (
-        Boolean(type.value) ||
-        // Boolean(variant.value) ||
-        Boolean(weekDay.value) ||
-        Boolean(building.value)
+        Boolean(type.value) || Boolean(weekDay.value) || Boolean(building.value)
       );
     }
     if (date.value) {
       return (
-        Boolean(type.value) ||
-        // Boolean(variant.value) ||
-        Boolean(date.value) ||
-        Boolean(building.value)
+        Boolean(type.value) || Boolean(date.value) || Boolean(building.value)
       );
     }
     return false;
-    // return Boolean(type.value) || Boolean(variant.value) || Boolean(date.value);
   });
+
   const weekDayOrDate = computed(() =>
     type.value === 'Основное'
       ? `&week_day=${weekDay.value}`
@@ -33,10 +27,6 @@ export function useBellsQuery(type, building, weekDay?, date?) {
     Основное: 'main',
     Изменения: 'changes',
   };
-  // const variantValues = {
-  //   Обычный: 'normal',
-  //   Сокращенные: 'reduced',
-  // };
 
   return useQuery({
     queryKey: ['bells', type, weekDay, date, building],
@@ -152,19 +142,20 @@ export function useUpdateBell() {
       axios.patch(`/api/bells/${id}`, {
         ...body,
       }),
-    onSuccess: () => {
+    onMutate: () => {
       queryClient.invalidateQueries({ queryKey: ['bells'] });
       queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
     },
   });
   return storePeriodMutation;
 }
+
 export function useUpdateBellPeriod() {
   const queryClient = useQueryClient();
   const storePeriodMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/bells-periods/${id}`, body),
-    onSuccess: () => {
+    onMutate: () => {
       queryClient.invalidateQueries({ queryKey: ['bells'] });
     },
   });

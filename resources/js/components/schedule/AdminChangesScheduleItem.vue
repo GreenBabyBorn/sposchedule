@@ -65,6 +65,7 @@
           id: props.schedule.id,
           body: {
             date: props.date,
+            published: false,
           },
         });
       } catch (e) {
@@ -142,6 +143,7 @@
           id: props.schedule.id,
           body: {
             date: props.date,
+            published: false,
           },
         });
       } catch (e) {
@@ -351,7 +353,7 @@
     class="schedule-item"
   >
     <div
-      class="rounded-t p-2 dark:bg-surface-800 flex flex-wrap justify-between items-center"
+      class="rounded-t p-2 dark:bg-surface-800 bg-surface-100 flex flex-wrap justify-between items-center"
     >
       <div class="flex items-center gap-2">
         <span
