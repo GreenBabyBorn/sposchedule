@@ -22,6 +22,10 @@ class TeacherController extends Controller
     {
         $query = Teacher::query();
 
+        if ($request->has('name')) {
+            $name = $request->input('name');
+            $query->where('name', 'ILIKE', "%{$name}%");
+        }
         if ($request->has('subject_id')) {
             $subjectId = $request->input('subject_id');
             $query->whereHas('subjects', function ($q) use ($subjectId) {

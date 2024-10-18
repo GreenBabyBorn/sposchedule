@@ -320,24 +320,25 @@
 
   const enabledEdit = useStorage('enableEdit', false);
 
-  const { data: teachers } = useTeachersQuery();
-
-  const { data: subjects } = useSubjectsQuery({ teachers: true });
-  const teachersFromSubject = computed(() => {
-    // Учителя, связанные с текущим предметом
-    const subjectTeachers = newLesson.subject?.teachers || [];
-
-    // Фильтруем всех учителей, чтобы исключить тех, кто уже есть в subjectTeachers
-    const filteredTeachers = teachers.value.filter(
-      teacher =>
-        !subjectTeachers.some(
-          subjectTeacher => subjectTeacher.id === teacher.id
-        )
-    );
-
-    // Возвращаем объединённый массив: сначала учителя из предмета, затем остальные учителя
-    return [...subjectTeachers, ...filteredTeachers];
+  const searchTeacher = ref('');
+  const queryTeacher = computed(() => {
+    return { name: searchTeacher.value };
   });
+
+  const { data: teachers } = useTeachersQuery(queryTeacher.value);
+  const { data: subjects } = useSubjectsQuery({ teachers: true });
+
+  const teachersFromSubject = computed(() => {
+    const subjectTeachers = newLesson.subject?.teachers || [];
+    if (searchTeacher.value) {
+      return [...subjectTeachers, ...teachers.value];
+    }
+    return [...subjectTeachers];
+  });
+
+  function filterTeachers(e) {
+    searchTeacher.value = e.value;
+  }
 </script>
 
 <template>
@@ -468,7 +469,12 @@
                 class="w-full"
                 :options="teachersFromSubject"
                 option-label="name"
-              />
+                @filter="filterTeachers"
+              >
+                <template #footer>
+                  <div class="px-3 py-2">Для остальных начните поиск</div>
+                </template>
+              </MultiSelect>
             </div>
           </td>
 
