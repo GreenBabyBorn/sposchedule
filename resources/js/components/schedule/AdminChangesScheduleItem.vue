@@ -134,8 +134,7 @@
   const { mutateAsync: storeLesson } = useStoreLesson();
 
   async function addNewLesson() {
-    const loadedSchedule = toRef(() => props.schedule).value.id;
-
+    const loadedSchedule = toRef(() => props.schedule).value.id || false;
     // Если тип расписания 'main', конвертируем его в изменения
     if (props.schedule.type === 'main') {
       try {
