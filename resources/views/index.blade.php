@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" type="image/png" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon32.ico">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/favicon180.png">
+    <link rel="manifest" href="/manifest.webmanifest">
     <meta name="author" content="greenbabyborn">
     <title>Пары РКЭ</title>
     <meta name="description" content="Расписание учебного процесса Рязанского Колледжа Электроники">
