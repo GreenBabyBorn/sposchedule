@@ -4,6 +4,7 @@ import axios from 'axios';
 export function useSubjectsQuery(query?: object) {
   return useQuery({
     queryKey: ['subjects', query],
+
     queryFn: async () =>
       (
         await axios.get('/api/subjects', {

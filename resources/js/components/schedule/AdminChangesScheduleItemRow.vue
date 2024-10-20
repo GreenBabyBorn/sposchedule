@@ -36,7 +36,7 @@
   };
 </script>
 <template>
-  <tr>
+  <tr v-if="lesson?.index">
     <td>
       <span class="text-xl font-medium text-surface-800 dark:text-white/80">
         {{ lesson?.index }}
@@ -55,7 +55,7 @@
       </div>
     </td>
     <td v-if="!lesson?.message">
-      <div v-if="lesson.subject" class="table-subrow">
+      <div v-if="lesson?.subject" class="table-subrow">
         <span v-if="!isEdit">{{ lesson.subject.name }}</span>
         <Select
           v-else
@@ -68,9 +68,7 @@
           @change="editLesson(lesson)"
         />
       </div>
-      <div v-else>
-        <span class="text-red-400">Предмет был удален</span>
-      </div>
+      <div v-else class="text-red-400">Предмет не найден</div>
       <div v-if="lesson.teachers" class="table-subrow">
         <div v-if="!isEdit" class="">
           <span
