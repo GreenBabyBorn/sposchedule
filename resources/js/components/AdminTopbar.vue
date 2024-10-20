@@ -24,7 +24,7 @@
 <template>
   <div
     style="z-index: 1100"
-    class="fixed h-16 top-0 left-0 w-full dark:bg-surface-900 bg-surface-200 flex items-center px-6 gap-4"
+    class="fixed left-0 top-0 flex h-16 w-full items-center gap-4 bg-surface-200 px-6 dark:bg-surface-900"
   >
     <Button
       icon="pi pi-bars"
@@ -33,8 +33,8 @@
       rounded
       @click="onSidebarToggle"
     />
-    <div class="flex justify-between items-center w-full">
-      <RouterLink to="/" class="font-bold text-xl dark:text-white">
+    <div class="flex w-full items-center justify-between">
+      <RouterLink to="/" class="text-xl font-bold dark:text-white">
         Пары РКЭ
       </RouterLink>
       <div class="flex gap-2">

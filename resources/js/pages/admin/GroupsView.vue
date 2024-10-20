@@ -235,12 +235,12 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Группы</h1>
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
       >
         <InputText
           v-model="newGroupName"
@@ -313,7 +313,7 @@
         @row-edit-save="onRowEditSave"
       >
         <template #header>
-          <div class="flex flex-wrap items-center gap-2 justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <Button
               severity="danger"
               :disabled="!selectedGroups.length || !groups.length"
@@ -330,14 +330,15 @@
         <Column field="name" header="Название группы" />
         <Column field="buildings" header="Корпус">
           <template #body="slotProps">
-            <div class="flex gap-2 flex-wrap">
+            <div class="flex flex-wrap gap-2">
               <Chip
                 v-for="building in slotProps.data.buildings"
+                :key="building.name"
                 :label="building.name"
               />
             </div>
           </template>
-          <template #editor="{ data, field }">
+          <template #editor="{ data }">
             <MultiSelect
               v-model="data.buildings"
               data-key="name"
@@ -367,14 +368,15 @@
         </Column>
         <Column field="semesters" header="Семестры">
           <template #body="slotProps">
-            <div class="flex gap-2 flex-wrap">
+            <div class="flex flex-wrap gap-2">
               <Chip
                 v-for="semester in slotProps.data.semesters"
+                :key="semester.name"
                 :label="semester.name"
               />
             </div>
           </template>
-          <template #editor="{ data, field }">
+          <template #editor="{ data }">
             <MultiSelect
               v-model="data.semesters"
               :max-selected-labels="2"

@@ -18,7 +18,7 @@
     <AdminNav />
     <main
       :class="{ 'md:ml-80': !isNavbarActive }"
-      class="pt-24 transition-all min-w-0 basis-full bg-surface-0 dark:text-surface-0 dark:bg-surface-950 p-6"
+      class="min-w-0 basis-full bg-surface-0 p-6 pt-24 transition-all dark:bg-surface-950 dark:text-surface-0"
     >
       <slot />
     </main>

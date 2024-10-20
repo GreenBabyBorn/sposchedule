@@ -50,7 +50,7 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">История</h1>
     </div>
 
@@ -76,7 +76,7 @@
         table-style="min-width: 50rem"
       >
         <template #header>
-          <div class="flex flex-wrap items-center gap-2 justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <!-- <Button severity="danger" :disabled="!selectedHistories.length || !histories.length"
                             type="button" icon="pi pi-trash" label="Удалить" outlined @click="deleteHistories" /> -->
             <InputText v-model="searchTerm" placeholder="Поиск" />

@@ -62,9 +62,9 @@
 <template>
   <div
     :class="{ 'active-navbar': isNavbarActive }"
-    class="transition-transform fixed z-50 w-80 top-16 left-0 basis-80 flex-grow-0 lg:min-h-screen md:bg-surface-200 md:dark:bg-surface-950"
+    class="fixed left-0 top-16 z-50 w-80 flex-grow-0 basis-80 transition-transform md:bg-surface-200 lg:min-h-screen md:dark:bg-surface-950"
   >
-    <div class="flex flex-col py-4 px-4">
+    <div class="flex flex-col px-4 py-4">
       <Menu :model="items" class="w-full p-4">
         <template #item="{ item, props }">
           <RouterLink
@@ -75,7 +75,7 @@
           >
             <a
               :class="{
-                '!text-primary-500 font-bold': $route.path === item.route,
+                'font-bold !text-primary-500': $route.path === item.route,
               }"
               :href="href"
               v-bind="props.action"
@@ -88,7 +88,7 @@
           <a
             v-else
             :class="{
-              '!text-primary-500 font-bold': $route.path === item.route,
+              'font-bold !text-primary-500': $route.path === item.route,
             }"
             :href="item.url"
             :target="item.target"

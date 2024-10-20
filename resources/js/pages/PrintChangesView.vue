@@ -114,7 +114,7 @@
 
 <template>
   <LoadingBar />
-  <div class="controls py-2 flex flex-wrap gap-2 items-center pl-2">
+  <div class="controls flex flex-wrap items-center gap-2 py-2 pl-2">
     <Button label="Печать" icon="pi pi-print" @click="printPage()" />
   </div>
   <div v-if="changesSchedules?.['1-5']" class="main">
@@ -134,7 +134,7 @@
 
       <div class="info">
         <h1>ИЗМЕНЕНИЯ В РАСПИСАНИИ ЗАНЯТИЙ (1-5 корпус)</h1>
-        <h2 class="italic uppercase">
+        <h2 class="uppercase italic">
           НА
           {{
             dayNamesWithPreposition[
@@ -208,9 +208,12 @@
               </td>
 
               <td class="subject-name">
-                <template v-for="lesson in group?.schedule?.lessons">
+                <template
+                  v-for="lesson in group?.schedule?.lessons"
+                  :key="lesson?.index"
+                >
                   <template v-if="lesson?.index === index">
-                    <span class="">
+                    <span>
                       {{ lesson?.subject?.name }}
                     </span>
                     <span class="font-bold">
@@ -252,7 +255,7 @@
 
       <div class="info">
         <h1>ИЗМЕНЕНИЯ В РАСПИСАНИИ ЗАНЯТИЙ (6 корпус)</h1>
-        <h2 class="italic uppercase">
+        <h2 class="uppercase italic">
           НА
           {{
             dayNamesWithPreposition[
@@ -326,7 +329,10 @@
               </td>
 
               <td class="subject-name">
-                <template v-for="lesson in group?.schedule?.lessons">
+                <template
+                  v-for="lesson in group?.schedule?.lessons"
+                  :key="lesson?.index"
+                >
                   <template v-if="lesson?.index === index">
                     <span class="">
                       {{ lesson?.subject?.name }}

@@ -125,15 +125,15 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Семестры</h1>
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-end gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+        class="flex flex-wrap items-end gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
       >
         <div class="">
-          <label for="years" class="block mb-1">Учебный год</label>
+          <label for="years" class="mb-1 block">Учебный год</label>
           <!-- <InputText id="years" v-model="inputSemester.years" placeholder="2023/2024"></InputText> -->
           <DatePicker
             v-model="years"
@@ -148,7 +148,7 @@
           />
         </div>
         <div class="">
-          <label for=" semester" class="block mb-1">Номер семестра</label>
+          <label for=" semester" class="mb-1 block">Номер семестра</label>
           <InputText
             v-model="indexSemester"
             v-keyfilter.int
@@ -159,7 +159,7 @@
           />
         </div>
         <div class="">
-          <label for="dates" class="block mb-1">Начало - Конец семестра</label>
+          <label for="dates" class="mb-1 block">Начало - Конец семестра</label>
           <DatePicker
             v-model="dates"
             append-to="self"

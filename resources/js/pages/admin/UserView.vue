@@ -73,7 +73,7 @@
 <template>
   <div class="flex flex-col items-start gap-4">
     <div class="">
-      <h1 class="text-lg mb-2">Профиль</h1>
+      <h1 class="mb-2 text-lg">Профиль</h1>
       <div class="flex flex-col items-start gap-4">
         <InputText v-model="user.name" class="" @change="updateProfile" />
         <InputText v-model="user.email" class="" @change="updateProfile" />
@@ -81,7 +81,7 @@
     </div>
 
     <div class="">
-      <h1 class="text-lg mb-2">Смена пароля</h1>
+      <h1 class="mb-2 text-lg">Смена пароля</h1>
       <div class="flex flex-col items-start gap-4">
         <Password
           v-model="password.password"

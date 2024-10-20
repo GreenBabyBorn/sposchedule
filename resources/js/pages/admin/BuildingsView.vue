@@ -96,12 +96,12 @@
 </script>
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Корпуса</h1>
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
       >
         <InputText
           v-model="newBuilding.name"
@@ -139,7 +139,7 @@
         @row-edit-save="onRowEditSave"
       >
         <template #header>
-          <div class="flex justify-between flex-wrap gap-2">
+          <div class="flex flex-wrap justify-between gap-2">
             <Button
               :disabled="!selectedBuildings.length || !buildings.length"
               severity="danger"

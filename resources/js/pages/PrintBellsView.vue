@@ -135,7 +135,7 @@
 
 <template>
   <LoadingBar />
-  <div class="controls py-2 flex flex-wrap gap-2 items-center pl-2">
+  <div class="controls flex flex-wrap items-center gap-2 py-2 pl-2">
     <DatePicker
       v-model="date"
       fluid
@@ -159,8 +159,8 @@
     />
   </div>
   <div class="main">
-    <div class="flex flex-col gap-2 items-center w-full">
-      <h1 v-if="publicBells" class="font-bold text-center py-2">
+    <div class="flex w-full flex-col items-center gap-2">
+      <h1 v-if="publicBells" class="py-2 text-center font-bold">
         <span class="uppercase">Расписание звонков</span> <br />
         на
         {{
@@ -192,14 +192,14 @@
       <span
         v-if="publicBells?.type"
         :class="{
-          'text-green-400 ': publicBells?.type !== 'main',
-          'text-surface-400 ': publicBells?.type === 'main',
+          'text-green-400': publicBells?.type !== 'main',
+          'text-surface-400': publicBells?.type === 'main',
         }"
-        class="text-sm text-right py-1 px-2 rounded-lg"
+        class="rounded-lg px-2 py-1 text-right text-sm"
         >{{ publicBells?.type === 'main' ? 'Основное' : 'Изменения' }}</span
       >
       <div class="">
-        <h2 v-if="!publicBells && isFetchedBells" class="text-2xl text-center">
+        <h2 v-if="!publicBells && isFetchedBells" class="text-center text-2xl">
           На эту дату расписание звонков не найдено
         </h2>
         <div v-if="publicBells" class="">
@@ -207,23 +207,23 @@
             <thead>
               <tr>
                 <th>
-                  <div class="flex gap-2 flex-col text-lg p-2">
+                  <div class="flex flex-col gap-2 p-2 text-lg">
                     <span class="self-end">Корпус</span>
-                    <span class="border rotate-12" />
+                    <span class="rotate-12 border" />
                     <span class="self-start">№ пары</span>
                   </div>
                 </th>
                 <th v-for="bell in mergedBells" :key="bell?.building">
-                  <div class="flex flex-col gap-1 items-center">
+                  <div class="flex flex-col items-center gap-1">
                     <span>
                       {{ bell?.building }}
                     </span>
                     <span
                       :class="{
-                        'text-green-400 ': bell.bells?.type !== 'main',
-                        'text-surface-400 ': bell.bells?.type === 'main',
+                        'text-green-400': bell.bells?.type !== 'main',
+                        'text-surface-400': bell.bells?.type === 'main',
                       }"
-                      class="text-sm text-right rounded-lg"
+                      class="rounded-lg text-right text-sm"
                       >{{
                         bell.bells?.type === 'main' ? 'Основное' : 'Изменения'
                       }}</span
@@ -234,7 +234,7 @@
             </thead>
             <tbody>
               <tr v-for="index in getIndexesFromBells" :key="index" class="">
-                <td class="text-center py-4 font-bold">{{ index }} пара</td>
+                <td class="py-4 text-center font-bold">{{ index }} пара</td>
                 <template v-for="bell in mergedBells" :key="bell?.building">
                   <template
                     v-for="period in bell.bells.periods"

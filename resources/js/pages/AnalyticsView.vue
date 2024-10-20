@@ -75,16 +75,16 @@
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 mx-auto px-4 py-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+  <div class="mx-auto flex flex-col gap-4 px-4 py-4">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Аналитика</h1>
     </div>
 
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-2 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-2 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
       >
-        <div class="flex flex-wrap items-center gap-2 justify-start">
+        <div class="flex flex-wrap items-center justify-start gap-2">
           <MultiSelect
             v-model="selectedGroups"
             :options="groups"
@@ -141,7 +141,11 @@
           style="min-width: 200px"
         >
           <template #body="slotProps">
-            <div v-for="(value, key) in slotProps.data.subjects" class="">
+            <div
+              v-for="(value, key) in slotProps.data.subjects"
+              :key="key"
+              class=""
+            >
               <p class="leading-normal">
                 {{ key }} -
                 <span class="text-lg">{{ value }} ак. ч.</span>

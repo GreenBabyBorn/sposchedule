@@ -48,13 +48,13 @@
   <LoadingBar />
   <div class="">
     <form
-      class="flex flex-col justify-center items-center h-screen gap-4"
+      class="flex h-screen flex-col items-center justify-center gap-4"
       @submit.prevent="debouncedAuth()"
     >
       <div
-        class="flex flex-col gap-4 rounded-lg px-4 py-8 bg-surface-100 dark:bg-surface-900 max-w-72"
+        class="flex max-w-72 flex-col gap-4 rounded-lg bg-surface-100 px-4 py-8 dark:bg-surface-900"
       >
-        <h1 class="text-center dark:text-surface-100 text-2xl mb-4">
+        <h1 class="mb-4 text-center text-2xl dark:text-surface-100">
           Авторизация
         </h1>
         <InputText
@@ -71,13 +71,13 @@
           :feedback="false"
           toggle-mask
         />
-        <div class="flex gap-2 items-center">
+        <div class="flex items-center gap-2">
           <Checkbox
             v-model="credentials.remember"
             input-id="remember"
             :binary="true"
           />
-          <label class="dark:text-surface-400 text-slate-800" for="remember">
+          <label class="text-slate-800 dark:text-surface-400" for="remember">
             Запомнить меня
           </label>
         </div>
@@ -86,7 +86,7 @@
           type="submit"
           label="Войти"
         />
-        <span v-if="isError" class="text-red-400 w-full">{{
+        <span v-if="isError" class="w-full text-red-400">{{
           error?.message
         }}</span>
       </div>

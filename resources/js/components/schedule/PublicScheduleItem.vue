@@ -16,25 +16,25 @@
 
 <template>
   <article class="schedule-item">
-    <div class="mb-2 flex flex-wrap justify-between items-center">
+    <div class="mb-2 flex flex-wrap items-center justify-between">
       <h2
-        class="text-xl text-left font-medium text-surface-800 dark:text-white/80"
+        class="text-left text-xl font-medium text-surface-800 dark:text-white/80"
       >
         {{ props.groupName }}
       </h2>
       <span>{{ props.weekType }}</span>
       <span
         :class="{
-          'text-green-400 ': props.type !== 'main',
-          'text-surface-400 ': props.type === 'main',
+          'text-green-400': props.type !== 'main',
+          'text-surface-400': props.type === 'main',
         }"
-        class="text-sm text-right py-1 px-2 rounded-lg"
+        class="rounded-lg px-2 py-1 text-right text-sm"
         >{{ props.type === 'main' ? 'Основное' : 'Изменения' }}</span
       >
     </div>
     <table
       v-if="lessons"
-      class="schedule-table dark:bg-surface-900 bg-surface-50 rounded"
+      class="schedule-table rounded bg-surface-50 dark:bg-surface-900"
     >
       <tbody>
         <template v-for="item in lessons" :key="item.index">
@@ -59,20 +59,20 @@
                 <p>{{ item.message }}</p>
               </div>
             </td>
-            <td v-if="!item.message" class="pl-0 p-1">
+            <td v-if="!item.message" class="p-1 pl-0">
               <div
                 v-if="item.id"
                 :class="{
                   'border-b border-surface-200 dark:border-surface-700':
                     item.teachers?.length,
                 }"
-                class="flex justify-between gap-1 items-center"
+                class="flex items-center justify-between gap-1"
               >
-                <span v-if="item.subject_name" class="text-sm text-left">{{
+                <span v-if="item.subject_name" class="text-left text-sm">{{
                   item.subject_name
                 }}</span>
-                <div v-else class="">
-                  <span class="text-sm text-left text-red-400"
+                <div v-else>
+                  <span class="text-left text-sm text-red-400"
                     >Предмет был удален</span
                   >
                 </div>
@@ -81,12 +81,13 @@
 
               <div
                 v-if="item.id"
-                class="dark:text-surface-500 flex justify-between items-center"
+                class="flex items-center justify-between dark:text-surface-500"
               >
-                <div v-if="item.id" class="flex flex-wrap gap-1 justify-start">
+                <div v-if="item.id" class="flex flex-wrap justify-start gap-1">
                   <span
                     v-for="teacher in item.teachers"
-                    class="dark:text-surface-500 text-sm"
+                    :key="teacher.name"
+                    class="text-sm dark:text-surface-500"
                     >{{ teacher.name }}</span
                   >
                 </div>
@@ -99,7 +100,7 @@
         </template>
       </tbody>
     </table>
-    <div v-else class="flex justify-center items-center">
+    <div v-else class="flex items-center justify-center">
       <span class="text-xl"> Расписание не найдено </span>
     </div>
   </article>

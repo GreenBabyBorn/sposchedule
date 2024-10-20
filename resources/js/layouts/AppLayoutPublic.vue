@@ -6,7 +6,7 @@
 <template>
   <Toast />
   <div
-    class="page bg-surface-0 dark:text-surface-0 dark:bg-surface-950 min-h-screen"
+    class="page min-h-screen bg-surface-0 dark:bg-surface-950 dark:text-surface-0"
   >
     <main>
       <slot />

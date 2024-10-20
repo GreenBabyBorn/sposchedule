@@ -3,8 +3,8 @@
 </script>
 
 <template>
-  <header class="dark:text-surface-100 py-4">
-    <div class="max-w-screen-xl mx-auto px-4">
+  <header class="py-4 dark:text-surface-100">
+    <div class="mx-auto max-w-screen-xl px-4">
       <nav>
         <ul class="flex items-center justify-evenly gap-2">
           <li class="basis-1/2">

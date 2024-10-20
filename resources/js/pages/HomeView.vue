@@ -276,30 +276,31 @@
         date.value = new Date();
         break;
 
-      case 'tomorrow':
+      case 'tomorrow': {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         date.value = tomorrow;
         break;
+      }
     }
   }
 </script>
 
 <template>
   <div
-    class="relative max-w-screen-xl mx-auto px-4 py-4 flex flex-col gap-4 scroll-smooth"
+    class="relative mx-auto flex max-w-screen-xl flex-col gap-4 scroll-smooth px-4 py-4"
   >
-    <div class="fixed bottom-8 right-8 z-50 flex gap-2 flex-col">
+    <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
       <a
         title="К звонкам"
-        class="pi pi-bell text-white dark:text-surface-900 bg-primary-500 rounded-full p-4"
+        class="pi pi-bell rounded-full bg-primary-500 p-4 text-white dark:text-surface-900"
         href="#bells"
       />
       <RouterLink
         v-if="isAuth"
         replace
         title="В панель управления"
-        class="pi pi-pen-to-square text-white dark:text-surface-900 bg-primary-500 rounded-full p-4"
+        class="pi pi-pen-to-square rounded-full bg-primary-500 p-4 text-white dark:text-surface-900"
         :to="{ path: '/admin/schedules/changes', query: route.query }"
       />
     </div>
@@ -307,11 +308,11 @@
     <nav
       ref="headerRef"
       :class="{ '-translate-y-full': headerHidden }"
-      class="transition-transform fixed rounded-lg rounded-t-none max-w-screen-xl mx-auto z-50 top-0 left-0 right-0 flex flex-wrap justify-between gap-4 p-4 bg-surface-100 dark:bg-surface-800"
+      class="fixed left-0 right-0 top-0 z-50 mx-auto flex max-w-screen-xl flex-wrap justify-between gap-4 rounded-lg rounded-t-none bg-surface-100 p-4 transition-transform dark:bg-surface-800"
     >
-      <div class="flex flex-col flex-wrap gap-4 justify-between w-full">
-        <div class="flex flex-wrap gap-2 items-center">
-          <div class="flex flex-col md:w-auto w-full">
+      <div class="flex w-full flex-col flex-wrap justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex w-full flex-col md:w-auto">
             <DatePicker
               v-model="date"
               append-to="self"
@@ -323,7 +324,7 @@
             >
               <template #inputicon="slotProps">
                 <div
-                  class="flex gap-2 justify-between items-center"
+                  class="flex items-center justify-between gap-2"
                   @click="slotProps.clickCallback"
                 >
                   <small>{{
@@ -400,14 +401,14 @@
           <div class="ml-auto self-center">
             <div
               v-if="schedulesChanges?.last_updated"
-              class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap"
+              class="flex flex-row flex-wrap items-center gap-1 lg:flex-col lg:items-end lg:gap-0"
             >
-              <span class="text-xs text-surface-400 leading-none"
+              <span class="text-xs leading-none text-surface-400"
                 >Последние обновление:</span
               >
               <time
                 title="Последние обновление"
-                class="text-sm text-right text-surface-400"
+                class="text-right text-sm text-surface-400"
                 :datetime="schedulesChanges?.last_updated"
                 >{{
                   useDateFormat(
@@ -420,7 +421,7 @@
           </div>
         </div>
 
-        <div v-show="showFilters" class="flex flex-wrap gap-2 items-center">
+        <div v-show="showFilters" class="flex flex-wrap items-center gap-2">
           <InputText
             v-model="cabinet"
             class="w-full md:w-auto"
@@ -500,7 +501,7 @@
           />
         </svg>
         <span
-          class="pi absolute top-0 left-1/2 -translate-x-1/2"
+          class="pi absolute left-1/2 top-0 -translate-x-1/2"
           :class="{
             'pi-angle-down': headerHidden,
             'pi-angle-up': !headerHidden,
@@ -514,7 +515,7 @@
     >
       <span
         v-if="isFetched && !schedulesChanges?.schedules.length"
-        class="text-2xl text-center"
+        class="text-center text-2xl"
         >Ничего не найдено...</span
       >
       <span v-else-if="isError" class="text-2xl"
@@ -522,7 +523,7 @@
       >
       <div class="schedules">
         <template v-if="isLoading">
-          <div v-for="item in 32" class="schedule">
+          <div v-for="item in 32" :key="item" class="schedule">
             <Skeleton height="2rem" class="mb-4" />
             <Skeleton height="10rem" />
           </div>
@@ -545,43 +546,43 @@
         </template>
       </div>
     </div>
-    <div class="flex flex-col gap-2 items-center w-full">
-      <h1 id="bells" class="text-2xl font-bold text-center py-2">Звонки</h1>
+    <div class="flex w-full flex-col items-center gap-2">
+      <h1 id="bells" class="py-2 text-center text-2xl font-bold">Звонки</h1>
       <span
         v-if="publicBells?.type"
         :class="{
-          'text-green-400 ': publicBells?.type !== 'main',
-          'text-surface-400 ': publicBells?.type === 'main',
+          'text-green-400': publicBells?.type !== 'main',
+          'text-surface-400': publicBells?.type === 'main',
         }"
-        class="text-sm text-right py-1 px-2 rounded-lg"
+        class="rounded-lg px-2 py-1 text-right text-sm"
         >{{ publicBells?.type === 'main' ? 'Основное' : 'Изменения' }}</span
       >
       <div class="">
-        <h2 v-if="!publicBells && isFetchedBells" class="text-2xl text-center">
+        <h2 v-if="!publicBells && isFetchedBells" class="text-center text-2xl">
           На эту дату расписание звонков не найдено
         </h2>
         <div v-if="publicBells" class="">
-          <table class="bells-table dark:bg-surface-900 bg-surface-50 rounded">
+          <table class="bells-table rounded bg-surface-50 dark:bg-surface-900">
             <thead>
               <tr>
                 <th>
-                  <div class="flex gap-2 flex-col text-xs p-2">
+                  <div class="flex flex-col gap-2 p-2 text-xs">
                     <span class="self-end">Корпус</span>
-                    <span class="border rotate-12" />
+                    <span class="rotate-12 border" />
                     <span class="self-start">№ пары</span>
                   </div>
                 </th>
                 <th v-for="bell in mergedBells" :key="bell?.building">
-                  <div class="flex flex-col gap-1 items-center">
+                  <div class="flex flex-col items-center gap-1">
                     <span>
                       {{ bell?.building }}
                     </span>
                     <span
                       :class="{
-                        'text-green-400 ': bell.bells?.type !== 'main',
-                        'text-surface-400 ': bell.bells?.type === 'main',
+                        'text-green-400': bell.bells?.type !== 'main',
+                        'text-surface-400': bell.bells?.type === 'main',
                       }"
-                      class="text-sm text-right rounded-lg"
+                      class="rounded-lg text-right text-sm"
                       >{{
                         bell.bells?.type === 'main' ? 'Основное' : 'Изменения'
                       }}</span
@@ -592,7 +593,7 @@
             </thead>
             <tbody>
               <tr v-for="index in getIndexesFromBells" :key="index" class="">
-                <td class="text-center py-4 font-bold">{{ index }} пара</td>
+                <td class="py-4 text-center font-bold">{{ index }} пара</td>
                 <template v-for="bell in mergedBells" :key="bell?.building">
                   <template
                     v-for="period in bell.bells.periods"

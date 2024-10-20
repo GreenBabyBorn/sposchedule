@@ -101,12 +101,12 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Преподаватели</h1>
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
       >
         <InputText
           v-model="newTeacherName"
@@ -141,7 +141,7 @@
         @row-edit-save="onRowEditSave"
       >
         <template #header>
-          <div class="flex justify-between flex-wrap gap-2">
+          <div class="flex flex-wrap justify-between gap-2">
             <Button
               severity="danger"
               :disabled="!selectedTeachers.length || !teachers.length"
@@ -163,14 +163,15 @@
         </Column>
         <Column field="subjects" header="Предметы">
           <template #body="slotProps">
-            <div class="flex gap-2 flex-wrap">
+            <div class="flex flex-wrap gap-2">
               <Chip
                 v-for="subject in slotProps.data.subjects"
+                :key="subject.name"
                 :label="subject.name"
               />
             </div>
           </template>
-          <template #editor="{ data, field }">
+          <template #editor="{ data }">
             <MultiSelect
               v-model="data.subjects"
               display="chip"

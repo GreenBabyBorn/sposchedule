@@ -354,11 +354,11 @@
     class="schedule-item"
   >
     <div
-      class="rounded-t p-2 dark:bg-surface-800 bg-surface-100 flex flex-wrap justify-between items-center"
+      class="flex flex-wrap items-center justify-between rounded-t bg-surface-100 p-2 dark:bg-surface-800"
     >
       <div class="flex items-center gap-2">
         <span
-          class="text-xl text-left font-medium text-surface-800 dark:text-white/80"
+          class="text-left text-xl font-medium text-surface-800 dark:text-white/80"
         >
           {{ props?.group?.name }}
         </span>
@@ -368,13 +368,13 @@
           severity="secondary"
           text
           icon="pi pi-pen-to-square"
+          :class="{ 'border !border-primary-500': isEdit }"
           @click="isEdit = !isEdit"
-          :class="{ 'border !border-primary-500 ': isEdit }"
         />
       </div>
 
       <span>{{ props?.weekType }}</span>
-      <div v-if="props.type !== 'main'" class="">
+      <div v-if="props.type !== 'main'">
         <ToggleButton
           v-model="published"
           :disabled="
@@ -389,10 +389,10 @@
       </div>
       <span
         :class="{
-          'text-green-400 ': props?.type !== 'main',
-          'text-surface-400 ': props?.type === 'main',
+          'text-green-400': props?.type !== 'main',
+          'text-surface-400': props?.type === 'main',
         }"
-        class="text-sm text-right py-1 px-2 rounded-lg"
+        class="rounded-lg px-2 py-1 text-right text-sm"
         >{{ props?.type === 'main' ? 'Основное' : 'Изменения' }}</span
       >
     </div>

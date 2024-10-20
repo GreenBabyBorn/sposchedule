@@ -152,24 +152,25 @@
         date.value = new Date();
         break;
 
-      case 'tomorrow':
+      case 'tomorrow': {
         const tomorrow = new Date();
         tomorrow.setDate(tomorrow.getDate() + 1);
         date.value = tomorrow;
         break;
+      }
     }
   }
 </script>
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Расписание (изменения)</h1>
     </div>
     <div
-      class="flex items-center justify-between gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+      class="flex items-center justify-between gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
     >
-      <div class="flex gap-2 items-center flex-wrap w-full">
+      <div class="flex w-full flex-wrap items-center gap-2">
         <DatePicker
           v-model="date"
           append-to="self"
@@ -181,7 +182,7 @@
         >
           <template #inputicon="slotProps">
             <div
-              class="flex gap-2 justify-between items-center"
+              class="flex items-center justify-between gap-2"
               @click="slotProps.clickCallback"
             >
               <small>{{
@@ -194,7 +195,7 @@
               <small>{{ schedulesChanges?.week_type }}</small>
             </div>
           </template>
-          <template #footer="slotProps">
+          <template #footer>
             <div class="flex justify-between pt-1">
               <Button
                 severity="secondary"
@@ -252,14 +253,14 @@
         <div class="ml-auto self-center">
           <div
             v-if="schedulesChanges?.last_updated"
-            class="flex gap-1 flex-row items-center lg:flex-col lg:gap-0 lg:items-end flex-wrap"
+            class="flex flex-row flex-wrap items-center gap-1 lg:flex-col lg:items-end lg:gap-0"
           >
-            <span class="text-xs text-surface-400 leading-none"
+            <span class="text-xs leading-none text-surface-400"
               >Последние обновление:</span
             >
             <time
               title="Последние обновление"
-              class="text-sm text-right text-surface-400"
+              class="text-right text-sm text-surface-400"
               :datetime="schedulesChanges?.last_updated"
               >{{
                 useDateFormat(

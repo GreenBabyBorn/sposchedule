@@ -3,6 +3,7 @@
 <template>
   <slot />
 </template>
+
 <style>
   body {
     background: none;

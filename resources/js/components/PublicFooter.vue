@@ -1,12 +1,12 @@
 <template>
   <footer class="">
     <div
-      class="max-w-screen-xl mx-auto px-4 py-4 flex gap-4 justify-center items-center text-sm opacity-50"
+      class="mx-auto flex max-w-screen-xl items-center justify-center gap-4 px-4 py-4 text-sm opacity-50"
     >
       <a
         href="https://t.me/greenbabyborn"
         target="_blank"
-        class="flex gap-1 items-center"
+        class="flex items-center gap-1"
       >
         Нашли ошибку?
       </a>
@@ -14,7 +14,7 @@
       <a
         href="https://vk.com/pairsrce"
         target="_blank"
-        class="flex gap-1 items-center"
+        class="flex items-center gap-1"
       >
         <svg
           width="1.5rem"

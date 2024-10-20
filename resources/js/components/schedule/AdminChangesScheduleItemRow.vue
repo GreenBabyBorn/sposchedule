@@ -73,9 +73,12 @@
       </div>
       <div v-if="lesson.teachers" class="table-subrow">
         <div v-if="!isEdit" class="">
-          <span v-for="teacher in lesson.teachers" class="opacity-50">{{
-            teacher.name + ' '
-          }}</span>
+          <span
+            v-for="teacher in lesson.teachers"
+            :key="teacher.name"
+            class="opacity-50"
+            >{{ teacher.name + ' ' }}</span
+          >
         </div>
         <MultiSelect
           v-else

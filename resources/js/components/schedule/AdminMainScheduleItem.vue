@@ -216,15 +216,6 @@
     });
   }
 
-  function showToast(summary, detail) {
-    toast.add({
-      severity: 'error',
-      summary: summary,
-      detail: detail,
-      life: 3000,
-      closable: true,
-    });
-  }
   const published = ref(props.item?.[0]?.published || null);
 
   watch(
@@ -260,9 +251,9 @@
 </script>
 
 <template>
-  <div class="relative overflow-x-auto schedule-item py-1">
+  <div class="schedule-item relative overflow-x-auto py-1">
     <div class="">
-      <div class="flex dark:bg-surface-800 py-2 px-4 items-center h-full gap-4">
+      <div class="flex h-full items-center gap-4 px-4 py-2 dark:bg-surface-800">
         <span class="text-2xl font-medium">{{ props.weekDay }}</span>
         <ToggleButton
           v-model="published"
@@ -287,7 +278,7 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="item in items">
+          <template v-for="item in items" :key="item.index">
             <tr>
               <td>
                 <span class="text-xl font-medium">
@@ -465,7 +456,7 @@
               <InputText
                 v-model="newLesson.index"
                 size="small"
-                class="min-w-10 w-full text-center"
+                class="w-full min-w-10 text-center"
               />
             </td>
             <td>

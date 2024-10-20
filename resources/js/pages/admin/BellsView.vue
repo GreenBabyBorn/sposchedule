@@ -362,12 +362,12 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Звонки</h1>
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-2 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-2 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
       >
         <div class="flex flex-wrap items-center gap-2">
           <SelectButton
@@ -412,7 +412,7 @@
             "
           />
           <!-- <Button @click="copyState = !copyState" text icon="pi pi-clone" title="Скопировать"></Button> -->
-          <div class="border-l border-surface-600 flex gap-2 pl-2">
+          <div class="flex gap-2 border-l border-surface-600 pl-2">
             <Button
               outlined
               icon="pi pi-clone"
@@ -443,8 +443,8 @@
             header="Создание заготовки"
             :style="{ width: '25rem' }"
           >
-            <div class="flex items-center gap-4 mb-4">
-              <label for="name" class="font-semibold w-24"
+            <div class="mb-4 flex items-center gap-4">
+              <label for="name" class="w-24 font-semibold"
                 >Название заготовки</label
               >
               <InputText
@@ -473,7 +473,7 @@
           <table class="w-full border-collapse">
             <thead>
               <tr
-                class="border dark:border-surface-700 border-surface-200 bg-surface-100 dark:bg-surface-800"
+                class="border border-surface-200 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
               >
                 <th>№</th>
                 <th>Начало - Конец</th>
@@ -492,21 +492,21 @@
 
               <tr
                 v-show="showAddNewBellPeriod"
-                class="border-t-primary-500 border-t border dark:border-surface-700 border-surface-200 bg-surface-100 dark:bg-surface-800"
+                class="border border-t border-surface-200 border-t-primary-500 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
               >
                 <td class="">
                   <div class="flex justify-center">
                     <InputText
                       v-model="newPeriod.index"
-                      class="text-center max-w-12"
+                      class="max-w-12 text-center"
                     />
                   </div>
                 </td>
                 <td class="">
                   <div
-                    class="flex justify-center items-center flex-col gap-2 py-2"
+                    class="flex flex-col items-center justify-center gap-2 py-2"
                   >
-                    <div class="flex gap-2 items-center">
+                    <div class="flex items-center gap-2">
                       <DatePicker
                         id="datepicker-timeonly"
                         v-model="newPeriod.period_from"
@@ -523,7 +523,7 @@
                     </div>
                     <div
                       v-if="newPeriod.has_break"
-                      class="flex gap-2 items-center"
+                      class="flex items-center gap-2"
                     >
                       <DatePicker
                         id="datepicker-timeonly"
@@ -546,7 +546,7 @@
                   <Checkbox v-model="newPeriod.has_break" :binary="true" />
                 </td>
                 <td class="">
-                  <div class="px-6 flex justify-center">
+                  <div class="flex justify-center px-6">
                     <Button
                       outlined
                       text
@@ -574,7 +574,7 @@
         />
       </div>
     </div>
-    <div class="flex flex-col gap-4 mt-4">
+    <div class="mt-4 flex flex-col gap-4">
       <h1 class="text-2xl">Заготовки звонков</h1>
       <DataTable
         v-model:editing-rows="editingRows"
@@ -586,7 +586,7 @@
         @row-edit-save="onRowEditSave"
       >
         <template #header>
-          <div class="flex flex-wrap items-center gap-2 justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <Button
               severity="danger"
               :disabled="!selectedBells?.length || !bellsPresets.length"

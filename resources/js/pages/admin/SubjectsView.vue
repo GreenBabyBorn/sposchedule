@@ -137,12 +137,12 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap justify-between items-baseline">
+    <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Предметы</h1>
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-4 p-4 rounded-lg bg-surface-100 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
       >
         <InputText
           v-model="newSubjectName"
@@ -194,7 +194,7 @@
         @row-edit-save="onRowEditSave"
       >
         <template #header>
-          <div class="flex flex-wrap items-center gap-2 justify-between">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <Button
               severity="danger"
               :disabled="!selectedSubjects.length || !subjects.length"

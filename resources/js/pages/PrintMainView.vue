@@ -93,6 +93,7 @@
       СБ: new Set(),
     };
 
+    // eslint-disable-next-line no-unsafe-optional-chaining
     for (const item of mainSchedules?.value) {
       for (const day of daysOfWeek) {
         for (const index of item.schedule[day]) {
@@ -162,7 +163,7 @@
 
 <template>
   <LoadingBar />
-  <div class="controls py-2 flex flex-wrap gap-2 items-center pl-2">
+  <div class="controls flex flex-wrap items-center gap-2 py-2 pl-2">
     <Select
       v-model="selectedSemester"
       show-clear
@@ -369,7 +370,10 @@
                       </div>
 
                       <div class="teacher">
-                        <span v-for="teacher in lesson?.lesson?.teachers">
+                        <span
+                          v-for="teacher in lesson?.lesson?.teachers"
+                          :key="teacher.name"
+                        >
                           {{ teacher.name }}
                         </span>
                       </div>
