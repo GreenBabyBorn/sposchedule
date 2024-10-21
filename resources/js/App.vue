@@ -4,16 +4,16 @@
   import AppLayout from '@/layouts/AppLayout.vue';
   import { useLoadingStore } from './stores/loading';
   import { useToast } from 'primevue/usetoast';
-  import { onMounted } from 'vue';
+  // import { onMounted } from 'vue';
 
   const toast = useToast();
   const loadingStore = useLoadingStore();
 
-  onMounted(() => {
-    window.addEventListener('load', () => {
-      window.history.replaceState(null, null, window.location.pathname);
-    });
-  });
+  // onMounted(() => {
+  //   window.addEventListener('load', () => {
+  //     window.history.replaceState(null, null, window.location.pathname);
+  //   });
+  // });
 
   axios.interceptors.request.use(config => {
     loadingStore.startLoading(); // Увеличиваем счетчик активных запросов и запускаем загрузку при первом запросе
