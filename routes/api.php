@@ -71,6 +71,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('lessons', LessonController::class)->except(['index', 'show']);
 
     Route::patch('/schedules/{schedule}/changes', [ScheduleController::class, 'fromMainToChangesSchedule']);
+    Route::post('/schedules/changes', [ScheduleController::class, 'createScheduleWithChanges']);
     Route::apiResource('schedules', ScheduleController::class)->except(['index', 'show']);
 
     Route::apiResource('subjects', SubjectController::class)->except(['index', 'show']);

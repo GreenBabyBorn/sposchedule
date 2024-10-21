@@ -105,6 +105,67 @@ class ScheduleController extends Controller
     }
 
 
+    public function createScheduleWithChanges(Request $request)
+    {
+        // Получаем данные из тела запроса
+        $scheduleData = $request->json()->all();  // Читаем все данные JSON из body
+
+        // Проверка наличия группы
+        $group = DB::table('groups')->find($scheduleData['group_id']);
+        if (!$group) {
+            return response()->json(['error' => 'Группа не найдена'], 404);
+        }
+
+        // Проверка наличия семестра
+        if (!isset($scheduleData['semester_id']) || !DB::table('semesters')->find($scheduleData['semester_id'])) {
+            return response()->json(['error' => 'Семестр не найден'], 404);
+        }
+        $carbonDate = Carbon::parse($request->input('date'));
+        // Создаем новое расписание с типом changes
+        $newScheduleId = DB::table('schedules')->insertGetId([
+            'group_id' => $scheduleData['group_id'],
+            'type' => 'changes',  // Тип изменений
+            'date' =>  $carbonDate, // Дата изменений (сегодня)
+            'semester_id' => $scheduleData['semester_id'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Перебираем уроки из объекта расписания
+        foreach ($scheduleData['lessons'] as $lessonData) {
+            // Создаем запись для каждого урока
+            $lessonId = DB::table('lessons')->insertGetId([
+                'schedule_id' => $newScheduleId,
+                'subject_id' => $lessonData['subject']['id'],
+                'index' => $lessonData['index'], // Порядковый номер урока
+                'week_type' => $lessonData['week_type'], // Числ или Знам
+                'cabinet' => $lessonData['cabinet'],
+                'building' => $lessonData['building'],
+                'message' => $lessonData['message'] ?? null, // Сообщение об изменениях, если есть
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // Добавляем учителей для каждого урока
+            if (!empty($lessonData['teachers'])) {
+                foreach ($lessonData['teachers'] as $teacher) {
+                    DB::table('lesson_teacher')->insert([
+                        'lesson_id' => $lessonId,
+                        'teacher_id' => $teacher['id'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        // Возвращаем созданное расписание и его уроки
+        return response()->json([
+            'schedule_id' => $newScheduleId,
+            'message' => 'Новое расписание с изменениями успешно создано',
+        ]);
+    }
+
 
     public function getScheduleByDate(Request $request)
     {

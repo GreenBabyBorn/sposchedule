@@ -7,7 +7,8 @@
   import { useSubjectsQuery } from '@/queries/subjects';
   import { useTeachersQuery } from '@/queries/teachers';
   import {
-    useFromMainToChangesSchedule,
+    useCreateScheduleWithChanges,
+    // useFromMainToChangesSchedule,
     useStoreScheduleChange,
     useUpdateSchedule,
   } from '@/queries/schedules';
@@ -53,21 +54,23 @@
 
   const { mutateAsync: updateLesson } = useUpdateLesson();
 
-  const { mutateAsync: fromMainToChangesSchedule, data: newChanges } =
-    useFromMainToChangesSchedule();
+  const { mutateAsync: createScheduleWithChanges, data: newChanges } =
+    useCreateScheduleWithChanges();
   async function editLesson(item) {
     if (!item.id) return;
     if (!item.message == !item.subject) return;
 
     if (props.type === 'main') {
       try {
-        await fromMainToChangesSchedule({
-          id: props.schedule.id,
+        await createScheduleWithChanges({
           body: {
+            group_id: props.group.id,
+            lessons: props.schedule.lessons,
             date: props.date,
-            published: false,
+            semester_id: props.semester.id,
           },
         });
+        return;
       } catch (e) {
         toast.add({
           severity: 'error',
@@ -138,11 +141,12 @@
     // Если тип расписания 'main', конвертируем его в изменения
     if (props.schedule.type === 'main') {
       try {
-        await fromMainToChangesSchedule({
-          id: props.schedule.id,
+        await createScheduleWithChanges({
           body: {
+            group_id: props.group.id,
+            lessons: props.schedule.lessons,
             date: props.date,
-            published: false,
+            semester_id: props.semester.id,
           },
         });
       } catch (e) {
@@ -189,7 +193,7 @@
     if (loadedSchedule && props.schedule.type !== 'main') {
       scheduleId = loadedSchedule;
     } else if (props.schedule.type === 'main') {
-      scheduleId = newChanges.value?.data?.id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
+      scheduleId = newChanges.value?.data?.schedule_id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
     } else {
       scheduleId = newSchedule.value?.data?.id; // Тоже необходимо проверить наличие значения
     }
@@ -227,10 +231,15 @@
   async function removeLesson(id) {
     if (props.type === 'main') {
       try {
-        await fromMainToChangesSchedule({
-          id: props.schedule.id,
+        let lesspnsForChanges = props.schedule.lessons.filter(
+          (l: any) => l.id !== id
+        );
+        await createScheduleWithChanges({
           body: {
+            group_id: props.group.id,
+            lessons: lesspnsForChanges,
             date: props.date,
+            semester_id: props.semester.id,
           },
         });
       } catch (e) {
