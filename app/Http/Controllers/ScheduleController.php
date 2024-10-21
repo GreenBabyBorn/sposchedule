@@ -142,8 +142,38 @@ class ScheduleController extends Controller
         $weekNumber = $semesterStart->diffInWeeks($carbonDate);
         $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
 
-        // Получаем все группы
-        $groups = DB::table('groups')->select('id', 'name')->get();
+        // Фильтры для групп
+        $groupQuery = DB::table('groups')->select('id', 'name');
+
+        if ($building = $request->input('building')) {
+            $groupQuery->whereExists(function ($query) use ($building) {
+                $query->select(DB::raw(1))
+                    ->from('group_building')
+                    ->join('buildings', 'group_building.building_name', '=', 'buildings.name')
+                    ->where('buildings.name', $building)
+                    ->whereColumn('group_building.group_id', 'groups.id');
+            });
+        }
+
+        if ($course = $request->input('course')) {
+            $groupQuery->where('course', $course);
+        }
+
+        if ($groupName = $request->input('group')) {
+            $groupQuery->where('name', 'ILIKE', "%{$groupName}%");
+        }
+
+        // Выполняем запрос к таблице групп с учетом фильтров
+        $groups = $groupQuery->get();
+
+        // Если не найдено ни одной группы по фильтрам
+        if ($groups->isEmpty()) {
+            return response()->json([
+                'week_type' => $weekType,
+                'last_updated' => null,
+                'schedules' => []
+            ]);
+        }
 
         // Основной SQL-запрос для получения расписаний
         $query = "
@@ -192,7 +222,6 @@ class ScheduleController extends Controller
                 (s.type = 'changes' AND s.date = :date)
                 OR (s.type = 'main' AND s.published = TRUE AND s.week_day = :week_day AND s.semester_id = :semester_id)
             )
-            GROUP BY g.id, s.id
         ";
 
         // Массив параметров для SQL-запроса
@@ -203,7 +232,7 @@ class ScheduleController extends Controller
         ];
 
         // Добавляем фильтры, если они присутствуют
-        if ($building = $request->input('building')) {
+        if ($building) {
             $query .= "
                 AND EXISTS (
                     SELECT 1
@@ -216,18 +245,18 @@ class ScheduleController extends Controller
             $params['building'] = $building;
         }
 
-        if ($course = $request->input('course')) {
+        if ($course) {
             $query .= " AND g.course = :course ";
             $params['course'] = $course;
         }
 
-        if ($groupName = $request->input('group')) {
-            $query .= " AND g.name LIKE :group_name ";
+        if ($groupName) {
+            $query .= " AND g.name ILIKE :group_name ";
             $params['group_name'] = "%{$groupName}%";
         }
 
         // Завершаем запрос
-        $query .= " ORDER BY g.id";
+        $query .= " GROUP BY g.id, s.id ORDER BY g.id";
 
         // Выполняем SQL-запрос
         $schedules = DB::select($query, $params);
@@ -293,11 +322,6 @@ class ScheduleController extends Controller
 
         // Добавляем расписания для каждой группы в финальный массив
         $finalSchedules['schedules'] = array_values($groupSchedules);
-
-        // Сортировка расписаний с данными выше пустых
-        // usort($finalSchedules['schedules'], function ($a, $b) {
-        //     return !empty($b['schedule']) <=> !empty($a['schedule']);
-        // });
 
         // Возвращаем результат
         return response()->json($finalSchedules);
