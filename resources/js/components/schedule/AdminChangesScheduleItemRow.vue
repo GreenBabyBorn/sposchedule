@@ -36,7 +36,7 @@
   };
 </script>
 <template>
-  <tr v-if="lesson?.index">
+  <tr v-if="lesson?.index >= 0">
     <td>
       <span class="text-xl font-medium text-surface-800 dark:text-white/80">
         {{ lesson?.index }}
