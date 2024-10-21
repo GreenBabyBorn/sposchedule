@@ -1,9 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
+// import { computed } from 'vue';
 
 export function useHistoryQuery(page, rows, searchTerm) {
+  // const enabled = computed(() => {
+  //   return Boolean((page.value && rows.value) || searchTerm.value);
+  // });
   return useQuery({
-    queryKey: ['history', page, rows, searchTerm],
+    // enabled: enabled,
+    queryKey: ['history', page, rows],
     queryFn: async () => {
       const response = await axios.get('/api/history', {
         params: {

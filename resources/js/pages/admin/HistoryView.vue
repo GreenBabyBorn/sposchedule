@@ -46,6 +46,12 @@
     details: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     created_at: { value: null, matchMode: FilterMatchMode.DATE_IS },
   });
+
+  function eventPage(event) {
+    console.log(event);
+    currentPage.value = event.page + 1;
+    rowsPerPage.value = event.rows;
+  }
 </script>
 
 <template>
@@ -67,13 +73,8 @@
         lazy
         :global-filter-fields="['action', 'details', 'created_at']"
         :value="histories?.data"
-        :on-page="
-          event => {
-            currentPage = event.page + 1;
-            rowsPerPage = event.rows;
-          }
-        "
         table-style="min-width: 50rem"
+        @page="eventPage"
       >
         <template #header>
           <div class="flex flex-wrap items-center justify-between gap-2">
