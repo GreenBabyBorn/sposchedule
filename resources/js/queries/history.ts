@@ -8,7 +8,7 @@ export function useHistoryQuery(page, rows, searchTerm) {
   // });
   return useQuery({
     // enabled: enabled,
-    queryKey: ['history', page, rows],
+    queryKey: ['history', page, rows, searchTerm],
     queryFn: async () => {
       const response = await axios.get('/api/history', {
         params: {
