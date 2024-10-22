@@ -71,6 +71,15 @@ const router = createRouter({
       },
     },
     {
+      path: '/hourload',
+      name: RouteNamesEnum.hourload,
+      component: () => import('@/pages/HourLoadView.vue'),
+      meta: {
+        layout: AppLayoutsEnum.admin,
+        title: 'Нагрузка',
+      },
+    },
+    {
       path: '/admin/history',
       name: RouteNamesEnum.history,
       component: () => import('@/pages/admin/HistoryView.vue'),

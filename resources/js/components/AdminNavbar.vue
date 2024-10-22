@@ -52,6 +52,11 @@
       route: '/analytics',
     },
     {
+      label: 'Нагрузка',
+      icon: 'pi pi-gauge',
+      route: '/hourload',
+    },
+    {
       label: 'История',
       icon: 'pi pi-list',
       route: '/admin/history',
