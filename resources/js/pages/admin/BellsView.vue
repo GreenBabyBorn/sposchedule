@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import SelectButton from 'primevue/selectbutton';
   import Select from 'primevue/select';
-  import { computed, onMounted, ref, watch, watchEffect } from 'vue';
+  import { computed, ref, watch, watchEffect } from 'vue';
   import DatePicker from 'primevue/datepicker';
   import InputText from 'primevue/inputtext';
   import Checkbox from 'primevue/checkbox';
@@ -103,14 +103,9 @@
   const { bells } = storeToRefs(bellsStore);
   const { setBells } = bellsStore;
 
-  onMounted(() => {
-    // building.value = buildingsFethed.value?.[0].name
-  });
-
   watch(buildingsFethed, () => {
     building.value = buildingsFethed.value?.[0].name;
   });
-  watch(data, setBells);
 
   let newPeriod = ref({
     index: 0,
@@ -356,6 +351,11 @@
       if (route.query.type) {
         type.value = route.query.type as any;
       }
+    }
+  });
+  watchEffect(() => {
+    if (buildingsFetched.value) {
+      setBells(data.value);
     }
   });
 </script>

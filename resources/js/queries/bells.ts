@@ -3,19 +3,19 @@ import axios from 'axios';
 import { computed } from 'vue';
 
 export function useBellsQuery(type, building, weekDay?, date?) {
-  const enabled = computed(() => {
-    if (weekDay.value) {
-      return (
-        Boolean(type.value) || Boolean(weekDay.value) || Boolean(building.value)
-      );
-    }
-    if (date.value) {
-      return (
-        Boolean(type.value) || Boolean(date.value) || Boolean(building.value)
-      );
-    }
-    return false;
-  });
+  // const enabled = computed(() => {
+  //   if (weekDay.value) {
+  //     return (
+  //       Boolean(type.value) || Boolean(weekDay.value) || Boolean(building.value)
+  //     );
+  //   }
+  //   if (date.value) {
+  //     return (
+  //       Boolean(type.value) || Boolean(date.value) || Boolean(building.value)
+  //     );
+  //   }
+  //   return false;
+  // });
 
   const weekDayOrDate = computed(() =>
     type.value === 'Основное'
@@ -29,8 +29,9 @@ export function useBellsQuery(type, building, weekDay?, date?) {
   };
 
   return useQuery({
-    queryKey: ['bells', type, weekDay, date, building],
-    enabled: enabled,
+    queryKey: ['bells', building, type, weekDay, date],
+
+    // enabled: enabled,
     queryFn: async () =>
       (
         await axios.get(
