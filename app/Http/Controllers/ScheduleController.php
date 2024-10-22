@@ -101,6 +101,7 @@ class ScheduleController extends Controller
             }
 
         }
+
         return new ScheduleResource($newSchedule);
     }
 
@@ -130,35 +131,35 @@ class ScheduleController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+        if (isset($scheduleData['lessons']) && is_array($scheduleData['lessons']) && !empty($scheduleData['lessons'])) {
+            // Перебираем уроки из объекта расписания
+            foreach ($scheduleData['lessons'] as $lessonData) {
+                // Создаем запись для каждого урока
+                $lessonId = DB::table('lessons')->insertGetId([
+                    'schedule_id' => $newScheduleId,
+                    'subject_id' => $lessonData['subject']['id'],
+                    'index' => $lessonData['index'], // Порядковый номер урока
+                    'week_type' => $lessonData['week_type'], // Числ или Знам
+                    'cabinet' => $lessonData['cabinet'],
+                    'building' => $lessonData['building'],
+                    'message' => $lessonData['message'] ?? null, // Сообщение об изменениях, если есть
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
 
-        // Перебираем уроки из объекта расписания
-        foreach ($scheduleData['lessons'] as $lessonData) {
-            // Создаем запись для каждого урока
-            $lessonId = DB::table('lessons')->insertGetId([
-                'schedule_id' => $newScheduleId,
-                'subject_id' => $lessonData['subject']['id'],
-                'index' => $lessonData['index'], // Порядковый номер урока
-                'week_type' => $lessonData['week_type'], // Числ или Знам
-                'cabinet' => $lessonData['cabinet'],
-                'building' => $lessonData['building'],
-                'message' => $lessonData['message'] ?? null, // Сообщение об изменениях, если есть
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-
-            // Добавляем учителей для каждого урока
-            if (!empty($lessonData['teachers'])) {
-                foreach ($lessonData['teachers'] as $teacher) {
-                    DB::table('lesson_teacher')->insert([
-                        'lesson_id' => $lessonId,
-                        'teacher_id' => $teacher['id'],
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
+                // Добавляем учителей для каждого урока
+                if (!empty($lessonData['teachers'])) {
+                    foreach ($lessonData['teachers'] as $teacher) {
+                        DB::table('lesson_teacher')->insert([
+                            'lesson_id' => $lessonId,
+                            'teacher_id' => $teacher['id'],
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ]);
+                    }
                 }
             }
         }
-
         // Возвращаем созданное расписание и его уроки
         return response()->json([
             'schedule_id' => $newScheduleId,
@@ -352,7 +353,7 @@ class ScheduleController extends Controller
             $filteredLessons = [];
             foreach ($schedule->lessons as $lesson) {
                 // Если тип недели совпадает с текущим или занятие проводится каждую неделю
-                if ($lesson['week_type'] === $weekType || $lesson['week_type'] === null) {
+                if ($lesson['week_type'] === $weekType || $lesson['week_type'] === null && $lesson['id'] !== null) {
                     $filteredLessons[] = $lesson;
                 }
             }
@@ -372,13 +373,24 @@ class ScheduleController extends Controller
             }
 
             // Сохраняем расписание для группы
-            $groupSchedules[$schedule->group->name]['schedule'] = [
-                'id' => $schedule->schedule_id,
-                'week_day' => $schedule->week_day,
-                'published' => $schedule->published,
-                'type' => $schedule->type,
-                'lessons' => $filteredLessons
-            ];
+            if ($schedule->type === 'changes') {
+                $groupSchedules[$schedule->group->name]['schedule'] = [
+                    'id' => $schedule->schedule_id,
+                    'week_day' => $schedule->week_day,
+                    'published' => $schedule->published,
+                    'type' => 'changes', // Указываем, что это изменения
+                    'lessons' => $filteredLessons
+                ];
+            } elseif (!isset($groupSchedules[$schedule->group->name]['schedule']['lessons'])) {
+                // Сохраняем основное расписание, только если еще не добавлены изменения
+                $groupSchedules[$schedule->group->name]['schedule'] = [
+                    'id' => $schedule->schedule_id,
+                    'week_day' => $schedule->week_day,
+                    'published' => $schedule->published,
+                    'type' => $schedule->type,
+                    'lessons' => $filteredLessons
+                ];
+            }
         }
 
         // Добавляем расписания для каждой группы в финальный массив
