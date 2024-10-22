@@ -347,6 +347,12 @@
   function filterTeachers(e) {
     searchTeacher.value = e.value;
   }
+  watch(
+    () => newLesson.subject,
+    () => {
+      newLesson.teachers = [];
+    }
+  );
 </script>
 
 <template>
@@ -470,6 +476,7 @@
             <div class="table-subrow">
               <MultiSelect
                 v-model="newLesson.teachers"
+                data-key="name"
                 :reset-filter-on-hide="true"
                 :auto-filter-focus="true"
                 filter
