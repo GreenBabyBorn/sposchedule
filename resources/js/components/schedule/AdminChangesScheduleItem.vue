@@ -412,7 +412,7 @@
       >
     </div>
     <table class="schedule-table bg-surface-50 dark:bg-surface-900">
-      <thead v-show="isEdit">
+      <thead>
         <tr>
           <th>
             <div class="">№</div>
