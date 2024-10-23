@@ -145,7 +145,7 @@
 
   .schedule-table th,
   .schedule-table td {
-    border: 1px solid var(--p-surface-600);
+    /* border: 1px solid var(--p-surface-600); */
     /* padding: 5px; */
     text-align: center;
   }

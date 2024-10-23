@@ -290,7 +290,7 @@
     }
   }
 
-  const hideAddNewLesson = ref(false);
+  // const hideAddNewLesson = ref(false);
 
   const newLessonMessageState = ref(false);
   function handlenewLessonMessage() {
@@ -410,8 +410,8 @@
         >{{ props?.type === 'main' ? 'Основное' : 'Изменения' }}</span
       >
     </div>
-    <table class="schedule-table dark:bg-surface-900">
-      <thead v-show="lessons?.length > 0 || hideAddNewLesson">
+    <table class="schedule-table bg-surface-50 dark:bg-surface-900">
+      <thead v-show="lessons?.length > 0">
         <tr>
           <th>
             <div class="">№</div>
@@ -443,7 +443,7 @@
           />
         </template>
 
-        <tr v-if="hideAddNewLesson && isEdit">
+        <tr v-if="isEdit" class="border-t-4 border-surface-600">
           <td>
             <InputText
               v-model="newLesson.index"
@@ -465,6 +465,7 @@
             <div class="table-subrow">
               <Select
                 v-model="newLesson.subject"
+                editable
                 :reset-filter-on-hide="true"
                 filter
                 placeholder="Предмет"
@@ -519,7 +520,6 @@
                     (!newLesson.index || !newLesson.subject)) ||
                   (newLessonMessageState && !newLesson.message)
                 "
-                text
                 icon="pi pi-save"
                 @click="addNewLesson()"
               />
@@ -534,7 +534,7 @@
         </tr>
       </tbody>
     </table>
-    <div v-if="isEdit" class="mt-2 flex items-center justify-center">
+    <!-- <div v-if="isEdit" class="mt-2 flex items-center justify-center">
       <Button
         label="Новая пара"
         title="Открыть форму для добавления пары"
@@ -545,7 +545,7 @@
         :icon="!hideAddNewLesson ? 'pi pi-angle-down' : 'pi pi-angle-up'"
         @click="hideAddNewLesson = !hideAddNewLesson"
       />
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -560,7 +560,7 @@
 
   .schedule-table th,
   .schedule-table td {
-    border: 1px solid var(--p-surface-600);
+    /* border: 1px solid var(--p-surface-600);*/
     /* padding: 5px; */
     text-align: center;
   }
