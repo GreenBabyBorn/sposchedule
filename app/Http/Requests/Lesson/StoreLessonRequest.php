@@ -24,7 +24,7 @@ class StoreLessonRequest extends FormRequest
     public function rules()
     {
         // Получаем значение поля message, если оно присутствует в запросе
-        $hasMessage = $this->has('message');
+        $hasMessage = $this->filled('message');
         $rules = [];
         // Определяем базовые правила
         if($hasMessage) {
@@ -35,15 +35,12 @@ class StoreLessonRequest extends FormRequest
                     'integer',
                     'min:0',
                     'max:10',
-                    // Правила уникальности будут применяться только если message отсутствует
-                    // !$hasMessage ? Rule::unique('lessons')->where(function ($query) {
-                    //     return $query->where('schedule_id', $this->input('schedule_id'));
-                    // }) : '',
                 ],
             ];
         } else {
             $rules = [
-                'subject_id' => 'required|exists:subjects,id',
+                'subject' => 'required',
+                'subject.id' => 'required|exists:subjects,id',
                 'schedule_id' => 'required|exists:schedules,id',
                 'cabinet' => 'nullable|string|max:255',
                 'week_type' => ['nullable', Rule::in(['ЧИСЛ', 'ЗНАМ'])],
@@ -52,10 +49,6 @@ class StoreLessonRequest extends FormRequest
                     'integer',
                     'min:0',
                     'max:10',
-                    // Правила уникальности будут применяться только если message отсутствует
-                    // !$hasMessage ? Rule::unique('lessons')->where(function ($query) {
-                    //     return $query->where('schedule_id', $this->input('schedule_id'));
-                    // }) : '',
                 ],
                 'building' => 'nullable|string|min:1',
             ];
@@ -115,8 +108,8 @@ class StoreLessonRequest extends FormRequest
     public function messages()
     {
         return [
-            'subject_id.required' => 'Поле "ID предмета" обязательно для заполнения.',
-            'subject_id.exists' => 'Предмет с указанным ID не найден.',
+            'subject.id.required' => 'Поле "ID предмета" обязательно для заполнения.',
+            'subject.id.exists' => 'Предмет с указанным ID не найден.',
             'schedule_id.required' => 'Поле "ID расписания" обязательно для заполнения.',
             'schedule_id.exists' => 'Расписание с указанным ID не найдено.',
             'cabinet.required' => 'Поле "Кабинет" обязательно для заполнения.',
