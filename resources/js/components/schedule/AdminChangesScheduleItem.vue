@@ -447,6 +447,7 @@
           <td>
             <InputText
               v-model="newLesson.index"
+              v-keyfilter.int
               size="small"
               class="w-full text-center"
             />
@@ -465,9 +466,9 @@
             <div class="table-subrow">
               <Select
                 v-model="newLesson.subject"
+                append-to="self"
+                data-key="name"
                 editable
-                :reset-filter-on-hide="true"
-                filter
                 placeholder="Предмет"
                 class="w-full text-left"
                 :options="subjects"
@@ -517,7 +518,9 @@
               <Button
                 :disabled="
                   (!newLessonMessageState &&
-                    (!newLesson.index || !newLesson.subject)) ||
+                    (!newLesson.index ||
+                      !newLesson.subject ||
+                      typeof newLesson.subject === 'string')) ||
                   (newLessonMessageState && !newLesson.message)
                 "
                 icon="pi pi-save"

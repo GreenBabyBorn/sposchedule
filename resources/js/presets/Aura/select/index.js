@@ -96,7 +96,7 @@ export default {
 
       // Misc
       'relative',
-      'cursor-pointer',
+      // 'cursor-pointer',
       'overflow-hidden overflow-ellipsis',
       'whitespace-nowrap',
       'appearance-none',
