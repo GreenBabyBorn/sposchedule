@@ -41,13 +41,13 @@
           <tr>
             <td class="p-2">
               <span class="text-surface-800 dark:text-white/80">
-                {{ item.index
-                }}<span
-                  v-if="item.weekType === 'ЗНАМ' || item.weekType === 'ЧИСЛ'"
+                {{ item.index }}
+                <span
+                  v-if="item.week_type === 'ЗНАМ' || item.week_type === 'ЧИСЛ'"
                   title="Дробная пара"
                   class="absolute text-sm"
                   >{{
-                    item.weekType === 'ЗНАМ' || item.weekType === 'ЧИСЛ'
+                    item.week_type === 'ЗНАМ' || item.week_type === 'ЧИСЛ'
                       ? '*'
                       : ''
                   }}</span
