@@ -43,7 +43,10 @@
               <span class="text-surface-800 dark:text-white/80">
                 {{ item.index }}
                 <span
-                  v-if="item.week_type === 'ЗНАМ' || item.week_type === 'ЧИСЛ'"
+                  v-if="
+                    (item.week_type === 'ЗНАМ' || item.week_type === 'ЧИСЛ') &&
+                    type === 'main'
+                  "
                   title="Дробная пара"
                   class="absolute text-sm"
                   >{{
