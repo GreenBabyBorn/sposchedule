@@ -7,6 +7,8 @@
   import Button from 'primevue/button';
   import { storeToRefs } from 'pinia';
   import LoadingBar from '@/components/LoadingBar.vue';
+  import DatePicker from 'primevue/datepicker';
+  import router from '@/router';
   import {
     monthDeclensions,
     dayNamesWithPreposition,
@@ -110,11 +112,36 @@
   function printPage() {
     window.print();
   }
+
+  const updateQueryParams = () => {
+    router.replace({
+      query: {
+        ...route.query,
+        date: isoDate.value || undefined,
+      },
+    });
+  };
+
+  watch(
+    [isoDate],
+    () => {
+      updateQueryParams();
+    },
+    { deep: true }
+  );
 </script>
 
 <template>
   <LoadingBar />
   <div class="controls flex flex-wrap items-center gap-2 py-2 pl-2">
+    <DatePicker
+      v-model="date"
+      append-to="self"
+      show-icon
+      icon-display="input"
+      date-format="dd.mm.yy"
+    >
+    </DatePicker>
     <Button label="Печать" icon="pi pi-print" @click="printPage()" />
   </div>
   <div v-if="changesSchedules?.['1-5']" class="main">
@@ -358,6 +385,13 @@
         </tbody>
       </table>
     </div>
+  </div>
+  <div
+    v-if="!changesSchedules?.['6'] && !changesSchedules?.['1-5']"
+    div
+    class="p-2 text-lg"
+  >
+    На эту дату изменений в расписании не найдено
   </div>
 </template>
 
