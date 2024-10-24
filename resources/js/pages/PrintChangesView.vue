@@ -387,7 +387,7 @@
     </div>
   </div>
   <div
-    v-if="!changesSchedules?.['6'] && !changesSchedules?.['1-5']"
+    v-if="!changesSchedules?.['6'] && !changesSchedules?.['1-5'] && isSuccess"
     div
     class="p-2 text-lg"
   >
