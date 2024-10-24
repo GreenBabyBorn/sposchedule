@@ -166,7 +166,7 @@
 } */
 
   tbody tr {
-    border-bottom: 1px var(--p-surface-500) solid;
+    border-bottom: 1px rgb(var(--p-surface-500)) solid;
     /* background: rgba(128, 128, 128, 0.243); */
   }
 

@@ -190,7 +190,7 @@
   }
 
   tbody tr {
-    border-bottom: 2px var(--p-surface-600) solid;
+    border-bottom: 2px rgb(var(--p-surface-600)) solid;
     /* background: rgba(128, 128, 128, 0.243); */
   }
 

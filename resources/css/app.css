@@ -47,35 +47,35 @@
 
 /* Primary and Surface Palettes */
 :root {
-  --p-primary-50: #eff6ff; /* blue-50 */
-  --p-primary-100: #dbeafe; /* blue-100 */
-  --p-primary-200: #bfdbfe; /* blue-200 */
-  --p-primary-300: #93c5fd; /* blue-300 */
-  --p-primary-400: #60a5fa; /* blue-400 */
-  --p-primary-500: #3b82f6; /* blue-500 */
-  --p-primary-600: #2563eb; /* blue-600 */
-  --p-primary-700: #1d4ed8; /* blue-700 */
-  --p-primary-800: #1e40af; /* blue-800 */
-  --p-primary-900: #1e3a8a; /* blue-900 */
-  --p-primary-950: #172554;
-  --p-surface-0: #ffffff;
-  --p-surface-50: #fafafa;
-  --p-surface-100: #f4f4f5;
-  --p-surface-200: #e4e4e7;
-  --p-surface-300: #d4d4d8;
-  --p-surface-400: #a1a1aa;
-  --p-surface-500: #71717a;
-  --p-surface-600: #52525b;
-  --p-surface-700: #3f3f46;
-  --p-surface-800: #27272a;
-  --p-surface-900: #18181b;
-  --p-surface-950: #09090b;
+  --p-primary-50: 239 246 255; /* blue-50 */
+  --p-primary-100: 219 234 254; /* blue-100 */
+  --p-primary-200: 191 219 254; /* blue-200 */
+  --p-primary-300: 147 197 253; /* blue-300 */
+  --p-primary-400: 96 165 250; /* blue-400 */
+  --p-primary-500: 59 130 246; /* blue-500 */
+  --p-primary-600: 37 99 235; /* blue-600 */
+  --p-primary-700: 29 78 216; /* blue-700 */
+  --p-primary-800: 30 64 175; /* blue-800 */
+  --p-primary-900: 30 58 138; /* blue-900 */
+  --p-primary-950: 23 37 84;
+  --p-surface-0: 255 255 255;
+  --p-surface-50: 250 250 250;
+  --p-surface-100: 244 244 245;
+  --p-surface-200: 228 228 231;
+  --p-surface-300: 212 212 216;
+  --p-surface-400: 161 161 170;
+  --p-surface-500: 113 113 122;
+  --p-surface-600: 82 82 91;
+  --p-surface-700: 63 63 70;
+  --p-surface-800: 39 39 42;
+  --p-surface-900: 24 24 27;
+  --p-surface-950: 9 9 11;
   --p-content-border-radius: 6px;
 }
 
 /* Light Mode */
 :root {
-  --p-primary-color: var(--p-primary-500);
+  --p-primary-color: rgb(var(--p-primary-500));
   --p-primary-contrast-color: var(--p-surface-0);
   --p-primary-hover-color: var(--p-primary-600);
   --p-primary-active-color: var(--p-primary-700);
@@ -92,14 +92,7 @@
   --p-text-hover-muted-color: var(--p-surface-600);
 }
 
-/* 
-* Dark Mode
-* Change the .p-dark to match the darkMode in tailwind.config.
-* For example; 
-*  darkMode: ['selector', '[class*="app-dark"]'] 
-*  should match;
-* :root.app-dark
-*/
+/* Dark Mode */
 :root.p-dark {
   --p-primary-color: var(--p-primary-400);
   --p-primary-contrast-color: var(--p-surface-900);
@@ -110,13 +103,13 @@
   --p-content-hover-color: var(--p-surface-0);
   --p-highlight-background: color-mix(
     in srgb,
-    var(--p-primary-400),
+    rgb(var(--p-primary-400)),
     transparent 84%
   );
   --p-highlight-color: rgba(255, 255, 255, 0.87);
   --p-highlight-focus-background: color-mix(
     in srgb,
-    var(--p-primary-400),
+    rgb(var(--p-primary-400)),
     transparent 76%
   );
   --p-highlight-focus-color: rgba(255, 255, 255, 0.87);
