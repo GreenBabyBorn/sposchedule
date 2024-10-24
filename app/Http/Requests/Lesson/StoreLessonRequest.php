@@ -39,8 +39,7 @@ class StoreLessonRequest extends FormRequest
             ];
         } else {
             $rules = [
-                'subject' => 'required',
-                'subject.id' => 'required|exists:subjects,id',
+                'subject_id' => 'required|exists:subjects,id',
                 'schedule_id' => 'required|exists:schedules,id',
                 'cabinet' => 'nullable|string|max:255',
                 'week_type' => ['nullable', Rule::in(['ЧИСЛ', 'ЗНАМ'])],
@@ -108,8 +107,8 @@ class StoreLessonRequest extends FormRequest
     public function messages()
     {
         return [
-            'subject.id.required' => 'Поле "ID предмета" обязательно для заполнения.',
-            'subject.id.exists' => 'Предмет с указанным ID не найден.',
+            'subject_id.required' => 'Поле "ID предмета" обязательно для заполнения.',
+            'subject_id.exists' => 'Предмет с указанным ID не найден.',
             'schedule_id.required' => 'Поле "ID расписания" обязательно для заполнения.',
             'schedule_id.exists' => 'Расписание с указанным ID не найдено.',
             'cabinet.required' => 'Поле "Кабинет" обязательно для заполнения.',
