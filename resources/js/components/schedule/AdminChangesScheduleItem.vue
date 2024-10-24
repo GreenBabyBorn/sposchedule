@@ -22,6 +22,7 @@
   import ToggleButton from 'primevue/togglebutton';
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
+  // import RCESelect from '../ui/RCESelect.vue';
 
   const toast = useToast();
   const props = defineProps({
@@ -411,7 +412,7 @@
       >
     </div>
     <table class="schedule-table bg-surface-50 dark:bg-surface-900">
-      <thead v-show="lessons?.length > 0">
+      <thead>
         <tr>
           <th>
             <div class="">№</div>
@@ -463,10 +464,10 @@
             </div>
           </td>
           <td v-show="!newLessonMessageState">
-            <div class="table-subrow">
+            <div class="table-subrow flex flex-col">
               <Select
                 v-model="newLesson.subject"
-                append-to="self"
+                filter
                 data-key="name"
                 editable
                 placeholder="Предмет"
