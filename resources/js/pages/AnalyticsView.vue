@@ -92,7 +92,7 @@
             filter
             placeholder="Выбрать группы"
             :max-selected-labels="3"
-            class="w-full md:w-60"
+            class=""
           />
           <DatePicker
             v-model="rangeDates"
@@ -112,7 +112,6 @@
         :loading="isLoading"
         :value="data"
         row-group-mode="rowspan"
-        table-style="min-width: 50rem"
       >
         <template #header>
           <div style="text-align: left">

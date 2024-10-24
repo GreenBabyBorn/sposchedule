@@ -76,16 +76,16 @@
 /* Light Mode */
 :root {
   --p-primary-color: rgb(var(--p-primary-500));
-  --p-primary-contrast-color: var(--p-surface-0);
-  --p-primary-hover-color: var(--p-primary-600);
-  --p-primary-active-color: var(--p-primary-700);
-  --p-content-border-color: var(--p-surface-200);
-  --p-content-hover-background: var(--p-surface-100);
-  --p-content-hover-color: var(--p-surface-800);
-  --p-highlight-background: var(--p-primary-50);
-  --p-highlight-color: var(--p-primary-700);
-  --p-highlight-focus-background: var(--p-primary-100);
-  --p-highlight-focus-color: var(--p-primary-800);
+  --p-primary-contrast-color: rgb(var(--p-surface-0));
+  --p-primary-hover-color: rgb(var(--p-primary-600));
+  --p-primary-active-color: rgb(var(--p-primary-700));
+  --p-content-border-color: rgb(var(--p-surface-200));
+  --p-content-hover-background: rgb(var(--p-surface-100));
+  --p-content-hover-color: rgb(var(--p-surface-800));
+  --p-highlight-background: rgb(var(--p-primary-50));
+  --p-highlight-color: rgb(var(--p-primary-700));
+  --p-highlight-focus-background: rgb(var(--p-primary-100));
+  --p-highlight-focus-color: rgb(var(--p-primary-800));
   --p-text-color: var(--p-surface-700);
   --p-text-hover-color: var(--p-surface-800);
   --p-text-muted-color: var(--p-surface-500);
