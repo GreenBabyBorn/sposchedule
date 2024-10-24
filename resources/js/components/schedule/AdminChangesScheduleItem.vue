@@ -201,9 +201,12 @@
     try {
       await storeLesson({
         body: {
-          ...newLesson,
-          teachers: newLesson.teachers,
+          // ...newLesson,
           index: newLesson.index,
+          building: newLesson.building,
+          message: newLesson.message,
+          cabinet: newLesson.cabinet,
+          teachers: newLesson.teachers,
           subject_id: newLesson.subject?.id,
           schedule_id: scheduleId,
         },

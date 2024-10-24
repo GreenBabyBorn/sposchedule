@@ -1270,7 +1270,7 @@ class ScheduleController extends Controller
             $weekNumber = $semesterStart->diffInWeeks($currentDate);
             $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
 
-            // Основной SQL-запрос для текущей даты
+            // Основной SQL-запрос для текущей даты с приоритетом расписания changes
             $query = "
                 SELECT g.name as group_name, 
                        subj.name as subject_name,
@@ -1283,11 +1283,22 @@ class ScheduleController extends Controller
                 WHERE s.published = true
                 AND subj.name IS NOT NULL
                 AND l.message IS NULL
+                AND g.id IN (" . implode(',', array_map('intval', $groupIds)) . ")
                 AND (
                     (s.type = 'changes' AND s.date = :date)
-                    OR (s.type = 'main' AND s.week_day = :week_day AND s.semester_id = :semester_id)
+                    OR (
+                        s.type = 'main' 
+                        AND s.week_day = :week_day 
+                        AND s.semester_id = :semester_id
+                        AND NOT EXISTS (
+                            SELECT 1
+                            FROM schedules s2
+                            WHERE s2.group_id = s.group_id
+                            AND s2.type = 'changes'
+                            AND s2.date = :date
+                        )
+                    )
                 )
-                AND g.id IN (" . implode(',', array_map('intval', $groupIds)) . ")
                 GROUP BY g.name, subj.name, l.week_type
                 ORDER BY g.name;
             ";
@@ -1319,7 +1330,7 @@ class ScheduleController extends Controller
 
                 // Добавляем количество уроков к предмету
                 if ($result->lesson_week_type === $weekType || $result->lesson_week_type === null) {
-                    $finalGroups[$result->group_name]['subjects'][$result->subject_name] = $finalGroups[$result->group_name]['subjects'][$result->subject_name] + $result->lesson_count * 2;
+                    $finalGroups[$result->group_name]['subjects'][$result->subject_name] += $result->lesson_count * 2;
                 }
             }
 
