@@ -38,6 +38,16 @@ class AppServiceProvider extends ServiceProvider
             //     ], Response::HTTP_TOO_MANY_REQUESTS);
             // });
         });
+        RateLimiter::for('login', function (Request $request) {
+            return [
+                Limit::perMinute(500),
+                Limit::perMinute(3)->by($request->input('email'))->response(function () {
+                    return response()->json([
+                        'message' => 'Превышено количество попыток входа. Пожалуйста, попробуйте снова через минуту.',
+                    ], Response::HTTP_TOO_MANY_REQUESTS);
+                }),
+            ];
+        });
 
         $this->app->singleton('historyLogger', function ($app) {
             return new HistoryLogger();

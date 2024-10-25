@@ -15,7 +15,8 @@ use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\HistoryController;
 
 Route::middleware('throttle:api')->group(function () {
-    Route::post('/login', [AuthController::class, 'login'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:login');
+    ;
     // Route::post('/register', [AuthController::class, 'register']);
     Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
