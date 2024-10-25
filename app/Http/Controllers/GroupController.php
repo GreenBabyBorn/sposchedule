@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Group\StoreGroupRequest;
 use App\Http\Requests\Group\UpdateGroupRequest;
-use App\Http\Requests\Group\AttachSemesterRequest;
-use App\Http\Requests\Group\DetachSemesterRequest;
+// use App\Http\Requests\Group\AttachSemesterRequest;
+// use App\Http\Requests\Group\DetachSemesterRequest;
 use App\Http\Resources\GroupResource;
 use App\Http\Resources\SkinnyGroup;
 use App\Http\Resources\LessonResource;
@@ -176,25 +176,25 @@ class GroupController extends Controller
         return response()->noContent();
     }
 
-    /**
-     * Attach a semester to a group
-     */
-    public function attachSemester(AttachSemesterRequest $request, Group $group)
-    {
-        $semester = Semester::findOrFail($request->semester_id);
-        $group->semesters()->attach($semester);
-        return response()->json(['message' => 'Семестр успешно добавлен к группе.', "semester" => $semester]);
-    }
+    // /**
+    //  * Attach a semester to a group
+    //  */
+    // public function attachSemester(AttachSemesterRequest $request, Group $group)
+    // {
+    //     $semester = Semester::findOrFail($request->semester_id);
+    //     $group->semesters()->attach($semester);
+    //     return response()->json(['message' => 'Семестр успешно добавлен к группе.', "semester" => $semester]);
+    // }
 
-    /**
-     * Detach a semester from a group
-     */
-    public function detachSemester(DetachSemesterRequest $request, Group $group)
-    {
-        $semester = Semester::findOrFail($request->semester_id);
-        $group->semesters()->detach($semester);
-        return response()->json(['message' => 'Семестр отвязан от группы.', "semester" => $semester ]);
-    }
+    // /**
+    //  * Detach a semester from a group
+    //  */
+    // public function detachSemester(DetachSemesterRequest $request, Group $group)
+    // {
+    //     $semester = Semester::findOrFail($request->semester_id);
+    //     $group->semesters()->detach($semester);
+    //     return response()->json(['message' => 'Семестр отвязан от группы.', "semester" => $semester ]);
+    // }
 
     public function getCourses(Request $request)
     {

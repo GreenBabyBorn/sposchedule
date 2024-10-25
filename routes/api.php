@@ -63,12 +63,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('bells', BellController::class)->except(['index', 'show']);
     Route::apiResource('bells-periods', BellsPeriodController::class)->except(['index', 'show']);
 
-    Route::post('/groups/{group}/semesters', [GroupController::class, 'attachSemester'])->where(['semester' => '[0-9]+']);
-    Route::delete('/groups/{group}/semesters', [GroupController::class, 'detachSemester'])->where(['semester' => '[0-9]+']);
+    // Route::post('/groups/{group}/semesters', [GroupController::class, 'attachSemester'])->where(['semester' => '[0-9]+']);
+    // Route::delete('/groups/{group}/semesters', [GroupController::class, 'detachSemester'])->where(['semester' => '[0-9]+']);
     Route::apiResource('groups', GroupController::class)->except(['index', 'show']);
 
-    Route::post('/lessons/{lesson}/teachers', [LessonController::class, 'attachTeacher'])->where(['lesson' => '[0-9]+']);
-    Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTeacher'])->where(['lesson' => '[0-9]+']);
+    // Route::post('/lessons/{lesson}/teachers', [LessonController::class, 'attachTeacher'])->where(['lesson' => '[0-9]+']);
+    // Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTeacher'])->where(['lesson' => '[0-9]+']);
     Route::apiResource('lessons', LessonController::class)->except(['index', 'show']);
 
     Route::patch('/schedules/{schedule}/changes', [ScheduleController::class, 'fromMainToChangesSchedule']);
@@ -77,8 +77,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('subjects', SubjectController::class)->except(['index', 'show']);
 
-    Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSubject'])->where(['teacher' => '[0-9]+']);
-    Route::delete('/teachers/{teacher}/subjects', [TeacherController::class, 'detachSubject'])->where(['teacher' => '[0-9]+']);
+    // Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSubject'])->where(['teacher' => '[0-9]+']);
+    // Route::delete('/teachers/{teacher}/subjects', [TeacherController::class, 'detachSubject'])->where(['teacher' => '[0-9]+']);
     Route::apiResource('teachers', TeacherController::class)->except(['index', 'show']);
 
     Route::apiResource('semesters', SemesterController::class)->except(['index', 'show']);
