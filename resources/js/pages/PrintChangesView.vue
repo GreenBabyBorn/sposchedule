@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { usePrintChangesSchedulesQuery } from '@/queries/schedules';
   import { useDateFormat } from '@vueuse/core';
-  import { computed, onMounted, ref, watch, nextTick } from 'vue';
+  import { computed, onMounted, ref, watch } from 'vue';
   import { useRoute } from 'vue-router';
   import { useAuthStore } from '@/stores/auth';
   import Button from 'primevue/button';
@@ -34,17 +34,13 @@
     }
   });
 
-  const isoDate = computed(() => {
-    return useDateFormat(date.value ? date.value : new Date(), 'DD.MM.YYYY')
-      .value;
+  const formattedDate = computed(() => {
+    if (date.value) return useDateFormat(date.value, 'DD.MM.YYYY').value;
+    return null;
   });
 
-  // const selectedCourse = ref()
-  const {
-    data: changesSchedules,
-    isSuccess,
-    isFetchedAfterMount,
-  } = usePrintChangesSchedulesQuery(isoDate);
+  const { data: changesSchedules, isSuccess } =
+    usePrintChangesSchedulesQuery(formattedDate);
 
   const blocks1_5 = computed(() => {
     const chunkSize = 4; // Размер подмассива
@@ -70,6 +66,7 @@
 
     return result;
   });
+
   const blocks6 = computed(() => {
     const chunkSize = 4; // Размер подмассива
     const result = [];
@@ -98,17 +95,6 @@
   const authStore = useAuthStore();
   const { user, isAuth } = storeToRefs(authStore);
 
-  watch([isFetchedAfterMount, isSuccess], async () => {
-    if (isFetchedAfterMount.value && isSuccess.value) {
-      // Ждём, пока контент будет полностью отрендерен
-      await nextTick();
-
-      // Ждём завершения загрузки ресурсов и запускаем печать
-
-      // window.print();
-    }
-  });
-
   function printPage() {
     window.print();
   }
@@ -117,13 +103,13 @@
     router.replace({
       query: {
         ...route.query,
-        date: isoDate.value || undefined,
+        date: formattedDate.value || undefined,
       },
     });
   };
 
   watch(
-    [isoDate],
+    [formattedDate],
     () => {
       updateQueryParams();
     },
@@ -221,7 +207,6 @@
         </thead>
         <tbody>
           <tr v-for="index in [0, 1, 2, 3, 4, 5, 6, 7]" :key="index">
-            <!-- Колонки расписания для каждой группы -->
             <template
               v-for="(group, groupIndex) in block"
               :key="`row-${index}-group-${groupIndex}`"

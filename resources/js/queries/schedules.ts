@@ -78,7 +78,6 @@ export function usePrintChangesSchedulesQuery(date) {
   return useQuery({
     enabled: enabled,
     queryKey: ['PrintScheduleChanges', date],
-    retry: 0,
     queryFn: async () =>
       (await axios.get(`/api/schedules/changes/print?date=${date.value}`)).data,
   });

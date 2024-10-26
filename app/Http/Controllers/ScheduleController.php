@@ -184,6 +184,9 @@ class ScheduleController extends Controller
      */
     public function getChangesSchedules(Request $request)
     {
+        $request->validate([
+            'date' => ['required', 'date'],
+        ]);
         $date = $request->input('date');
         $carbonDate = Carbon::parse($date);
 
@@ -398,6 +401,9 @@ class ScheduleController extends Controller
      */
     public function getPublicSchedules(Request $request)
     {
+        $request->validate([
+            'date' => ['required', 'date'],
+        ]);
         $date = $request->input('date');
         $carbonDate = Carbon::parse($date);
 
@@ -586,6 +592,9 @@ class ScheduleController extends Controller
      */
     public function getChangesSchedulesPrint(Request $request)
     {
+        $request->validate([
+            'date' => ['required', 'date'],
+        ]);
         $date = $request->input('date');
 
         $carbonDate = Carbon::parse($date);
@@ -795,13 +804,15 @@ class ScheduleController extends Controller
      */
     public function getLessonCountsByDateRange(Request $request)
     {
+        $request->validate([
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date'],
+            'group_ids' => ['required'],
+            'group_ids.*' => ['exists:groups,id'],
+        ]);
         $startDate = Carbon::parse($request->input('start_date'));
         $endDate = Carbon::parse($request->input('end_date'));
         $groupIds = $request->input('group_ids');
-
-        if (! $startDate || ! $endDate) {
-            return response()->json(['error' => 'Необходимо указать диапазон дат'], 400);
-        }
 
         if (is_string($groupIds)) {
             $groupIds = explode(',', $groupIds);
@@ -914,20 +925,18 @@ class ScheduleController extends Controller
      */
     public function getSchedulesByDateRange(Request $request)
     {
+        $request->validate([
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date'],
+            'group_ids' => ['required'],
+            'group_ids.*' => ['exists:groups,id'],
+        ]);
         $startDate = Carbon::parse($request->input('start_date'));
         $endDate = Carbon::parse($request->input('end_date'));
         $groupIds = $request->input('group_ids');
 
         if (is_string($groupIds)) {
             $groupIds = explode(',', $groupIds);
-        }
-
-        if (! $startDate || ! $endDate) {
-            return response()->json(['error' => 'Необходимо указать диапазон дат'], 400);
-        }
-
-        if (empty($groupIds)) {
-            return response()->json(['error' => 'Необходимо указать хотя бы одну группу'], 400);
         }
 
         $weekDayMapping = [
