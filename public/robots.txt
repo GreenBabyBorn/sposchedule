@@ -2,3 +2,4 @@ User-agent: *
 Disallow: /admin/
 Disallow: /print/
 Disallow: /analytics/
+Clean-param: building&course&group /
