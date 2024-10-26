@@ -18,7 +18,7 @@ class UpdateBellsPeriodRequest extends FormRequest
     {
         return [
             'bells_id' => 'required|exists:bells,id', // Проверяем существование bells_id
-            'index' => 'required|integer|min:0|unique:bells_periods,index,' . $this->route('bells_period') . ',id,bells_id,' . $this->bells_id, // Уникальность индекса с исключением текущего id
+            'index' => 'required|integer|min:0|unique:bells_periods,index,'.$this->route('bells_period').',id,bells_id,'.$this->bells_id, // Уникальность индекса с исключением текущего id
             'has_break' => 'boolean',
             'period_from' => 'required|date_format:H:i', // Время в формате HH:MM
             'period_to' => 'required|date_format:H:i|after:period_from', // Время окончания должно быть после времени начала

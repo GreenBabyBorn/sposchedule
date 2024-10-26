@@ -17,8 +17,6 @@ class BellsPeriod extends Model
         'period_to_after',
     ];
 
-
-
     // Связь с Bells
     public function bells(): BelongsTo
     {

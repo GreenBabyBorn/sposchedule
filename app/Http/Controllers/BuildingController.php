@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\HistoryLogger;
 use App\Models\Building;
 use Illuminate\Http\Request;
-use App\Facades\HistoryLogger;
 
 class BuildingController extends Controller
 {
     // Получение всех корпусов
     public function index()
     {
-        return Building::orderBy('name', )->get();
+        return Building::orderBy('name')->get();
     }
 
     // Создание нового корпуса
@@ -23,7 +23,8 @@ class BuildingController extends Controller
         ]);
 
         $building = Building::create($validatedData);
-        HistoryLogger::logAction('Добавлен корпус ' . $building->name);
+        HistoryLogger::logAction('Добавлен корпус '.$building->name);
+
         return response()->json($building, 201);
     }
 
@@ -31,6 +32,7 @@ class BuildingController extends Controller
     public function show($name)
     {
         $building = Building::findOrFail($name);
+
         return response()->json($building);
     }
 
@@ -44,7 +46,8 @@ class BuildingController extends Controller
         ]);
 
         $building->update($validatedData);
-        HistoryLogger::logAction('Обновлен корпус ' . $building->name);
+        HistoryLogger::logAction('Обновлен корпус '.$building->name);
+
         return response()->json($building);
     }
 
@@ -53,7 +56,8 @@ class BuildingController extends Controller
     {
         $building = Building::findOrFail($name);
         $building->delete();
-        HistoryLogger::logAction('Удален корпус ' . $building->name);
+        HistoryLogger::logAction('Удален корпус '.$building->name);
+
         return response()->json(null, 204);
     }
 }

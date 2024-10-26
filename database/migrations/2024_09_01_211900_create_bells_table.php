@@ -15,9 +15,9 @@ class CreateBellsTable extends Migration
             $table->date('date')->nullable();
             $table->string('building');
             $table->foreign('building')
-                  ->references('name')
-                  ->on('buildings')
-                  ->onDelete('cascade');
+                ->references('name')
+                ->on('buildings')
+                ->onDelete('cascade');
             $table->boolean('is_preset')->default(false);
             $table->string('name_preset')->nullable();
             $table->boolean('published')->default(false)->nullable();

@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\HistoryLogger;
 use App\Http\Requests\Semester\StoreSemesterRequest;
 use App\Http\Requests\Semester\UpdateSemesterRequest;
 use App\Http\Resources\SemesterResource;
 use App\Models\Semester;
-use App\Facades\HistoryLogger;
 
 class SemesterController extends Controller
 {
@@ -25,6 +25,7 @@ class SemesterController extends Controller
     {
         $semester = Semester::create($request->all());
         HistoryLogger::logAction('Добавлен семестр', $semester->toArray());
+
         return new SemesterResource($semester);
     }
 
@@ -43,6 +44,7 @@ class SemesterController extends Controller
     {
         $semester->update($request->all());
         HistoryLogger::logAction('Обновлен семестр', $semester->toArray());
+
         return new SemesterResource($semester);
     }
 

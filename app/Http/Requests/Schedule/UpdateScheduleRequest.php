@@ -17,10 +17,10 @@ class UpdateScheduleRequest extends FormRequest
     }
 
     /**
-    * Get the validation rules that apply to the request.
-    *
-    * @return array
-    */
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -43,7 +43,6 @@ class UpdateScheduleRequest extends FormRequest
                 Rule::in(['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']),
             ],
 
-
         ];
     }
 
@@ -53,7 +52,7 @@ class UpdateScheduleRequest extends FormRequest
         $validator->after(function ($validator) {
             $date = $this->safe()->input('date');
             $week_type = $this->safe()->input('week_type');
-            if(!$week_type) {
+            if (! $week_type) {
                 return;
             }
 
@@ -64,7 +63,7 @@ class UpdateScheduleRequest extends FormRequest
             $weekNumber = intdiv($daysSinceStart, 7) + 1;
             $isOddWeek = $weekNumber % 2 !== 0;
 
-            if (!$isOddWeek && $week_type === 'ЗНАМ') {
+            if (! $isOddWeek && $week_type === 'ЗНАМ') {
                 return;
             }
 

@@ -4,7 +4,6 @@ namespace App\Http\Requests\Group;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\Rule;
 
 class AttachSemesterRequest extends FormRequest
 {
@@ -25,13 +24,14 @@ class AttachSemesterRequest extends FormRequest
     {
         return [
             // "semester_id" => 'required|integer|exists:subjects,id|unique:subject_teacher'
-            "semester_id" => [
+            'semester_id' => [
                 'required',
                 'integer',
                 'exists:semesters,id',
-            ]
+            ],
         ];
     }
+
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
@@ -43,6 +43,7 @@ class AttachSemesterRequest extends FormRequest
             }
         });
     }
+
     /**
      * Get custom messages for validator errors.
      *

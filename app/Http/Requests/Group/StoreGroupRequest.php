@@ -51,7 +51,7 @@ class StoreGroupRequest extends FormRequest
             'specialization.max' => 'Поле "специальность" не должно превышать 255 символов.',
             'semesters.required' => 'Необходимо указать хотя бы один семестр.',
             'semesters.*.id.required' => 'ID семестра обязателен для заполнения.',
-            'semesters.*.id.exists' => 'Указанный семестр не существует.'
+            'semesters.*.id.exists' => 'Указанный семестр не существует.',
         ];
     }
 
@@ -70,7 +70,7 @@ class StoreGroupRequest extends FormRequest
         $validator = parent::getValidatorInstance();
 
         $validator->after(function ($validator) {
-            $name = $this->specialization . "-" . $this->course . $this->index;
+            $name = $this->specialization.'-'.$this->course.$this->index;
             if (Group::where('name', $name)->exists()) {
                 $validator->errors()->add('name', 'Группа с таким именем уже существует.');
             }

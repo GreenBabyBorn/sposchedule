@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Semester;
 
 class Group extends Model
 {
@@ -37,7 +36,7 @@ class Group extends Model
         parent::boot();
 
         static::saving(function ($group) {
-            $group->name = $group->specialization . '-' . $group->course . $group->index;
+            $group->name = $group->specialization.'-'.$group->course.$group->index;
         });
     }
 }

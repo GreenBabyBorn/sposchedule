@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\HistoryLogger;
 use App\Http\Requests\Lesson\StoreLessonRequest;
 use App\Http\Requests\Lesson\UpdateLessonRequest;
 use App\Http\Resources\LessonResource;
 use App\Models\Lesson;
-use App\Models\Schedule;
 // use App\Models\Teacher;
 // use Illuminate\Http\Request;
-use App\Facades\HistoryLogger;
+use App\Models\Schedule;
 
 class LessonController extends Controller
 {
@@ -31,7 +31,8 @@ class LessonController extends Controller
             $teachersIds = array_column($request->teachers, 'id');
             $lesson->teachers()->sync($teachersIds);
         }
-        HistoryLogger::logAction("Добавлена {$lesson->index} пара {$lesson->subject?->name}", );
+        HistoryLogger::logAction("Добавлена {$lesson->index} пара {$lesson->subject?->name}");
+
         return new LessonResource($lesson);
     }
 
@@ -54,6 +55,7 @@ class LessonController extends Controller
             $lesson->teachers()->sync($teachersIds);
         }
         HistoryLogger::logAction("Обновлена {$lesson->index} пара {$lesson->subject?->name}");
+
         return new LessonResource($lesson);
     }
 
@@ -76,6 +78,7 @@ class LessonController extends Controller
                 $schedule->delete();
             }
         }
+
         return response()->noContent();
         // return empty($schedule->lessons);
     }

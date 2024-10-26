@@ -17,7 +17,7 @@ class Lesson extends Model
         'index',
         'building',
         'week_type',
-        'message'
+        'message',
     ];
 
     public function subject()

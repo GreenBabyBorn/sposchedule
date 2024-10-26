@@ -2,15 +2,18 @@
 
 namespace App\Rules;
 
+use App\Models\Semester;
+use Carbon\Carbon; // Убедитесь, что путь к модели Semester верный
 use Illuminate\Contracts\Validation\Rule;
-use App\Models\Semester; // Убедитесь, что путь к модели Semester верный
-use Carbon\Carbon;
 
 class NoOverlappingSemesters implements Rule
 {
     private $years;
+
     private $start;
+
     private $end;
+
     private $currentSemesterId;
 
     public function __construct($years, $start, $end, $currentSemesterId = null)
@@ -40,7 +43,7 @@ class NoOverlappingSemesters implements Rule
             ->exists();
 
         // Возвращаем true, если пересечений нет
-        return !$overlappingSemester;
+        return ! $overlappingSemester;
     }
 
     public function message()

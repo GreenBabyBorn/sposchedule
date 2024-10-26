@@ -18,7 +18,7 @@ class SubjectResource extends JsonResource
         $includeTeachers = $request->query('teachers', false);
 
         // Базовый массив, который всегда возвращается
-        return  [
+        return [
             'id' => $this->id,
             'name' => $this->name,
             'teachers' => $this->when(

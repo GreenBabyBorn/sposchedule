@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 // use App\Http\Requests\Teacher\AttachSubjectRequest;
 // use App\Http\Requests\Teacher\DetachSubjectRequest;
+use App\Facades\HistoryLogger;
 use App\Http\Requests\Teacher\StoreTeacherRequest;
 use App\Http\Requests\Teacher\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
-use App\Facades\HistoryLogger;
 
 class TeacherController extends Controller
 {
@@ -42,6 +41,7 @@ class TeacherController extends Controller
 
         // Получаем отфильтрованные группы
         $teachers = $query->get();
+
         return TeacherResource::collection($teachers);
     }
 
@@ -52,6 +52,7 @@ class TeacherController extends Controller
     {
         $teacher = Teacher::create($request->all());
         HistoryLogger::logAction('Добавлен преподаватель', $teacher->toArray());
+
         return new TeacherResource($teacher);
     }
 
@@ -74,6 +75,7 @@ class TeacherController extends Controller
             $subjectsIds = array_column($request->subjects, 'id');
             $teacher->subjects()->sync($subjectsIds);
         }
+
         return new TeacherResource($teacher);
     }
 
@@ -84,6 +86,7 @@ class TeacherController extends Controller
     {
         HistoryLogger::logAction('Удален преподаватель', $teacher->toArray());
         $teacher->delete();
+
         return response()->noContent();
     }
 

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Bell;
 use App\Models\BellsPeriod;
 use App\Models\Building;
+use Illuminate\Database\Seeder;
 
 class BellsSeeder extends Seeder
 {

@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Teacher;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidationException;
 
 class DetachSubjectRequest extends FormRequest
 {
@@ -15,7 +14,7 @@ class DetachSubjectRequest extends FormRequest
         return true;
     }
 
-     /**
+    /**
      * Get the validation rules that apply to the request.
      *
      * @return array
@@ -26,17 +25,18 @@ class DetachSubjectRequest extends FormRequest
             'subject_id' => 'required|integer|exists:subjects,id|integer',
         ];
     }
+
     /**
      * Custom validation logic
      */
     public function withValidator($validator)
     {
-        
+
         $validator->after(function ($validator) {
             $teacher = $this->route('teacher');
             $subjectId = $this->safe()->input('subject_id');
 
-            if (!$teacher->subjects()->where('subject_id', $subjectId)->exists()) {
+            if (! $teacher->subjects()->where('subject_id', $subjectId)->exists()) {
                 $validator->errors()->add('subject_id', 'Этот предмет не прикреплен к этому преподавателю.');
             }
         });

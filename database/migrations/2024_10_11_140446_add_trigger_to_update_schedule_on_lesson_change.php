@@ -3,7 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 
-return new class () extends Migration {
+return new class() extends Migration
+{
     public function up()
     {
         // Создаем функцию для обновления поля updated_at у schedules

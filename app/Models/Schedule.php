@@ -17,7 +17,7 @@ class Schedule extends Model
         'week_day',
         // 'view_mode',
         'message',
-        'published'
+        'published',
     ];
 
     public function group()

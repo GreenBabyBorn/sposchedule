@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use App\Facades\HistoryLogger;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -32,7 +32,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Успешная регистрация',
-            'token' => $token // Возвращаем токен
+            'token' => $token, // Возвращаем токен
         ], 201);
     }
 
@@ -43,7 +43,7 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        if (!Auth::attempt($credentials, $request->remember ? true : false)) {
+        if (! Auth::attempt($credentials, $request->remember ? true : false)) {
             return response()->json(['message' => 'Неверный логин или пароль'], 401);
         }
 
@@ -53,7 +53,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Добро пожаловать!',
-            'token' => $token
+            'token' => $token,
         ]);
     }
 
@@ -64,7 +64,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         $user = $request->user();
 
-        if($user) {
+        if ($user) {
             $user->tokens()->delete();
         }
 
@@ -79,7 +79,7 @@ class AuthController extends Controller
         // Валидация данных
         $request->validate([
             'name' => 'sometimes|string|max:255', // Поле может быть передано, но не обязательно
-            'email' => 'sometimes|string|email|max:255|unique:users,email,' . $user->id, // Уникальный email, игнорируем текущего пользователя
+            'email' => 'sometimes|string|email|max:255|unique:users,email,'.$user->id, // Уникальный email, игнорируем текущего пользователя
             'password' => 'sometimes|string|min:6|confirmed', // Обновление пароля, если передан
         ]);
 
@@ -104,7 +104,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Профиль успешно обновлен',
-            'user' => $user
+            'user' => $user,
         ]);
     }
 }

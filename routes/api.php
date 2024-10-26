@@ -1,22 +1,22 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BellController;
+use App\Http\Controllers\BellsPeriodController;
+use App\Http\Controllers\BuildingController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\AuthController;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
-use App\Http\Controllers\BellController;
-use App\Http\Controllers\BellsPeriodController;
-use App\Http\Controllers\BuildingController;
-use App\Http\Controllers\HistoryController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('throttle:api')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login')->middleware('throttle:login');
-    ;
+
     // Route::post('/register', [AuthController::class, 'register']);
     Route::get('/schedules/public', [ScheduleController::class, 'getPublicSchedules']);
 
@@ -28,12 +28,12 @@ Route::middleware('throttle:api')->group(function () {
     Route::get('/bells/presets', [BellController::class, 'presetsBells']);
     Route::apiResource('bells', BellController::class)->only(['index', 'show']);
     Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
-    Route::get('/schedules/changes/print', [ScheduleController::class, 'getScheduleByDatePrint']);
+    Route::get('/schedules/changes/print', [ScheduleController::class, 'getChangesSchedulesPrint']);
     Route::get('/schedules/main/semester/{semester}/print', [ScheduleController::class, 'getSchedulesMainPrint']);
     Route::get('/groups/courses', [GroupController::class, 'getCourses']);
     Route::get('/groups/public', [GroupController::class, 'indexPublic']);
     Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
-    Route::get('/schedules/changes', [ScheduleController::class, 'getScheduleByDate']);
+    Route::get('/schedules/changes', [ScheduleController::class, 'getChangesSchedules']);
     Route::apiResource('groups', GroupController::class)->only(['index', 'show']);
     Route::apiResource('lessons', LessonController::class)->only(['show']);
     Route::apiResource('schedules', ScheduleController::class)->only(['show']);
@@ -42,10 +42,9 @@ Route::middleware('throttle:api')->group(function () {
     Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);
 
     Route::apiResource('buildings', BuildingController::class)->parameters([
-        'buildings' => 'name'
+        'buildings' => 'name',
     ]);
 });
-
 
 // Маршруты, требующие аутентификации
 Route::middleware(['auth:sanctum'])->group(function () {

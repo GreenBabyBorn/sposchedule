@@ -18,7 +18,7 @@ class SemesterResource extends JsonResource
             'id' => $this->id,
             'years' => $this->years,
             'index' => $this->index,
-            'name' => $this->years . " " . $this->index . " " . "семестр",
+            'name' => $this->years.' '.$this->index.' '.'семестр',
             'start' => $this->start,
             'end' => $this->end,
         ];

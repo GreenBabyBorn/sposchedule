@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Semester;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\NoOverlappingSemesters;
+use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSemesterRequest extends FormRequest
 {

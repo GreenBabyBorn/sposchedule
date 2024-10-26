@@ -2,20 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Facades\HistoryLogger;
 use App\Http\Requests\Group\StoreGroupRequest;
-use App\Http\Requests\Group\UpdateGroupRequest;
 // use App\Http\Requests\Group\AttachSemesterRequest;
 // use App\Http\Requests\Group\DetachSemesterRequest;
+use App\Http\Requests\Group\UpdateGroupRequest;
 use App\Http\Resources\GroupResource;
-use App\Http\Resources\SkinnyGroup;
 use App\Http\Resources\LessonResource;
-use App\Http\Resources\ScheduleResource;
+use App\Http\Resources\SkinnyGroup;
 use App\Models\Group;
 use App\Models\Schedule;
 use App\Models\Semester;
 use Illuminate\Http\Request;
-use App\Facades\HistoryLogger;
 
 class GroupController extends Controller
 {
@@ -74,7 +72,7 @@ class GroupController extends Controller
         $query = Group::query();
 
         $building = $request->input('building');
-        if($building) {
+        if ($building) {
             $query->whereHas('buildings', function ($query) use ($building) {
                 $query->where('name', $building);
             });
@@ -126,7 +124,7 @@ class GroupController extends Controller
 
         $group = Group::create([
             ...$request->all(),
-            "name" => $name,
+            'name' => $name,
 
         ]);
         $semesterIds = array_column($request->semesters, 'id');
@@ -134,7 +132,8 @@ class GroupController extends Controller
         $buildingsIds = array_column($request->buildings, 'name');
         $group->buildings()->sync($buildingsIds);
         $group->refresh();
-        HistoryLogger::logAction('Добавлена группа ' . $group->name, $group->toArray());
+        HistoryLogger::logAction('Добавлена группа '.$group->name, $group->toArray());
+
         return new GroupResource($group);
     }
 
@@ -146,13 +145,12 @@ class GroupController extends Controller
         return new GroupResource($group);
     }
 
-
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateGroupRequest $request, Group $group)
     {
-        HistoryLogger::logAction('Обновлена группа ' . $group->name, $group->toArray());
+        HistoryLogger::logAction('Обновлена группа '.$group->name, $group->toArray());
         $group->update($request->all());
         if ($request->has('semesters') && is_array($request->semesters)) {
             $semestersIds = array_column($request->semesters, 'id');
@@ -163,6 +161,7 @@ class GroupController extends Controller
             $group->buildings()->sync($buildingsIds);
         }
         $group->refresh();
+
         return new GroupResource($group);
     }
 
@@ -171,8 +170,9 @@ class GroupController extends Controller
      */
     public function destroy(Group $group)
     {
-        HistoryLogger::logAction('Удалена группа ' . $group->name, $group->toArray());
+        HistoryLogger::logAction('Удалена группа '.$group->name, $group->toArray());
         $group->delete();
+
         return response()->noContent();
     }
 
@@ -200,7 +200,7 @@ class GroupController extends Controller
     {
         $building = $request->query('building');
         $coursesQuery = Group::select('course')->distinct()->orderBy('course', 'asc');
-        if($building) {
+        if ($building) {
             $coursesQuery->whereHas('buildings', function ($query) use ($building) {
                 $query->where('name', $building);
             });
@@ -214,22 +214,21 @@ class GroupController extends Controller
     {
         // Получаем расписания для данной группы с типом 'main'
         $schedules = Schedule::where('group_id', $group->id)
-        ->where('semester_id', $semester->id)
-        ->where('type', 'main')
-        ->with('lessons') // Загрузить уроки вместе с расписанием
-        ->get()
-        ->groupBy('week_day');
-
+            ->where('semester_id', $semester->id)
+            ->where('type', 'main')
+            ->with('lessons') // Загрузить уроки вместе с расписанием
+            ->get()
+            ->groupBy('week_day');
 
         // Инициализируем пустой массив для ответа
         $response = [
-        'ПН' => [],
-        'ВТ' => [],
-        'СР' => [],
-        'ЧТ' => [],
-        'ПТ' => [],
-        'СБ' => [],
-        'ВС' => [],
+            'ПН' => [],
+            'ВТ' => [],
+            'СР' => [],
+            'ЧТ' => [],
+            'ПТ' => [],
+            'СБ' => [],
+            'ВС' => [],
         ];
         // Заполняем ответ расписаниями по дням недели
 
@@ -243,7 +242,7 @@ class GroupController extends Controller
                 foreach ($schedule->lessons as $lesson) {
                     $index = $lesson->index; // Поле "index", указывающее номер пары
 
-                    if (!isset($dayLessons[$index])) {
+                    if (! isset($dayLessons[$index])) {
                         $dayLessons[$index] = [
                             'index' => $index,
                             'schedule_id' => $schedule->id,
@@ -252,19 +251,19 @@ class GroupController extends Controller
                             // 'ЗНАМ' => new \stdClass() ,
                         ];
                     }
-                    if ($lesson->week_type === 'ЧИСЛ' && !empty($lesson)) {
+                    if ($lesson->week_type === 'ЧИСЛ' && ! empty($lesson)) {
                         $dayLessons[$index]['ЧИСЛ'] = new LessonResource($lesson);
                         if (empty($dayLessons[$index]['ЗНАМ'])) {
                             $dayLessons[$index]['ЗНАМ'] = new \stdClass();
                         }
-                    } if ($lesson->week_type === 'ЗНАМ' && !empty($lesson)) {
+                    } if ($lesson->week_type === 'ЗНАМ' && ! empty($lesson)) {
                         $dayLessons[$index]['ЗНАМ'] = new LessonResource($lesson);
                         if (empty($dayLessons[$index]['ЧИСЛ'])) {
                             $dayLessons[$index]['ЧИСЛ'] = new \stdClass();
                         }
                         // $dayLessons[$index]['ЧИСЛ'] = new \stdClass();
                     }
-                    if($lesson->week_type === null) {
+                    if ($lesson->week_type === null) {
                         $dayLessons[$index]['lesson'] = new LessonResource($lesson);
 
                     }
@@ -278,6 +277,4 @@ class GroupController extends Controller
         return response()->json($response);
 
     }
-
-
 }

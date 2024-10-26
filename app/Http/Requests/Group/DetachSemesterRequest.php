@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Group;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidationException;
 
 class DetachSemesterRequest extends FormRequest
 {
@@ -16,16 +15,17 @@ class DetachSemesterRequest extends FormRequest
     }
 
     /**
-    * Get the validation rules that apply to the request.
-    *
-    * @return array
-    */
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
     public function rules()
     {
         return [
             'semester_id' => 'required|integer|exists:semesters,id|integer',
         ];
     }
+
     /**
      * Custom validation logic
      */
@@ -36,7 +36,7 @@ class DetachSemesterRequest extends FormRequest
             $group = $this->route('group');
             $semesterId = $this->safe()->input('semester_id');
 
-            if (!$group->semesters()->where('semester_id', $semesterId)->exists()) {
+            if (! $group->semesters()->where('semester_id', $semesterId)->exists()) {
                 $validator->errors()->add('semester_id', 'Этот семестр не прикреплен к этой группе.');
             }
         });

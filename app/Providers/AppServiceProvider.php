@@ -2,13 +2,12 @@
 
 namespace App\Providers;
 
-use App\Models\History;
-use Illuminate\Support\Facades\RateLimiter;
+use App\Services\HistoryLogger;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use App\Services\HistoryLogger;
 use Symfony\Component\HttpFoundation\Response;
 
 class AppServiceProvider extends ServiceProvider

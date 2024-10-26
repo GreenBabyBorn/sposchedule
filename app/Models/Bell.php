@@ -17,8 +17,8 @@ class Bell extends Model
         'published',
     ];
 
-
     public const TYPE_MAIN = 'main';
+
     public const TYPE_CHANGES = 'changes';
 
     protected $casts = [

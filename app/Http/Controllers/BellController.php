@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use App\Facades\HistoryLogger;
 use App\Http\Resources\BellsResource;
 use App\Models\Bell;
-use App\Models\BellPeriod;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Models\BellsPeriod;
-use App\Facades\HistoryLogger;
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class BellController extends Controller
 {
@@ -39,7 +35,7 @@ class BellController extends Controller
             $query = Bell::query();
 
             // Добавляем фильтрацию по building, если он передан
-            if (!empty($queryParams['building'])) {
+            if (! empty($queryParams['building'])) {
                 $query->where('building', $queryParams['building']);
             }
 
@@ -49,7 +45,7 @@ class BellController extends Controller
             }
             // Фильтрация по типу changes
             elseif ($queryParams['type'] === 'changes') {
-                if (!empty($queryParams['date'])) {
+                if (! empty($queryParams['date'])) {
                     $carbonDate = Carbon::parse($queryParams['date']); // Преобразуем строку даты в объект Carbon
                     $query->whereDate('date', $carbonDate->format('Y-m-d')); // Учитываем только дату без времени
 
@@ -61,12 +57,12 @@ class BellController extends Controller
 
                 $query->where(function (Builder $query) use ($queryParams, $carbonDate) {
                     $query->whereDate('date', $carbonDate->format('Y-m-d'))
-                          ->orWhere('week_day', $queryParams['week_day']);
+                        ->orWhere('week_day', $queryParams['week_day']);
                 })
-                ->whereDoesntHave('self', function (Builder $query) use ($queryParams, $carbonDate) {
-                    $query->where('variant', $queryParams['variant'])
-                          ->whereDate('date', $carbonDate->format('Y-m-d'));
-                });
+                    ->whereDoesntHave('self', function (Builder $query) use ($queryParams, $carbonDate) {
+                        $query->where('variant', $queryParams['variant'])
+                            ->whereDate('date', $carbonDate->format('Y-m-d'));
+                    });
             }
 
             // Выполняем запрос
@@ -78,6 +74,7 @@ class BellController extends Controller
 
         return new BellsResource($bells);
     }
+
     public function presetsBells(Request $request)
     {
         return BellsResource::collection(Bell::where('is_preset', true)->get());
@@ -126,28 +123,27 @@ class BellController extends Controller
         }
     }
 
-
     public function saveAsPreset(Request $request)
     {
         // Получаем звонок по ID
         $bell = Bell::find($request->bells_id);
 
-        if (!$bell) {
+        if (! $bell) {
             return response()->json([
-                'message' => 'Звонок не найден'
+                'message' => 'Звонок не найден',
             ], 404);
         }
 
         if ($bell->is_preset) {
             return response()->json([
-                'message' => 'Этот звонок уже является пресетом'
+                'message' => 'Этот звонок уже является пресетом',
             ], 400);
         }
 
         // Создаем копию звонка с флагом "preset"
         $presetBell = $bell->replicate();
         $presetBell->is_preset = true;
-        $presetBell->name_preset = $request->name ?? 'Пресет для звонка ' . $bell->id;
+        $presetBell->name_preset = $request->name ?? 'Пресет для звонка '.$bell->id;
         $presetBell->save();
 
         // 3. Копируем зависимые записи из таблицы bells_periods
@@ -160,9 +156,10 @@ class BellController extends Controller
             $newPeriod->save();
         }
         HistoryLogger::logAction('Сохранена заготовка звонков', $presetBell->toArray());
+
         return response()->json([
             'message' => 'Звонок успешно сохранен как пресет',
-            'preset_bell' => new BellsResource($presetBell)
+            'preset_bell' => new BellsResource($presetBell),
         ]);
     }
 
@@ -171,7 +168,7 @@ class BellController extends Controller
         $building = $request->input('building');
         $date = $request->input('date');
 
-        if (!$date) {
+        if (! $date) {
             return response()->json([
                 'message' => 'Необходимо указать дату.',
             ], 400);
@@ -213,7 +210,6 @@ class BellController extends Controller
             ->where('published', true)
             ->where('is_preset', false);
 
-
         if ($building) {
             $mainQuery->where('building', $building);
         }
@@ -232,15 +228,15 @@ class BellController extends Controller
             ], 404);
         }
 
-
         return BellsResource::collection($filteredBells);
     }
+
     public function publicBellsPrint(Request $request)
     {
         $buildings = $request->input('buildings');
         $date = $request->input('date');
 
-        if (!$date) {
+        if (! $date) {
             return response()->json([
                 'message' => 'Необходимо указать дату.',
             ], 400);
@@ -309,11 +305,11 @@ class BellController extends Controller
         return BellsResource::collection($filteredBells);
     }
 
-
     // Получение конкретного расписания звонков
     public function show($id)
     {
         $bell = Bell::with('periods')->findOrFail($id);
+
         return response()->json($bell);
     }
 
@@ -334,6 +330,7 @@ class BellController extends Controller
 
         $bell = Bell::create($request->all());
         HistoryLogger::logAction('Добавлено расписание звонков', $bell->toArray());
+
         return response()->json($bell, 201);
     }
 
@@ -354,6 +351,7 @@ class BellController extends Controller
         // }
         HistoryLogger::logAction('Обновлено расписание звонков', $bell->toArray());
         $bell->update($request->all());
+
         return response()->json($bell);
     }
 
@@ -363,6 +361,7 @@ class BellController extends Controller
         $bell = Bell::findOrFail($id);
         HistoryLogger::logAction('Удалено расписание звонков', $bell->toArray());
         $bell->delete();
+
         return response()->json(['message' => 'Расписание звонков удалено.']);
     }
 }

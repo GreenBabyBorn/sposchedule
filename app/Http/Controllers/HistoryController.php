@@ -14,12 +14,12 @@ class HistoryController extends Controller
         $query = History::query();
 
         // Фильтр по строке поиска
-        if ($request->has('search') && !empty($request->input('search'))) {
+        if ($request->has('search') && ! empty($request->input('search'))) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('action', 'ilike', '%' . $search . '%')
-                  ->orWhere('details', 'ilike', '%' . $search . '%')
-                  ->orWhere('id', 'ilike', '%' . $search . '%');
+                $q->where('action', 'ilike', '%'.$search.'%')
+                    ->orWhere('details', 'ilike', '%'.$search.'%')
+                    ->orWhere('id', 'ilike', '%'.$search.'%');
             });
         }
 
@@ -39,6 +39,7 @@ class HistoryController extends Controller
     public function destroy(History $history)
     {
         $history->delete();
+
         return response()->noContent();
     }
 }

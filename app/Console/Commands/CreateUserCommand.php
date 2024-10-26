@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\User;
+use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Hash;
 
 class CreateUserCommand extends Command
@@ -17,7 +17,6 @@ class CreateUserCommand extends Command
                             {name : The name of the user} 
                             {email : The email of the user} 
                             {password : The password of the user}';
-
 
     /**
      * The console command description.
@@ -38,6 +37,7 @@ class CreateUserCommand extends Command
         // Проверяем, существует ли пользователь с таким email
         if (User::where('email', $email)->exists()) {
             $this->error('A user with this email already exists.');
+
             return 1;
         }
 
@@ -49,6 +49,7 @@ class CreateUserCommand extends Command
         ]);
 
         $this->info("User '{$user->name}' created successfully with ID: {$user->id}");
+
         return 0;
     }
 }

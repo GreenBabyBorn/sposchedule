@@ -14,12 +14,11 @@ class StoreBellsPeriodRequest extends FormRequest
         return true;
     }
 
-
     public function rules()
     {
         return [
             'bells_id' => 'required|exists:bells,id', // Проверяем существование bells_id
-            'index' => 'required|integer|min:0|unique:bells_periods,index,NULL,id,bells_id,' . $this->bells_id, // Уникальность индекса для конкретного bells_id
+            'index' => 'required|integer|min:0|unique:bells_periods,index,NULL,id,bells_id,'.$this->bells_id, // Уникальность индекса для конкретного bells_id
             'has_break' => 'boolean',
             'period_from' => 'required|date_format:H:i', // Время в формате HH:MM
             'period_to' => 'required|date_format:H:i|after:period_from', // Время окончания должно быть после времени начала

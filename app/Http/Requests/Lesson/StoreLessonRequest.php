@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests\Lesson;
 
+use App\Models\Lesson;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Models\Lesson;
 
 class StoreLessonRequest extends FormRequest
 {
@@ -27,7 +27,7 @@ class StoreLessonRequest extends FormRequest
         $hasMessage = $this->filled('message');
         $rules = [];
         // Определяем базовые правила
-        if($hasMessage) {
+        if ($hasMessage) {
             $rules = [
                 'week_type' => ['nullable', Rule::in(['ЧИСЛ', 'ЗНАМ'])],
                 'index' => [
@@ -52,8 +52,6 @@ class StoreLessonRequest extends FormRequest
                 'building' => 'nullable|string|min:1',
             ];
         }
-
-
 
         return $rules;
     }

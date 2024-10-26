@@ -2,14 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Http\Resources\BellsPeriodResource;
-use App\Models\BellsPeriod;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use App\Facades\HistoryLogger;
 use App\Http\Requests\StoreBellsPeriodRequest;
 use App\Http\Requests\UpdateBellsPeriodRequest;
+use App\Http\Resources\BellsPeriodResource;
+use App\Models\BellsPeriod;
 
 class BellsPeriodController extends Controller
 {
@@ -17,6 +14,7 @@ class BellsPeriodController extends Controller
     public function index()
     {
         $periods = BellsPeriod::with('bells')->get();
+
         return BellsPeriodResource::collection($periods);
     }
 
@@ -24,6 +22,7 @@ class BellsPeriodController extends Controller
     public function show($id)
     {
         $period = BellsPeriod::findOrFail($id);
+
         return new BellsPeriodResource($period);
     }
 
@@ -32,6 +31,7 @@ class BellsPeriodController extends Controller
     {
         $period = BellsPeriod::create($request->all());
         HistoryLogger::logAction('Добавлен звонок', $period->toArray());
+
         return new BellsPeriodResource($period);
     }
 
@@ -41,6 +41,7 @@ class BellsPeriodController extends Controller
         $period = BellsPeriod::findOrFail($id);
         HistoryLogger::logAction('Обновлен звонок', $period->toArray());
         $period->update($request->all());
+
         return new BellsPeriodResource($period);
     }
 
@@ -50,6 +51,7 @@ class BellsPeriodController extends Controller
         $period = BellsPeriod::findOrFail($id);
         HistoryLogger::logAction('Удален звонок', $period->toArray());
         $period->delete();
+
         return response()->json(['message' => 'Период звонка удален.']);
     }
 }

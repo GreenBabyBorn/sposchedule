@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Schedule;
 
-use App\Rules\ValidWeekType;
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -19,38 +18,38 @@ class StoreScheduleRequest extends FormRequest
     }
 
     /**
-    * Get the validation rules that apply to the request.
-    *
-    * @return array
-    */
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
     public function rules()
     {
         return [
             'group_id' => ['required', 'exists:groups,id',
-            function ($attribute, $value, $fail) {
-                if ($this->type === 'main') {
-                    $existingSchedule = \App\Models\Schedule::where('group_id', $this->group_id)
-                        ->where('type', $this->type)
-                        ->where('week_day', $this->week_day)
-                        ->where('semester_id', $this->semester_id)
-                        ->first();
+                function ($attribute, $value, $fail) {
+                    if ($this->type === 'main') {
+                        $existingSchedule = \App\Models\Schedule::where('group_id', $this->group_id)
+                            ->where('type', $this->type)
+                            ->where('week_day', $this->week_day)
+                            ->where('semester_id', $this->semester_id)
+                            ->first();
 
-                    if ($existingSchedule) {
-                        throw new \App\Exceptions\ScheduleExistsException($existingSchedule->id);
-                    }
-                } elseif ($this->type === 'changes') {
-                    $existingSchedule = \App\Models\Schedule::where('group_id', $this->group_id)
-                    ->where('type', $this->type)
-                    ->where('date', $this->date)
-                    ->where('semester_id', $this->semester_id)
-                    ->first();
+                        if ($existingSchedule) {
+                            throw new \App\Exceptions\ScheduleExistsException($existingSchedule->id);
+                        }
+                    } elseif ($this->type === 'changes') {
+                        $existingSchedule = \App\Models\Schedule::where('group_id', $this->group_id)
+                            ->where('type', $this->type)
+                            ->where('date', $this->date)
+                            ->where('semester_id', $this->semester_id)
+                            ->first();
 
-                    if ($existingSchedule) {
-                        throw new \App\Exceptions\ScheduleExistsException($existingSchedule->id);
+                        if ($existingSchedule) {
+                            throw new \App\Exceptions\ScheduleExistsException($existingSchedule->id);
+                        }
                     }
-                }
-            },
-        ],
+                },
+            ],
             'date' => [
                 'nullable',
                 'required_if:type,changes',
@@ -61,7 +60,7 @@ class StoreScheduleRequest extends FormRequest
 
                     // Учитываем только те записи, где group_id и type совпадают с текущими значениями
                     return $query->where('group_id', $groupId)
-                                 ->where('type', $type);
+                        ->where('type', $type);
                 }),
             ],
             'type' => [
@@ -74,7 +73,6 @@ class StoreScheduleRequest extends FormRequest
                 Rule::in(['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']),
             ],
 
-
         ];
     }
 
@@ -84,7 +82,7 @@ class StoreScheduleRequest extends FormRequest
         if ($this->has('date') && preg_match('/\d{2}\.\d{2}\.\d{4}/', $this->input('date'))) {
             try {
                 $this->merge([
-                    'date' => Carbon::createFromFormat('d.m.Y', $this->input('date'))->format('Y-m-d')
+                    'date' => Carbon::createFromFormat('d.m.Y', $this->input('date'))->format('Y-m-d'),
                 ]);
             } catch (\Exception $e) {
                 throw new ValidationException('Дата в неправильном формате. Пожалуйста, используйте формат dd.mm.yyyy.');
@@ -98,10 +96,9 @@ class StoreScheduleRequest extends FormRequest
         $validator->after(function ($validator) {
             // $date = $this->safe()->input('date');
             $week_type = $this->safe()->input('week_type');
-            if(!$week_type) {
+            if (! $week_type) {
                 return;
             }
-
 
         });
     }

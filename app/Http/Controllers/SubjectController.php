@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\HistoryLogger;
 use App\Http\Requests\Subject\StoreSubjectRequest;
 use App\Http\Requests\Subject\UpdateSubjectRequest;
 use App\Http\Resources\SubjectResource;
 use App\Models\Subject;
 use Illuminate\Http\Request;
-use App\Facades\HistoryLogger;
 
 class SubjectController extends Controller
 {
@@ -27,6 +27,7 @@ class SubjectController extends Controller
 
         // Получаем отфильтрованные группы
         $subjects = $query->get();
+
         return SubjectResource::collection($subjects);
     }
 
@@ -37,6 +38,7 @@ class SubjectController extends Controller
     {
         $subject = Subject::create($request->all());
         HistoryLogger::logAction('Добавлен предмет', $subject->toArray());
+
         return new SubjectResource($subject);
     }
 
@@ -55,6 +57,7 @@ class SubjectController extends Controller
     {
         HistoryLogger::logAction('Обновлен предмет', $subject->toArray());
         $subject->update($request->all());
+
         return new SubjectResource($subject);
     }
 
@@ -64,6 +67,7 @@ class SubjectController extends Controller
     public function destroy(Subject $subject)
     {
         $subject->delete();
+
         return response()->noContent();
 
     }
