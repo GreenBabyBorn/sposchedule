@@ -470,6 +470,7 @@
     width: 4%;
     font-size: 0.9rem;
     text-align: center;
+    word-wrap: break-word;
   }
 
   .info * {
