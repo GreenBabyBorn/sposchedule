@@ -18,14 +18,14 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     user.value = null;
   };
 
-  const fetchUser = async () => {
-    try {
-      const response = await axios.get('/api/user');
-      user.value = response.data;
-    } catch (e) {
-      return e;
-    }
-  };
+  // const fetchUser = async () => {
+  //   try {
+  //     const response = await axios.get('/api/user');
+  //     user.value = response.data;
+  //   } catch (e) {
+  //     return e;
+  //   }
+  // };
 
   const isAuth = computed(() => {
     return Boolean(user.value);
@@ -37,6 +37,6 @@ export const useAuthStore = defineStore('useAuthStore', () => {
     register,
     login,
     logout,
-    fetchUser,
+    // fetchUser,
   };
 });

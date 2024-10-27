@@ -193,7 +193,8 @@ interface RouteMeta {
 router.beforeEach(to => {
   const { title, description }: RouteMeta = to.meta as RouteMeta;
   const defaultTitle = 'Пары РКЭ';
-  const defaultDescription = 'Расписание РКЭ';
+  const defaultDescription =
+    'Расписание учебного процесса Рязанского Колледжа Электроники';
 
   document.title = title ? `${title} | ${defaultTitle}` : defaultTitle;
 

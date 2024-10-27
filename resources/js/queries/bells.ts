@@ -58,10 +58,10 @@ export function usePublicBellsQuery(building, date) {
   });
 }
 export function usePublicBellsPrintQuery(buildings, date) {
-  const enabled = computed(() => Boolean(date?.value || buildings?.value));
+  const enabled = computed(() => Boolean(date?.value));
 
   return useQuery({
-    queryKey: ['bells', date, buildings],
+    queryKey: ['bells', date],
     enabled: enabled,
     retry: 0,
     queryFn: async () => {
