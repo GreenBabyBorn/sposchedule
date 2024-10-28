@@ -126,6 +126,7 @@
       show-icon
       icon-display="input"
       date-format="dd.mm.yy"
+      select-other-months
     >
     </DatePicker>
     <Button label="Печать" icon="pi pi-print" @click="printPage()" />

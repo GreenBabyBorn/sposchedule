@@ -142,6 +142,7 @@
       show-icon
       icon-display="input"
       date-format="dd.mm.yy"
+      select-other-months
     />
     <MultiSelect
       v-model="selectedBuildings"

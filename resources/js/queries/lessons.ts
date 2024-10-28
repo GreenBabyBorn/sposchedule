@@ -9,6 +9,10 @@ export function useUpdateLesson() {
       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
       queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
     },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+    },
   });
   return updateSemesterMutation;
 }

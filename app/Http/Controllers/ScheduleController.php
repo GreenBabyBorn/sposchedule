@@ -64,9 +64,8 @@ class ScheduleController extends Controller
         $schedule->update($request->all());
         HistoryLogger::logAction(
             action: 'Обновлено '.($schedule->type === 'main' ? 'основное' : 'измененное').
-            ' расписание на '.($schedule->week_day ?? $schedule->date).' для группы '.$schedule->group?->name
+            ' расписание на '.($schedule->week_day ?? Carbon::parse($schedule->date)->translatedFormat('d F Y')).' для группы '.$schedule->group?->name
         );
-
         return new ScheduleResource($schedule);
     }
 

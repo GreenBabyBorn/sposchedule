@@ -102,6 +102,7 @@
             selection-mode="range"
             :manual-input="false"
             class="w-full md:w-60"
+            select-other-months
           />
         </div>
       </form>

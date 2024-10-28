@@ -164,8 +164,29 @@
 
 <template>
   <div class="flex flex-col gap-4">
-    <div class="flex flex-wrap items-baseline justify-between">
-      <h1 class="text-2xl">Расписание (изменения)</h1>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <h1 class="text-2xl">Изменения</h1>
+      <div class="ml-auto self-center">
+        <div
+          v-if="schedulesChanges?.last_updated"
+          class="flex flex-row flex-wrap items-center gap-1 lg:flex-col lg:items-end lg:gap-0"
+        >
+          <span class="text-xs leading-none text-surface-400"
+            >Последние обновление:</span
+          >
+          <time
+            title="Последние обновление"
+            class="text-right text-sm text-surface-400"
+            :datetime="schedulesChanges?.last_updated"
+            >{{
+              useDateFormat(
+                schedulesChanges?.last_updated,
+                'DD.MM.YYYY HH:mm:ss'
+              )
+            }}</time
+          >
+        </div>
+      </div>
     </div>
     <div
       class="flex items-center justify-between gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
@@ -179,6 +200,7 @@
           icon-display="input"
           :invalid="isError"
           date-format="dd.mm.yy"
+          select-other-months
         >
           <template #inputicon="slotProps">
             <div
@@ -250,27 +272,6 @@
             },
           }"
         />
-        <div class="ml-auto self-center">
-          <div
-            v-if="schedulesChanges?.last_updated"
-            class="flex flex-row flex-wrap items-center gap-1 lg:flex-col lg:items-end lg:gap-0"
-          >
-            <span class="text-xs leading-none text-surface-400"
-              >Последние обновление:</span
-            >
-            <time
-              title="Последние обновление"
-              class="text-right text-sm text-surface-400"
-              :datetime="schedulesChanges?.last_updated"
-              >{{
-                useDateFormat(
-                  schedulesChanges?.last_updated,
-                  'DD.MM.YYYY HH:mm:ss'
-                )
-              }}</time
-            >
-          </div>
-        </div>
       </div>
     </div>
 
@@ -280,7 +281,7 @@
       <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
     </span>
     <div v-if="isSuccess">
-      <BlockUI class="schedules" :blocked="isFetching">
+      <BlockUI class="schedules z-50" :blocked="isFetching">
         <ChangesScheduleItem
           v-for="(item, index) in schedulesChanges?.schedules"
           :key="index"
@@ -301,16 +302,19 @@
 
 <style scoped>
   .schedules {
-    display: flex;
-    /* flex-direction: column; */
+    /* display: flex;
     flex-wrap: wrap;
     row-gap: 2rem;
     column-gap: 10px;
-    justify-content: space-between;
+    justify-content: space-between; */
+    display: grid;
+    row-gap: 2rem;
+    column-gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
   }
 
   .schedule {
-    min-width: 440px;
-    flex: 0 1 calc(25% - 10px);
+    /* min-width: 440px;
+    flex: 0 1 calc(25% - 10px); */
   }
 </style>

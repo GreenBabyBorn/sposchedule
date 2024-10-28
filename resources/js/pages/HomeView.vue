@@ -321,6 +321,7 @@
               icon-display="input"
               :invalid="isError"
               date-format="dd.mm.yy"
+              select-other-months
             >
               <template #inputicon="slotProps">
                 <div

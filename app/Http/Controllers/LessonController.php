@@ -49,7 +49,7 @@ class LessonController extends Controller
      */
     public function update(UpdateLessonRequest $request, Lesson $lesson)
     {
-        $lesson->update($request->all());
+        $lesson->update($request->validated());
         if ($request->has('teachers') && is_array($request->teachers)) {
             $teachersIds = array_column($request->teachers, 'id');
             $lesson->teachers()->sync($teachersIds);

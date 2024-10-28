@@ -125,10 +125,10 @@
     message?: string | null;
   };
   let newLesson = reactive<LessonWithWeekTypes>({
-    index: null,
+    index: props.schedule?.lessons?.at(-1)?.index + 1 || '',
     subject: null,
     teachers: [],
-    building: null,
+    building: props.schedule?.lessons?.at(-1)?.building,
     cabinet: null,
     message: null,
   });
@@ -386,7 +386,7 @@
           severity="secondary"
           text
           icon="pi pi-pen-to-square"
-          :class="{ 'border !border-primary-500': isEdit }"
+          :class="{ '!text-primary-500': isEdit }"
           @click="isEdit = !isEdit"
         />
       </div>
@@ -410,11 +410,11 @@
           'text-green-400': props?.type !== 'main',
           'text-surface-400': props?.type === 'main',
         }"
-        class="rounded-lg px-2 py-1 text-right text-sm"
+        class="rounded-lg px-2 py-1 text-right"
         >{{ props?.type === 'main' ? 'Основное' : 'Изменения' }}</span
       >
     </div>
-    <table class="schedule-table bg-surface-50 dark:bg-surface-900">
+    <table class="schedule-table rounded-b bg-surface-50 dark:bg-surface-900">
       <thead>
         <tr>
           <th>
@@ -454,6 +454,7 @@
               v-keyfilter.int
               size="small"
               class="w-full text-center"
+              placeholder="№"
             />
           </td>
 
@@ -505,6 +506,7 @@
                 v-model="newLesson.building"
                 size="small"
                 class="w-full text-center"
+                placeholder="Корпус"
               />
             </div>
           </td>
@@ -514,6 +516,7 @@
                 v-model="newLesson.cabinet"
                 size="small"
                 class="w-full text-center"
+                placeholder="Кабинет"
               />
             </div>
           </td>

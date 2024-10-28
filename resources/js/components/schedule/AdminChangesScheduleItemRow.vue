@@ -38,9 +38,21 @@
 <template>
   <tr v-if="lesson?.index >= 0">
     <td>
-      <span class="text-xl font-medium text-surface-800 dark:text-white/80">
+      <span
+        v-if="!isEdit"
+        class="text-lg font-bold text-surface-800 dark:text-white/80"
+      >
         {{ lesson?.index }}
       </span>
+      <InputText
+        v-else
+        v-model="lesson.index"
+        v-keyfilter.int
+        class="w-full text-center font-bold"
+        placeholder="№"
+        size="small"
+        @change="editLesson(lesson)"
+      />
     </td>
     <td v-show="lesson?.message" colspan="3/1">
       <div class="table-subrow">
@@ -64,6 +76,7 @@
           filter
           class="w-full text-left"
           :options="subjects"
+          size="small"
           option-label="name"
           @change="editLesson(lesson)"
         />
@@ -83,21 +96,24 @@
           v-model="lesson.teachers"
           data-key="name"
           filter
-          placeholder="Выберите преподавателя"
+          placeholder="Преподаватель"
           :options="teachers"
           class="w-full"
           option-label="name"
+          size="small"
           @change="editLesson(lesson)"
         />
       </div>
     </td>
     <td v-show="!lesson.message">
       <div v-if="lesson.id" class="table-subrow">
-        <span v-if="!isEdit">{{ lesson.building }}</span>
+        <span v-if="!isEdit">{{ lesson.building }} корпус</span>
         <InputText
           v-else
           v-model="lesson.building"
-          class="w-full"
+          class="w-full text-center"
+          placeholder="Корпус"
+          size="small"
           @change="editLesson(lesson)"
         />
       </div>
@@ -108,7 +124,9 @@
         <InputText
           v-else
           v-model="lesson.cabinet"
-          class="w-full"
+          class="w-full text-center"
+          size="small"
+          placeholder="Кабинет"
           @change="editLesson(lesson)"
         />
       </div>
