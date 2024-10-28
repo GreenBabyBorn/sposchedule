@@ -240,7 +240,7 @@
                   :key="lesson.index"
                 >
                   <template v-if="lesson?.index === index">
-                    <span v-if="lesson?.cabinet.includes('/')">
+                    <span v-if="lesson?.cabinet?.includes('/')">
                       {{ lesson?.cabinet.split('/')[0] }}/<br />{{
                         lesson?.cabinet.split('/')[1]
                       }}
@@ -364,10 +364,17 @@
                 </template>
               </td>
               <td class="cabinet text-center">
-                <template v-for="lesson in group?.schedule?.lessons">
+                <template
+                  v-for="lesson in group?.schedule?.lessons"
+                  :key="lesson?.index"
+                >
                   <template v-if="lesson?.index === index">
-                    {{ lesson?.cabinet }}
-                    {{ lesson?.cabinet.includes('/') ? '' : '/' }}
+                    <span v-if="lesson?.cabinet?.includes('/')">
+                      {{ lesson?.cabinet.split('/')[0] }}/<br />{{
+                        lesson?.cabinet.split('/')[1]
+                      }}
+                    </span>
+                    <span v-else>{{ lesson?.cabinet }}</span>
                   </template>
                 </template>
               </td>
