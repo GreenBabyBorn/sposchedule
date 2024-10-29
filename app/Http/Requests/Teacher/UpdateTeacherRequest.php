@@ -3,6 +3,10 @@
 namespace App\Http\Requests\Teacher;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Exceptions\TeacherExistsException;
+use Illuminate\Validation\Validator;
+use App\Models\Teacher;
+use Illuminate\Validation\Rule;
 
 class UpdateTeacherRequest extends FormRequest
 {
@@ -21,11 +25,13 @@ class UpdateTeacherRequest extends FormRequest
      */
     public function rules()
     {
+
         return [
-            // 'first_name' => 'required|string|max:255',
-            // 'last_name' => 'required|string|max:255',
-            // 'patronymic' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
+           'name' => [
+            'required',
+            'string',
+            'max:255',
+        ],
         ];
     }
 
@@ -37,18 +43,25 @@ class UpdateTeacherRequest extends FormRequest
     public function messages()
     {
         return [
-            // 'first_name.required' => 'Поле "Имя" обязательно для заполнения.',
-            // 'first_name.string' => 'Поле "Имя" должно быть строкой.',
-            // 'first_name.max' => 'Поле "Имя" не должно превышать 255 символов.',
-            // 'last_name.required' => 'Поле "Фамилия" обязательно для заполнения.',
-            // 'last_name.string' => 'Поле "Фамилия" должно быть строкой.',
-            // 'last_name.max' => 'Поле "Фамилия" не должно превышать 255 символов.',
-            // 'patronymic.required' => 'Поле "Отчество" обязательно для заполнения.',
-            // 'patronymic.string' => 'Поле "Отчество" должно быть строкой.',
-            // 'patronymic.max' => 'Поле "Отчество" не должно превышать 255 символов.',
             'name.required' => 'Поле ФИО обязательно для заполнения.',
             'name.string' => 'Поле ФИО должно быть строкой.',
             'name.max' => 'Поле ФИО не должно превышать 255 символов.',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function (Validator $validator) {
+            $teacher = $this->route('teacher');
+            $name = $this->input('name');
+            $existingTeacher = Teacher::where('name', $name)->first();
+            if($existingTeacher->id === $teacher->id) {
+                return;
+            }
+            if ($existingTeacher) {
+                // Throw the custom exception if a duplicate subject is found
+                throw new TeacherExistsException($existingTeacher->id);
+            }
+        });
     }
 }

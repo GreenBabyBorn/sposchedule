@@ -3,6 +3,9 @@
 namespace App\Http\Requests\Teacher;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
+use App\Exceptions\TeacherExistsException;
+use App\Models\Teacher;
 
 class StoreTeacherRequest extends FormRequest
 {
@@ -22,10 +25,7 @@ class StoreTeacherRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'first_name' => 'required|string|max:255',
-            // 'last_name' => 'required|string|max:255',
-            // 'patronymic' => 'required|string|max:255',
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:teachers,name',
 
         ];
     }
@@ -38,18 +38,22 @@ class StoreTeacherRequest extends FormRequest
     public function messages()
     {
         return [
-            // 'first_name.required' => 'Поле "Имя" обязательно для заполнения.',
-            // 'first_name.string' => 'Поле "Имя" должно быть строкой.',
-            // 'first_name.max' => 'Поле "Имя" не должно превышать 255 символов.',
-            // 'last_name.required' => 'Поле "Фамилия" обязательно для заполнения.',
-            // 'last_name.string' => 'Поле "Фамилия" должно быть строкой.',
-            // 'last_name.max' => 'Поле "Фамилия" не должно превышать 255 символов.',
-            // 'patronymic.required' => 'Поле "Отчество" обязательно для заполнения.',
-            // 'patronymic.string' => 'Поле "Отчество" должно быть строкой.',
-            // 'patronymic.max' => 'Поле "Отчество" не должно превышать 255 символов.',
             'name.required' => 'Поле ФИО обязательно для заполнения.',
             'name.string' => 'Поле ФИО должно быть строкой.',
             'name.max' => 'Поле ФИО не должно превышать 255 символов.',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function (Validator $validator) {
+            $name = $this->input('name');
+            $existingSubject = Teacher::where('name', $name)->first();
+
+            if ($existingSubject) {
+                // Throw the custom exception if a duplicate subject is found
+                throw new TeacherExistsException($existingSubject->id);
+            }
+        });
     }
 }

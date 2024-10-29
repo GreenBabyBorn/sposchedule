@@ -10,6 +10,7 @@ use App\Http\Requests\Teacher\UpdateTeacherRequest;
 use App\Http\Resources\TeacherResource;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
 {
@@ -89,6 +90,63 @@ class TeacherController extends Controller
 
         return response()->noContent();
     }
+
+    public function mergeTeachers(Request $request)
+    {
+        $data = $request->validate([
+            'teacher_ids' => 'required|array|min:2',
+            'teacher_ids.*' => 'integer|exists:teachers,id',
+            'target_name' => 'required|string|max:255',
+        ]);
+
+        try {
+            DB::transaction(function () use ($data, &$targetTeacher) {
+                // Создание или поиск целевого учителя
+                $targetTeacher = Teacher::firstOrCreate(['name' => $data['target_name']]);
+
+                // Заранее загружаем учителей с их уроками
+                $teachers = Teacher::with('lessons')->whereIn('id', $data['teacher_ids'])->get();
+
+                // Слияние предметов и обновление уроков
+                foreach ($teachers as $teacher) {
+                    if ($teacher->id !== $targetTeacher->id) {
+                        // Перенос предметов текущего учителя к целевому
+                        $targetTeacher->subjects()->syncWithoutDetaching($teacher->subjects->pluck('id'));
+
+                        // Обновление учителя в уроках, если уроки существуют
+                        if ($teacher->lessons) {
+                            foreach ($teacher->lessons as $lesson) {
+                                $lesson->teachers()->syncWithoutDetaching([$targetTeacher->id]);
+                            }
+                        }
+                    }
+                }
+
+                // Удаление выбранных учителей, кроме целевого
+                Teacher::whereIn('id', $data['teacher_ids'])
+                    ->where('id', '<>', $targetTeacher->id)
+                    ->delete();
+            });
+
+            // Логирование действия
+            HistoryLogger::logAction('Объединены учителя в ' . $targetTeacher->name);
+
+            return response()->json([
+                'message' => 'Учителя успешно объединены.',
+                'target_teacher' => [
+                    'id' => $targetTeacher->id,
+                    'name' => $targetTeacher->name,
+                ],
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Ошибка при объединении учителей.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
     // /**
     //  * Attach a subject to a teacher

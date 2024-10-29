@@ -167,7 +167,7 @@
     :style="{ width: '25rem' }"
   >
     <span class="mb-8 block text-surface-500 dark:text-surface-400"
-      >Был найден предмет с таким названием, хотите объеденить?</span
+      >Был найден предмет с таким названием, хотите объединить?</span
     >
     <div class="mb-4 flex items-center gap-4">
       <label for="subject_name" class="w-24 font-semibold"
@@ -188,7 +188,7 @@
       ></Button>
       <Button
         type="button"
-        label="Объеденить"
+        label="Объединить"
         @click="handleMergeSubjects"
       ></Button>
     </div>

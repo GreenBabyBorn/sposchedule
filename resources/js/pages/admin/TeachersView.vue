@@ -12,10 +12,12 @@
     useDestroyTeacher,
     useStoreTeacher,
     useUpdateTeacher,
+    useMergeTeachers,
   } from '../../queries/teachers';
   import { useSubjectsQuery } from '../../queries/subjects';
   import Chip from 'primevue/chip';
   import { FilterMatchMode } from '@primevue/core/api';
+  import Dialog from 'primevue/dialog';
 
   const { data: teachers } = useTeachersQuery();
 
@@ -28,14 +30,40 @@
   const editingRows = ref([]);
   const selectedTeachers = ref([]);
 
+  const { mutateAsync: mergeTeachers } = useMergeTeachers();
+  const mergeTeacherName = ref('');
+  const firstMergeTeacher = ref('');
+  const secondMergeTeacher = ref('');
+  const visible = ref(false);
+
+  async function handleMergeSubjects() {
+    await mergeTeachers({
+      teacher_ids: [firstMergeTeacher.value, secondMergeTeacher.value],
+      target_name: mergeTeacherName.value,
+    });
+    visible.value = false;
+  }
+
   const { mutateAsync: updateTeacher, isPending: isUpdated } =
     useUpdateTeacher();
 
   const onRowEditSave = async event => {
     let { newData } = event;
     try {
-      await updateTeacher({ id: newData.id, body: newData });
+      await updateTeacher({
+        id: newData.id,
+        body: {
+          ...newData,
+        },
+      });
     } catch (e) {
+      if (newData.id !== e?.response.data.teacher_id) {
+        firstMergeTeacher.value = newData.id;
+        secondMergeTeacher.value = e?.response.data.teacher_id;
+        mergeTeacherName.value = newData.name;
+        visible.value = true;
+        return;
+      }
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -100,6 +128,37 @@
 </script>
 
 <template>
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Объединение"
+    :style="{ width: '25rem' }"
+  >
+    <span class="mb-8 block text-surface-500 dark:text-surface-400"
+      >Был найден преподаватель с таким же ФИО, хотите объединить?</span
+    >
+    <div class="mb-4 flex items-center gap-4">
+      <label for="subject_name" class="w-24 font-semibold">ФИО</label>
+      <InputText
+        id="subject_name"
+        v-model="mergeTeacherName"
+        class="flex-auto"
+      />
+    </div>
+    <div class="flex justify-end gap-2">
+      <Button
+        type="button"
+        label="Отмена"
+        severity="secondary"
+        @click="visible = false"
+      ></Button>
+      <Button
+        type="button"
+        label="Объединить"
+        @click="handleMergeSubjects"
+      ></Button>
+    </div>
+  </Dialog>
   <div class="flex flex-col gap-4">
     <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Преподаватели</h1>

@@ -17,4 +17,8 @@ class Teacher extends Model
     {
         return $this->belongsToMany(Subject::class);
     }
+    public function lessons()
+    {
+        return $this->belongsToMany(Lesson::class);
+    }
 }

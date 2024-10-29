@@ -314,10 +314,14 @@
   }
   .schedules > *:only-child {
     justify-self: center;
-    max-width: 500px;
+    width: 500px;
+  }
+  @media screen and (max-width: 768px) {
+    .schedules > *:only-child {
+      justify-self: center;
+      width: 100%;
+    }
   }
   .schedule {
-    /* min-width: 440px;
-    flex: 0 1 calc(25% - 10px); */
   }
 </style>

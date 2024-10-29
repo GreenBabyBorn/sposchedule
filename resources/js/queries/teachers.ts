@@ -45,3 +45,18 @@ export function useDestroyTeacher() {
   });
   return destroyTeacherMutation;
 }
+
+export function useMergeTeachers() {
+  const queryClient = useQueryClient();
+  const storeSubjectMutation = useMutation({
+    mutationFn: ({ teacher_ids, target_name }: any) =>
+      axios.post('/api/teachers/merge', {
+        teacher_ids,
+        target_name,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teachers'] });
+    },
+  });
+  return storeSubjectMutation;
+}
