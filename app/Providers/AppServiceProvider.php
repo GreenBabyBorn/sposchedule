@@ -9,6 +9,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Lesson;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +27,43 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Validator::extend('unique_schedule_index', function ($attribute, $value, $parameters, $validator) {
+            $data = $validator->getData();
+
+            if (empty($data['schedule_id']) || empty($data['index'])) {
+                return true; // Skip if essential fields are missing, allowing normal validation rules to handle it
+            }
+
+            $scheduleId = $data['schedule_id'];
+            $index = $data['index'];
+            $weekType = array_key_exists('week_type', $data) ? $data['week_type'] : null;
+
+
+            // Check for existing lessons
+            $existingLessons = Lesson::where('schedule_id', $scheduleId)
+                ->where('index', $index)
+                ->get();
+
+            // Check for a conflicting week type
+            $hasSameType = $existingLessons->contains(function ($lesson) use ($weekType) {
+                return $lesson->week_type === $weekType;
+            });
+
+            if ($hasSameType) {
+                return false;
+            }
+
+            // Allow opposite week types
+            if ($weekType === 'ЧИСЛ' || $weekType === 'ЗНАМ') {
+                $oppositeType = $weekType === 'ЧИСЛ' ? 'ЗНАМ' : 'ЧИСЛ';
+                $oppositeExists = $existingLessons->contains('week_type', $oppositeType);
+
+                return $oppositeExists || $existingLessons->isEmpty();
+            }
+
+            return $existingLessons->isEmpty();
+        }, 'Невозможно добавить урок: дублирование schedule_id и index.');
+
         RateLimiter::for('api', function (Request $request) {
 
             // if ($request->user()) {

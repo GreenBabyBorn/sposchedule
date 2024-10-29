@@ -22,18 +22,23 @@ class UpdateLessonRequest extends FormRequest
      */
     public function rules()
     {
+        $lessonId = $this->route('lesson') ? $this->route('lesson')->id : null;
         return [
             'subject_id' => 'nullable|exists:subjects,id',
             'schedule_id' => 'nullable|exists:schedules,id',
             'cabinet' => 'nullable|string|max:255',
             'index' => [
                 'sometimes',
+                'bail',
                 'integer',
                 'min:0',
                 'max:10',
-                Rule::unique('lessons')->where(function ($query) {
-                    return $query->where('schedule_id', $this->safe()->input('schedule_id'));
-                })->ignore($this->route('lesson')->id)
+                // 'unique_schedule_index:{$lessonId}',
+
+                Rule::unique('lessons')
+                ->where('schedule_id', $this->input('schedule_id'))
+                ->where('week_type', $this->input('week_type'))
+                ->ignore($this->route('lesson')->id)
             ],
             'building' => 'nullable|integer|min:1',
         ];

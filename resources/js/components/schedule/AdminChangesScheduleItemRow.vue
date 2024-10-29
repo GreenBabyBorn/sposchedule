@@ -47,14 +47,14 @@
       <InputText
         v-else
         v-model="lesson.index"
-        v-keyfilter.int
+        v-keyfilter="/^\d+$/"
         class="w-full text-center font-bold"
         placeholder="№"
         size="small"
         @change="editLesson(lesson)"
       />
     </td>
-    <td v-show="lesson?.message" colspan="3/1">
+    <td v-show="lesson?.message" colspan="2/1">
       <div class="table-subrow">
         <span v-if="!isEdit">{{ lesson.message }}</span>
         <Textarea
@@ -67,7 +67,7 @@
       </div>
     </td>
     <td v-if="!lesson?.message">
-      <div v-if="lesson?.subject" class="table-subrow">
+      <div v-if="lesson?.subject" class="text-left">
         <span v-if="!isEdit">{{ lesson.subject.name }}</span>
         <Select
           v-else
@@ -82,7 +82,7 @@
         />
       </div>
       <div v-else class="text-red-400">Предмет не найден</div>
-      <div v-if="lesson.teachers" class="table-subrow">
+      <div v-if="lesson.teachers" class="text-left">
         <div v-if="!isEdit" class="">
           <span
             v-for="teacher in lesson.teachers"
@@ -106,8 +106,21 @@
       </div>
     </td>
     <td v-show="!lesson.message">
-      <div v-if="lesson.id" class="table-subrow">
-        <span v-if="!isEdit">{{ lesson.building }} корпус</span>
+      <div v-if="lesson.id" class="text-right">
+        <span v-if="!isEdit" class="p-1">{{ lesson.cabinet }}</span>
+        <InputText
+          v-else
+          v-model="lesson.cabinet"
+          class="w-full text-center"
+          size="small"
+          placeholder="Кабинет"
+          @change="editLesson(lesson)"
+        />
+      </div>
+      <div v-if="lesson.id" class="text-right">
+        <span v-if="!isEdit" class="p-1 opacity-50"
+          >{{ lesson.building }} корпус</span
+        >
         <InputText
           v-else
           v-model="lesson.building"
@@ -118,19 +131,9 @@
         />
       </div>
     </td>
-    <td v-show="!lesson.message">
-      <div v-if="lesson.id" class="table-subrow">
-        <span v-if="!isEdit">{{ lesson.cabinet }}</span>
-        <InputText
-          v-else
-          v-model="lesson.cabinet"
-          class="w-full text-center"
-          size="small"
-          placeholder="Кабинет"
-          @change="editLesson(lesson)"
-        />
-      </div>
-    </td>
+    <!-- <td v-show="!lesson.message">
+      
+    </td> -->
     <td v-if="isEdit">
       <div class="table-subrow">
         <!-- <Button text :disabled="!lesson?.cabinet || !lesson?.building || !lesson?.subject" icon="pi pi-check"

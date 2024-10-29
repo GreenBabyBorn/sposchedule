@@ -455,6 +455,7 @@
             <td>
               <InputText
                 v-model="newLesson.index"
+                placeholder="№"
                 size="small"
                 class="w-full min-w-10 text-center"
               />
@@ -467,6 +468,7 @@
                   :focus-on-hover="false"
                   filter
                   class="w-full text-left"
+                  placeholder="Предмет"
                   :options="subjects"
                   option-label="name"
                 />
@@ -477,6 +479,7 @@
                   :reset-filter-on-hide="true"
                   :focus-on-hover="false"
                   filter
+                  placeholder="Предмет"
                   class="w-full text-left"
                   :options="subjects"
                   option-label="name"
@@ -489,7 +492,7 @@
                   v-model="newLesson['ЧИСЛ'].teachers"
                   :reset-filter-on-hide="true"
                   filter
-                  placeholder="Выберите преподавателя"
+                  placeholder="Преподаватель"
                   class="w-full"
                   :options="teachers"
                   option-label="name"
@@ -501,7 +504,7 @@
                   :reset-filter-on-hide="true"
                   :auto-filter-focus="true"
                   filter
-                  placeholder="Выберите преподавателя"
+                  placeholder="Преподаватель"
                   class="w-full"
                   :options="teachers"
                   option-label="name"
@@ -514,6 +517,7 @@
                   v-model="newLesson['ЧИСЛ'].building"
                   size="small"
                   class="w-full text-center"
+                  placeholder="Корпус"
                 />
               </div>
               <div v-if="newLesson['ЗНАМ']" class="table-subrow">
@@ -521,6 +525,7 @@
                   v-model="newLesson['ЗНАМ'].building"
                   size="small"
                   class="w-full text-center"
+                  placeholder="Корпус"
                 />
               </div>
             </td>
@@ -530,6 +535,7 @@
                   v-model="newLesson['ЧИСЛ'].cabinet"
                   size="small"
                   class="w-full text-center"
+                  placeholder="Кабинет"
                 />
               </div>
               <div v-if="newLesson['ЗНАМ']" class="table-subrow">
@@ -537,12 +543,22 @@
                   v-model="newLesson['ЗНАМ'].cabinet"
                   size="small"
                   class="w-full text-center"
+                  placeholder="Кабинет"
                 />
               </div>
             </td>
             <td>
               <div class="table-subrow">
-                <Button text icon="pi pi-save" @click="addNewLesson()" /><Button
+                <Button
+                  :disabled="
+                    !newLesson.index &&
+                    !(newLesson?.ЗНАМ?.subject || newLesson?.ЧИСЛ?.subject)
+                  "
+                  text
+                  icon="pi pi-save"
+                  @click="addNewLesson()"
+                />
+                <Button
                   text
                   :title="`${addRowAddNewLessonState ? 'Не дробное' : 'Дробное'} `"
                   :icon="`pi ${addRowAddNewLessonState ? 'pi-arrows-h' : 'pi-percentage'} `"

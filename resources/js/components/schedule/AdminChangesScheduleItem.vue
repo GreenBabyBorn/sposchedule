@@ -327,7 +327,7 @@
     );
     const differenceInMs = today - parsedDate;
     const differenceInDays = differenceInMs / (1000 * 60 * 60 * 24);
-    return differenceInDays > 0 && parsedDate < today;
+    return differenceInDays > 1 && parsedDate < today;
   };
 
   const enabledEdit = useStorage('enableEdit', false);
@@ -418,20 +418,20 @@
       <thead>
         <tr>
           <th>
-            <div class="">№</div>
+            <!-- <div class="">№</div> -->
           </th>
           <th>
-            <div class="">Предмет / Преподаватели</div>
+            <!-- <div class="">Предмет / Преподаватели</div> -->
           </th>
 
           <th>
-            <div class="">Корпус</div>
+            <!-- <div class="">Корпус</div> -->
           </th>
-          <th>
-            <div class="">Кабинет</div>
-          </th>
+          <!-- <th> -->
+          <!-- <div class="">Кабинет</div> -->
+          <!-- </th> -->
           <th v-if="isEdit">
-            <div class="">Действия</div>
+            <!-- <div class="">Действия</div> -->
           </th>
         </tr>
       </thead>
@@ -451,14 +451,14 @@
           <td>
             <InputText
               v-model="newLesson.index"
-              v-keyfilter.int
+              v-keyfilter="/^\d+$/"
               size="small"
               class="w-full text-center"
               placeholder="№"
             />
           </td>
 
-          <td v-show="newLessonMessageState" colspan="3/1">
+          <td v-show="newLessonMessageState" colspan="2/1">
             <div class="table-subrow">
               <Textarea
                 v-model="newLesson.message"
@@ -467,6 +467,7 @@
               />
             </div>
           </td>
+
           <td v-show="!newLessonMessageState">
             <div class="table-subrow flex flex-col">
               <Select
@@ -503,6 +504,14 @@
           <td v-show="!newLessonMessageState">
             <div class="table-subrow">
               <InputText
+                v-model="newLesson.cabinet"
+                size="small"
+                class="w-full text-center"
+                placeholder="Кабинет"
+              />
+            </div>
+            <div class="table-subrow">
+              <InputText
                 v-model="newLesson.building"
                 size="small"
                 class="w-full text-center"
@@ -510,16 +519,9 @@
               />
             </div>
           </td>
-          <td v-show="!newLessonMessageState">
-            <div class="table-subrow">
-              <InputText
-                v-model="newLesson.cabinet"
-                size="small"
-                class="w-full text-center"
-                placeholder="Кабинет"
-              />
-            </div>
-          </td>
+
+          <!-- <td v-show="!newLessonMessageState"></td> -->
+
           <td>
             <div class="table-subrow">
               <Button
@@ -585,7 +587,7 @@
 
   .schedule-table th:first-child,
   .schedule-table td:first-child {
-    width: 10%;
+    width: 5%;
   }
 
   .schedule-table th:nth-child(2),
@@ -600,7 +602,7 @@
 
   .schedule-table th:nth-child(4),
   .schedule-table td:nth-child(4) {
-    width: 15%;
+    width: 10%;
   }
 
   .schedule-table th:nth-child(5),
@@ -609,7 +611,7 @@
   }
 
   tbody tr {
-    border-bottom: 2px rgb(var(--p-surface-600)) solid;
+    border-bottom: 1px rgb(var(--p-surface-500)) solid;
     /* background: rgba(128, 128, 128, 0.243); */
   }
 
