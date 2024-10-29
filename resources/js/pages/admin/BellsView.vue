@@ -547,12 +547,7 @@
                 </td>
                 <td class="">
                   <div class="flex justify-center px-6">
-                    <Button
-                      outlined
-                      text
-                      icon="pi pi-save"
-                      @click="addPeriod"
-                    />
+                    <Button icon="pi pi-save" @click="addPeriod" />
                   </div>
                 </td>
               </tr>

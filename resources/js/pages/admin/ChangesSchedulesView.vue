@@ -16,7 +16,7 @@
   import { useBuildingsQuery } from '@/queries/buildings';
   import { useGroupsPublicQuery } from '@/queries/groups';
   import { reducedWeekDays, dateRegex } from '@/composables/constants';
-  import BlockUI from 'primevue/blockui';
+  // import BlockUI from 'primevue/blockui';
 
   const route = useRoute();
   const scheduleStore = useScheduleStore();
@@ -280,22 +280,23 @@
       добавления
       <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
     </span>
-    <div v-if="isSuccess">
-      <BlockUI class="schedules z-50" :blocked="isFetching">
-        <ChangesScheduleItem
-          v-for="(item, index) in schedulesChanges?.schedules"
-          :key="index"
-          class="schedule"
-          :date="isoDate"
-          :schedule="item?.schedule"
-          :semester="item?.semester"
-          :type="item?.schedule?.type"
-          :group="item?.group"
-          :lessons="item?.schedule?.lessons"
-          :week-type="item?.week_type"
-          :published="item?.schedule?.published"
-        />
-      </BlockUI>
+    <div v-if="isSuccess && schedulesChanges?.schedules" class="schedules z-50">
+      <!-- <BlockUI  :blocked="isFetching"> -->
+      <ChangesScheduleItem
+        v-for="item in schedulesChanges?.schedules"
+        :key="item?.id"
+        :disabled="isFetching"
+        class="schedule"
+        :date="isoDate"
+        :schedule="item?.schedule"
+        :semester="item?.semester"
+        :type="item?.schedule?.type"
+        :group="item?.group"
+        :lessons="item?.schedule?.lessons"
+        :week-type="item?.week_type"
+        :published="item?.schedule?.published"
+      />
+      <!-- </BlockUI> -->
     </div>
   </div>
 </template>

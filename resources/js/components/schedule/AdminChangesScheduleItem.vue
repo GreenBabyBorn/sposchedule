@@ -19,7 +19,10 @@
   } from '@/queries/lessons';
   import { useToast } from 'primevue/usetoast';
   import { computed, reactive, ref, toRef, watch } from 'vue';
-  import ToggleButton from 'primevue/togglebutton';
+  // import ToggleButton from 'primevue/togglebutton';
+
+  import ToggleSwitch from 'primevue/toggleswitch';
+
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
   // import RCESelect from '../ui/RCESelect.vue';
@@ -34,6 +37,7 @@
     lessons: { required: true },
     schedule: { required: true, type: Object },
     published: { required: false, type: Boolean },
+    disabled: { requierd: false, type: Boolean },
     // teachers: { required: true },
     // subjects: { required: true }
   });
@@ -43,6 +47,7 @@
   const dateRef: any = toRef<any>(() => props.date);
   const semester: any = toRef<any>(() => props.semester);
   const group: any = toRef<any>(() => props.group);
+  const disabled: any = toRef<any>(() => props.disabled);
 
   const published = ref(props.published);
 
@@ -362,7 +367,8 @@
 <template>
   <div
     :class="{
-      'opacity-50': isOneDayDifference(dateRef) && !Boolean(enabledEdit),
+      'opacity-50':
+        (isOneDayDifference(dateRef) && !Boolean(enabledEdit)) || disabled,
     }"
     :title="
       isOneDayDifference(dateRef) && !Boolean(enabledEdit)
@@ -372,7 +378,7 @@
     class="schedule-item"
   >
     <div
-      class="flex flex-wrap items-center justify-between rounded-t bg-surface-100 p-2 dark:bg-surface-800"
+      class="flex items-center justify-between rounded-t bg-surface-0 p-2 dark:bg-surface-950"
     >
       <div class="flex items-center gap-2">
         <span
@@ -386,35 +392,43 @@
           severity="secondary"
           text
           icon="pi pi-pen-to-square"
-          :class="{ '!text-primary-500': isEdit }"
+          :class="{ '!text-indigo-500': isEdit }"
           @click="isEdit = !isEdit"
+        />
+        <ToggleSwitch
+          v-if="props.type !== 'main'"
+          v-model="published"
+          :disabled="
+            !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
+          "
+          @change="handlePublished"
         />
       </div>
 
       <span>{{ props?.weekType }}</span>
-      <div v-if="props.type !== 'main'">
-        <ToggleButton
+      <!-- <div v-if="props.type !== 'main'" class="flex items-center"> -->
+      <!-- <ToggleButton
           v-model="published"
           :disabled="
             !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
           "
           class="text-sm"
           fluid
-          on-label="Снять с публикации"
-          off-label="Опубликовать"
+          off-icon="pi pi-times"
+          on-icon="pi pi-check"
           @change="handlePublished"
-        />
-      </div>
+        /> -->
+      <!-- </div> -->
       <span
         :class="{
           'text-green-400': props?.type !== 'main',
           'text-surface-400': props?.type === 'main',
         }"
-        class="rounded-lg px-2 py-1 text-right"
+        class="rounded-lg px-2 py-1 text-right text-sm"
         >{{ props?.type === 'main' ? 'Основное' : 'Изменения' }}</span
       >
     </div>
-    <table class="schedule-table rounded-b bg-surface-50 dark:bg-surface-900">
+    <table class="schedule-table rounded bg-surface-50 dark:bg-surface-900">
       <thead>
         <tr>
           <th>
