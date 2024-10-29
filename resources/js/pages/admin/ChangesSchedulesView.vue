@@ -312,7 +312,10 @@
     column-gap: 10px;
     grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
   }
-
+  .schedules > *:only-child {
+    justify-self: center;
+    max-width: 500px;
+  }
   .schedule {
     /* min-width: 440px;
     flex: 0 1 calc(25% - 10px); */
