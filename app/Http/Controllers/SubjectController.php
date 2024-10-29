@@ -6,8 +6,10 @@ use App\Facades\HistoryLogger;
 use App\Http\Requests\Subject\StoreSubjectRequest;
 use App\Http\Requests\Subject\UpdateSubjectRequest;
 use App\Http\Resources\SubjectResource;
-use App\Models\Subject;
 use Illuminate\Http\Request;
+use App\Models\Subject;
+use App\Models\Lesson;
+use Illuminate\Support\Facades\DB;
 
 class SubjectController extends Controller
 {
@@ -70,5 +72,47 @@ class SubjectController extends Controller
 
         return response()->noContent();
 
+    }
+
+    public function merge(Request $request)
+    {
+        // Validate request inputs
+        $data = $request->validate([
+            'subject_ids' => 'required|array|min:2',
+            'subject_ids.*' => 'integer|exists:subjects,id',
+            'target_name' => 'required|string|max:255',
+        ]);
+
+        try {
+            // Initialize targetSubject variable
+
+            DB::transaction(function () use ($data, &$targetSubject) {
+                // Find or create the target subject by name
+                $targetSubject = Subject::firstOrCreate(['name' => $data['target_name']]);
+
+                // Update lessons to use the target subject ID
+                Lesson::whereIn('subject_id', $data['subject_ids'])
+                    ->update(['subject_id' => $targetSubject->id]);
+
+                // Delete old subjects, excluding the target subject
+                Subject::whereIn('id', $data['subject_ids'])
+                    ->where('id', '<>', $targetSubject->id)
+                    ->delete();
+            });
+
+            return response()->json([
+                'message' => 'Subjects merged successfully.',
+                'target_subject' => [
+                    'id' => $targetSubject->id,
+                    'name' => $targetSubject->name,
+                ],
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred while merging subjects.',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

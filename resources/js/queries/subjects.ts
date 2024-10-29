@@ -49,3 +49,18 @@ export function useDestroySubject() {
   });
   return destroySubjectMutation;
 }
+
+export function useMergeSubjects() {
+  const queryClient = useQueryClient();
+  const storeSubjectMutation = useMutation({
+    mutationFn: ({ subject_ids, target_name }: any) =>
+      axios.post('/api/subjects/merge', {
+        subject_ids,
+        target_name,
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['subjects'] });
+    },
+  });
+  return storeSubjectMutation;
+}

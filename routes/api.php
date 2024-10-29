@@ -74,8 +74,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/schedules/changes', [ScheduleController::class, 'createScheduleWithChanges']);
     Route::apiResource('schedules', ScheduleController::class)->except(['index', 'show']);
 
+    Route::post('/subjects/merge', [SubjectController::class, 'merge']);
     Route::apiResource('subjects', SubjectController::class)->except(['index', 'show']);
-
     // Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSubject'])->where(['teacher' => '[0-9]+']);
     // Route::delete('/teachers/{teacher}/subjects', [TeacherController::class, 'detachSubject'])->where(['teacher' => '[0-9]+']);
     Route::apiResource('teachers', TeacherController::class)->except(['index', 'show']);

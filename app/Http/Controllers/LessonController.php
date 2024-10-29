@@ -83,6 +83,9 @@ class LessonController extends Controller
         // return empty($schedule->lessons);
     }
 
+
+
+
     // public function attachTeacher(Request $request, Lesson $lesson)
     // {
     //     $teacher = Teacher::find($request->teacher_id);

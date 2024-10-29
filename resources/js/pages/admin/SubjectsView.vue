@@ -11,9 +11,11 @@
     useDestroySubject,
     useStoreSubject,
     useUpdateSubject,
+    useMergeSubjects,
   } from '../../queries/subjects';
   import Textarea from 'primevue/textarea';
   import { FilterMatchMode } from '@primevue/core/api';
+  import Dialog from 'primevue/dialog';
 
   const { data: subjects } = useSubjectsQuery();
 
@@ -25,12 +27,31 @@
   const editingRows = ref([]);
   const selectedSubjects = ref([]);
 
+  const { mutateAsync: mergeSubjects } = useMergeSubjects();
+  const mergeSubjectName = ref('');
+  const firstMergeSubject = ref('');
+  const secondMergeSubject = ref('');
+
+  async function handleMergeSubjects() {
+    await mergeSubjects({
+      subject_ids: [firstMergeSubject.value, secondMergeSubject.value],
+      target_name: mergeSubjectName.value,
+    });
+    visible.value = false;
+  }
   const { mutateAsync, isPending: isUpdated } = useUpdateSubject();
   const onRowEditSave = async event => {
     let { newData } = event;
     try {
       await mutateAsync({ id: newData.id, body: newData });
     } catch (e) {
+      if (newData.id !== e?.response.data.subject_id) {
+        firstMergeSubject.value = newData.id;
+        secondMergeSubject.value = e?.response.data.subject_id;
+        mergeSubjectName.value = newData.name;
+        visible.value = true;
+        return;
+      }
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -133,9 +154,44 @@
     global: { value: null, matchMode: FilterMatchMode.CONTAINS },
     name: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   });
+
+  const visible = ref(false);
 </script>
 
 <template>
+  <Dialog
+    v-model:visible="visible"
+    modal
+    header="Объединение"
+    :style="{ width: '25rem' }"
+  >
+    <span class="mb-8 block text-surface-500 dark:text-surface-400"
+      >Был найден предмет с таким названием, хотите объеденить?</span
+    >
+    <div class="mb-4 flex items-center gap-4">
+      <label for="subject_name" class="w-24 font-semibold"
+        >Название предмета</label
+      >
+      <InputText
+        id="subject_name"
+        v-model="mergeSubjectName"
+        class="flex-auto"
+      />
+    </div>
+    <div class="flex justify-end gap-2">
+      <Button
+        type="button"
+        label="Отмена"
+        severity="secondary"
+        @click="visible = false"
+      ></Button>
+      <Button
+        type="button"
+        label="Объеденить"
+        @click="handleMergeSubjects"
+      ></Button>
+    </div>
+  </Dialog>
   <div class="flex flex-col gap-4">
     <div class="flex flex-wrap items-baseline justify-between">
       <h1 class="text-2xl">Предметы</h1>
@@ -208,6 +264,7 @@
           </div>
         </template>
         <Column selection-mode="multiple" header-style="width: 3rem" />
+        <Column field="id" header="ID"> </Column>
         <Column field="name" header="Название предмета">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" />
