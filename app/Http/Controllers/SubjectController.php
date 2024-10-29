@@ -9,6 +9,7 @@ use App\Http\Resources\SubjectResource;
 use Illuminate\Http\Request;
 use App\Models\Subject;
 use App\Models\Lesson;
+use App\Models\Teacher;
 use Illuminate\Support\Facades\DB;
 
 class SubjectController extends Controller
@@ -89,6 +90,16 @@ class SubjectController extends Controller
 
                 Lesson::whereIn('subject_id', $data['subject_ids'])
                     ->update(['subject_id' => $targetSubject->id]);
+
+                $teachers = Teacher::whereHas('subjects', function ($query) use ($data) {
+                    $query->whereIn('subjects.id', $data['subject_ids']); // Specify 'subjects.id' to avoid ambiguity
+                })->get();
+
+                foreach ($teachers as $teacher) {
+                    // Detach old subjects and attach the target subject
+                    $teacher->subjects()->detach($data['subject_ids']);
+                    $teacher->subjects()->syncWithoutDetaching([$targetSubject->id]);
+                }
 
                 Subject::whereIn('id', $data['subject_ids'])
                     ->where('id', '<>', $targetSubject->id)

@@ -79,7 +79,7 @@
                     >Предмет был удален</span
                   >
                 </div>
-                <span>{{ item.cabinet }}</span>
+                <span class="text-right">{{ item.cabinet }}</span>
               </div>
 
               <div
