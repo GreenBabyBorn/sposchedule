@@ -327,7 +327,7 @@
           </div>
         </template>
         <Column selection-mode="multiple" header-style="width: 3rem" />
-        <Column field="name" header="Название группы" />
+        <Column sortable field="name" header="Название группы" />
         <Column field="buildings" header="Корпус">
           <template #body="slotProps">
             <div class="flex flex-wrap gap-2">
@@ -351,12 +351,12 @@
             />
           </template>
         </Column>
-        <Column field="specialization" header="Специальность">
+        <Column sortable field="specialization" header="Специальность">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" fluid />
           </template>
         </Column>
-        <Column field="course" header="Курс">
+        <Column sortable field="course" header="Курс">
           <template #editor="{ data, field }">
             <Select
               v-model="data[field]"
@@ -389,7 +389,12 @@
             />
           </template>
         </Column>
-        <Column field="updated_at" header="Дата изменения" style="width: 20%">
+        <Column
+          sortable
+          field="updated_at"
+          header="Дата изменения"
+          style="width: 20%"
+        >
           <template #body="slotProps">
             {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}
           </template>

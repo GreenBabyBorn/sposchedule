@@ -76,7 +76,6 @@ class SubjectController extends Controller
 
     public function merge(Request $request)
     {
-        // Validate request inputs
         $data = $request->validate([
             'subject_ids' => 'required|array|min:2',
             'subject_ids.*' => 'integer|exists:subjects,id',
@@ -84,24 +83,20 @@ class SubjectController extends Controller
         ]);
 
         try {
-            // Initialize targetSubject variable
 
             DB::transaction(function () use ($data, &$targetSubject) {
-                // Find or create the target subject by name
                 $targetSubject = Subject::firstOrCreate(['name' => $data['target_name']]);
 
-                // Update lessons to use the target subject ID
                 Lesson::whereIn('subject_id', $data['subject_ids'])
                     ->update(['subject_id' => $targetSubject->id]);
 
-                // Delete old subjects, excluding the target subject
                 Subject::whereIn('id', $data['subject_ids'])
                     ->where('id', '<>', $targetSubject->id)
                     ->delete();
             });
-
+            HistoryLogger::logAction('Объеденены предметы в '.$targetSubject->name);
             return response()->json([
-                'message' => 'Subjects merged successfully.',
+                'message' => 'Предметы успешно объеденены.',
                 'target_subject' => [
                     'id' => $targetSubject->id,
                     'name' => $targetSubject->name,
@@ -110,9 +105,10 @@ class SubjectController extends Controller
 
         } catch (\Exception $e) {
             return response()->json([
-                'error' => 'An error occurred while merging subjects.',
+                'error' => 'Ошибка при объеденении предметов.',
                 'details' => $e->getMessage(),
             ], 500);
         }
+
     }
 }

@@ -41,7 +41,8 @@
   }
   const { mutateAsync, isPending: isUpdated } = useUpdateSubject();
   const onRowEditSave = async event => {
-    let { newData } = event;
+    let { newData, data } = event;
+    if (data.name === newData.name) return;
     try {
       await mutateAsync({ id: newData.id, body: newData });
     } catch (e) {
@@ -264,14 +265,14 @@
           </div>
         </template>
         <Column selection-mode="multiple" header-style="width: 3rem" />
-        <Column field="id" header="ID"> </Column>
-        <Column field="name" header="Название предмета">
+        <Column sortable field="id" header="ID"> </Column>
+        <Column sortable field="name" header="Название предмета">
           <template #editor="{ data, field }">
-            <InputText v-model="data[field]" />
+            <InputText v-model="data[field]" fluid />
           </template>
         </Column>
 
-        <Column field="updated_at" header="Дата изменения">
+        <Column sortable field="updated_at" header="Дата изменения">
           <template #body="slotProps">
             {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}
           </template>

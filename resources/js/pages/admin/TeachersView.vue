@@ -156,7 +156,7 @@
         </template>
         <Column selection-mode="multiple" header-style="width: 3rem" />
 
-        <Column field="name" header="ФИО">
+        <Column sortable field="name" header="ФИО">
           <template #editor="{ data, field }">
             <InputText v-model="data[field]" class="w-full" />
           </template>
@@ -186,7 +186,12 @@
           </template>
         </Column>
 
-        <Column field="updated_at" header="Дата изменения" style="width: 20%">
+        <Column
+          sortable
+          field="updated_at"
+          header="Дата изменения"
+          style="width: 20%"
+        >
           <template #body="slotProps">
             {{ useDateFormat(slotProps.data.updated_at, 'DD.MM.YY HH:mm:ss') }}
           </template>
