@@ -370,11 +370,6 @@
       'opacity-50':
         (isOneDayDifference(dateRef) && !Boolean(enabledEdit)) || disabled,
     }"
-    :title="
-      isOneDayDifference(dateRef) && !Boolean(enabledEdit)
-        ? 'Редактирование для прошедших дней отключено'
-        : 'Редактировать'
-    "
     class="schedule-item"
   >
     <div
@@ -393,6 +388,11 @@
           text
           icon="pi pi-pen-to-square"
           :class="{ '!text-indigo-500': isEdit }"
+          :title="
+            isOneDayDifference(dateRef) && !Boolean(enabledEdit)
+              ? 'Редактирование для прошедших дней отключено'
+              : 'Редактировать'
+          "
           @click="isEdit = !isEdit"
         />
         <ToggleSwitch
@@ -401,6 +401,7 @@
           :disabled="
             !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
           "
+          :title="published ? 'Снять с публикации' : 'Опубликовать'"
           @change="handlePublished"
         />
       </div>
