@@ -1,6 +1,7 @@
 <script setup lang="ts">
   import MultiSelect from 'primevue/multiselect';
-  import Select from 'primevue/select';
+  // import Select from 'primevue/select';
+  import CustomSelect from '@/components/ui/custom/select/Select.vue';
   import InputText from 'primevue/inputtext';
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
@@ -485,16 +486,24 @@
 
           <td v-show="!newLessonMessageState">
             <div class="table-subrow flex flex-col">
-              <Select
+              <CustomSelect
                 v-model="newLesson.subject"
-                filter
                 data-key="name"
                 editable
                 placeholder="Предмет"
                 class="w-full text-left"
                 :options="subjects"
                 option-label="name"
-              />
+              ></CustomSelect>
+              <!-- <Select
+                v-model="newLesson.subject"
+                data-key="name"
+                editable
+                placeholder="Предмет"
+                class="w-full text-left"
+                :options="subjects"
+                option-label="name"
+              /> -->
             </div>
             <div class="table-subrow">
               <MultiSelect
