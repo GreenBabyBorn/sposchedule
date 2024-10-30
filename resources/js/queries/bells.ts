@@ -3,20 +3,6 @@ import axios from 'axios';
 import { computed } from 'vue';
 
 export function useBellsQuery(type, building, weekDay?, date?) {
-  // const enabled = computed(() => {
-  //   if (weekDay.value) {
-  //     return (
-  //       Boolean(type.value) || Boolean(weekDay.value) || Boolean(building.value)
-  //     );
-  //   }
-  //   if (date.value) {
-  //     return (
-  //       Boolean(type.value) || Boolean(date.value) || Boolean(building.value)
-  //     );
-  //   }
-  //   return false;
-  // });
-
   const weekDayOrDate = computed(() =>
     type.value === 'Основное'
       ? `&week_day=${weekDay.value}`
@@ -30,8 +16,6 @@ export function useBellsQuery(type, building, weekDay?, date?) {
 
   return useQuery({
     queryKey: ['bells', building, type, weekDay, date],
-
-    // enabled: enabled,
     queryFn: async () =>
       (
         await axios.get(
@@ -139,13 +123,14 @@ export function useStoreBell() {
 export function useUpdateBell() {
   const queryClient = useQueryClient();
   const storePeriodMutation = useMutation({
-    mutationFn: ({ id, body }: any) =>
-      axios.patch(`/api/bells/${id}`, {
-        ...body,
-      }),
-    onMutate: () => {
+    mutationFn: ({ id, body }: any) => axios.patch(`/api/bells/${id}`, body),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bells'] });
-      queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
+      // queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells'] });
+      // queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
     },
   });
   return storePeriodMutation;
@@ -156,8 +141,13 @@ export function useUpdateBellPeriod() {
   const storePeriodMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/bells-periods/${id}`, body),
-    onMutate: () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['bells'] });
+      // queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
+    },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['bells'] });
+      // queryClient.invalidateQueries({ queryKey: ['bells-presets'] });
     },
   });
   return storePeriodMutation;

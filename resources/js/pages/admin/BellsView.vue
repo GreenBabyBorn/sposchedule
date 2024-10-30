@@ -7,6 +7,7 @@
   import Checkbox from 'primevue/checkbox';
   import DataTable from 'primevue/datatable';
   import Column from 'primevue/column';
+  import ToggleSwitch from 'primevue/toggleswitch';
   import {
     useApplyPreset,
     useBellsQuery,
@@ -24,7 +25,7 @@
   import { useBellsStore } from '@/stores/bells';
   import { storeToRefs } from 'pinia';
   import { useBuildingsQuery } from '@/queries/buildings';
-  import ToggleButton from 'primevue/togglebutton';
+  // import ToggleButton from 'primevue/togglebutton';
   import Dialog from 'primevue/dialog';
   import router from '@/router';
   import { useRoute } from 'vue-router';
@@ -218,14 +219,17 @@
   };
   const { mutateAsync: updateBell } = useUpdateBell();
 
-  const showAddNewBellPeriod = ref(false);
+  // const showAddNewBellPeriod = ref(false);
 
   const visible = ref(false);
   const presetName = ref('');
-  function savePreset() {
+  async function savePreset() {
     visible.value = false;
     try {
-      storeBellPreset({ bells_id: bells.value.id, name: presetName.value });
+      await storeBellPreset({
+        bells_id: bells.value.id,
+        name: presetName.value,
+      });
       presetName.value = '';
     } catch (e) {
       toast.add({
@@ -358,6 +362,8 @@
       setBells(data.value);
     }
   });
+
+  // watch(data, setBells);
 </script>
 
 <template>
@@ -399,14 +405,23 @@
             v-model="date"
             append-to="self"
             date-format="dd.mm.yy"
+            select-other-months
           />
-          <ToggleButton
+          <!-- <ToggleButton
             v-model="published"
             :disabled="!data"
             class="text-sm"
             fluid
             on-label="Снять с публикации"
             off-label="Опубликовать"
+            @change="
+              updateBell({ id: bells?.id, body: { published: published } })
+            "
+          /> -->
+          <ToggleSwitch
+            v-model="published"
+            :disabled="!data"
+            :title="published ? 'Снять с публикации' : 'Опубликовать'"
             @change="
               updateBell({ id: bells?.id, body: { published: published } })
             "
@@ -491,8 +506,7 @@
               />
 
               <tr
-                v-show="showAddNewBellPeriod"
-                class="border border-t border-surface-200 border-t-primary-500 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
+                class="border border-t-4 border-surface-200 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
               >
                 <td class="">
                   <div class="flex justify-center">
@@ -556,7 +570,7 @@
         </div>
       </div>
 
-      <div class="mt-2 flex items-center justify-center">
+      <!-- <div class="mt-2 flex items-center justify-center">
         <Button
           label="Новый звонок"
           title="Открыть форму для добавления звонка"
@@ -567,7 +581,7 @@
           :icon="!showAddNewBellPeriod ? 'pi pi-angle-down' : 'pi pi-angle-up'"
           @click="showAddNewBellPeriod = !showAddNewBellPeriod"
         />
-      </div>
+      </div> -->
     </div>
     <div class="mt-4 flex flex-col gap-4">
       <h1 class="text-2xl">Заготовки звонков</h1>

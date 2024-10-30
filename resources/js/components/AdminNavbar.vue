@@ -61,8 +61,9 @@
 
 <template>
   <div
+    style="z-index: 1000"
     :class="{ 'active-navbar': isNavbarActive }"
-    class="fixed left-0 top-16 z-auto w-80 flex-grow-0 basis-80 transition-transform md:bg-surface-100 lg:min-h-screen md:dark:bg-surface-950"
+    class="fixed left-0 top-16 w-80 flex-grow-0 basis-80 transition-transform md:bg-surface-100 lg:min-h-screen md:dark:bg-surface-950"
   >
     <div class="flex flex-col px-4 py-4">
       <Menu :model="items" class="w-full p-4">

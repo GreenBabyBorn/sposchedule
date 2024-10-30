@@ -88,14 +88,6 @@ class BellController extends Controller
         $bells = Bell::find($request->bells_id);
 
         if ($preset && $bells) {
-            // Копируем атрибуты $preset в $bells
-            // $bells->type = $preset->type;
-            // $bells->week_day = $preset->week_day;
-            // $bells->date = $preset->date;
-            // $bells->building = $preset->building;
-            // $bells->is_preset = $preset->is_preset;
-            // $bells->name_preset = $preset->name_preset;
-            // $bells->name_preset = $preset->name_preset;
 
             // Сохраняем изменения в $bells
             $bells->save();
@@ -140,10 +132,19 @@ class BellController extends Controller
             ], 400);
         }
 
+        $namePreset = $request->name ?? 'Пресет для звонка ' . $bell->id;
+
+        // Проверяем, существует ли пресет с таким же именем
+        if (Bell::where('is_preset', true)->where('name_preset', $namePreset)->exists()) {
+            return response()->json([
+                'message' => 'Заготовка с таким именем уже существует',
+            ], 400);
+        }
+
         // Создаем копию звонка с флагом "preset"
         $presetBell = $bell->replicate();
         $presetBell->is_preset = true;
-        $presetBell->name_preset = $request->name ?? 'Пресет для звонка '.$bell->id;
+        $presetBell->name_preset =  $namePreset;
         $presetBell->save();
 
         // 3. Копируем зависимые записи из таблицы bells_periods

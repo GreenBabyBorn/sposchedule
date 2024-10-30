@@ -13,7 +13,8 @@
   } from '@/queries/lessons';
   import { useToast } from 'primevue/usetoast';
   import { reactive, ref, toRef, watch } from 'vue';
-  import ToggleButton from 'primevue/togglebutton';
+  import ToggleSwitch from 'primevue/toggleswitch';
+  // import ToggleButton from 'primevue/togglebutton';
 
   const toast = useToast();
 
@@ -255,13 +256,19 @@
     <div class="">
       <div class="flex h-full items-center gap-4 px-4 py-2 dark:bg-surface-800">
         <span class="text-2xl font-medium">{{ props.weekDay }}</span>
-        <ToggleButton
+        <!-- <ToggleButton
           v-model="published"
           :disabled="!props.item.length"
           class="text-sm"
           fluid
           on-label="Снять с публикации"
           off-label="Опубликовать"
+          @change="handlePublished"
+        /> -->
+        <ToggleSwitch
+          v-model="published"
+          :disabled="!props.item.length"
+          :title="published ? 'Снять с публикации' : 'Опубликовать'"
           @change="handlePublished"
         />
       </div>

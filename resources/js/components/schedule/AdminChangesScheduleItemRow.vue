@@ -118,9 +118,9 @@
         />
       </div>
       <div v-if="lesson.id" class="text-right">
-        <span v-if="!isEdit" class="p-1 opacity-50"
-          >{{ lesson.building }} корпус</span
-        >
+        <span v-if="!isEdit" class="p-1 opacity-50">{{
+          `${lesson.building ? lesson.building + ' корпус' : ''}`
+        }}</span>
         <InputText
           v-else
           v-model="lesson.building"

@@ -284,6 +284,17 @@
       }
     }
   }
+
+  const isChangesBells = computed(() => {
+    if (!publicBells.value) return false; // Ensure publicBells is defined
+
+    for (const bell of publicBells.value) {
+      if (bell?.type === 'changes') {
+        return true;
+      }
+    }
+    return false;
+  });
 </script>
 
 <template>
@@ -293,7 +304,8 @@
     <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
       <a
         title="К звонкам"
-        class="pi pi-bell rounded-full bg-primary-500 p-4 text-white dark:text-surface-900"
+        :class="{ 'pulse-button': isChangesBells }"
+        class="pi pi-bell relative rounded-full bg-primary-500 p-4 text-white dark:text-surface-900"
         href="#bells"
       />
       <RouterLink
@@ -601,10 +613,10 @@
                     :key="period.index"
                   >
                     <td v-if="period?.index === index">
-                      <div>
+                      <div class="text-nowrap">
                         {{ period.period_from }} - {{ period.period_to }}
                       </div>
-                      <div v-if="period?.period_from_after">
+                      <div v-if="period?.period_from_after" class="text-nowrap">
                         {{ period.period_from_after }} -
                         {{ period.period_to_after }}
                       </div>
@@ -644,6 +656,30 @@
 
   .bells-table td {
     padding: 0.75rem 1rem;
+  }
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+      transform: rotate(0deg);
+    }
+    30% {
+      transform: rotate(20deg);
+    }
+    70% {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+      transform: rotate(-20deg);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+      transform: rotate(0deg);
+    }
+  }
+
+  .pulse-button {
+    animation: pulse 2s infinite;
   }
 
   @media screen and (max-width: 768px) {

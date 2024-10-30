@@ -317,6 +317,11 @@
     justify-self: center;
     width: 500px;
   }
+  @media screen and (max-width: 440px) {
+    .schedules {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+  }
   @media screen and (max-width: 768px) {
     .schedules > *:only-child {
       justify-self: center;

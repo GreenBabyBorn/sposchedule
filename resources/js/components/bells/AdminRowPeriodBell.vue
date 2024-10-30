@@ -5,13 +5,14 @@
   import Button from 'primevue/button';
   import { useDestroyBellPeriod, useUpdateBellPeriod } from '@/queries/bells';
   import { useToast } from 'primevue/usetoast';
+  import InputText from 'primevue/inputtext';
 
   const toast = useToast();
 
   const props = defineProps<{
     period: {
       id: number;
-      index: number;
+      index: string;
       has_break: boolean;
       period_from: Date;
       period_to: Date;
@@ -20,7 +21,7 @@
     };
   }>();
 
-  const period = toRef(props.period);
+  const period = toRef(() => props.period);
 
   const { mutateAsync: updatePeriod } = useUpdateBellPeriod();
   const { mutateAsync: destroyPeriod } = useDestroyBellPeriod();
@@ -41,22 +42,13 @@
       period_from: formatTime(period.period_from),
       period_to: formatTime(period.period_to),
     };
-    console.log(period.has_break);
     if (
       period.has_break &&
-      period.period_from_after &&
-      period.period_to_after
+      (period.period_from_after || period.period_to_after)
     ) {
       body.period_from_after = formatTime(period.period_from_after);
       body.period_to_after = formatTime(period.period_to_after);
-    } else if (
-      !period.has_break &&
-      !period?.period_from_after &&
-      !period?.period_to_after
-    ) {
-      body.period_from_after = formatTime(period.period_from);
-      body.period_to_after = formatTime(period.period_to);
-    } else {
+    } else if (!period.has_break) {
       body.period_from_after = null;
       body.period_to_after = null;
     }
@@ -97,7 +89,12 @@
     class="border border-surface-200 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
   >
     <td class="text-center text-lg">
-      {{ period.index }}
+      <InputText
+        v-model="period.index"
+        class="max-w-12 text-center"
+        @blur="editPeriod(period)"
+      />
+      <!-- {{ period.index }} -->
     </td>
 
     <td class="">
