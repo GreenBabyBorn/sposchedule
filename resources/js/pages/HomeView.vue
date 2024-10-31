@@ -304,8 +304,11 @@
     <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
       <a
         title="К звонкам"
-        :class="{ 'pulse-button': isChangesBells }"
-        class="pi pi-bell relative rounded-full bg-primary-500 p-4 text-white dark:text-surface-900"
+        :class="{
+          'bg-green-400': isChangesBells,
+          'bg-surface-400': !isChangesBells,
+        }"
+        class="pi pi-bell relative rounded-full p-4 text-white shadow-md dark:text-surface-900"
         href="#bells"
       />
       <RouterLink
