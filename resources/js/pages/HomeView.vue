@@ -286,7 +286,7 @@
   }
 
   const isChangesBells = computed(() => {
-    if (!publicBells.value) return false; // Ensure publicBells is defined
+    if (!publicBells.value) return false;
 
     for (const bell of publicBells.value) {
       if (bell?.type === 'changes') {
@@ -303,6 +303,7 @@
   >
     <div class="fixed bottom-8 right-8 z-50 flex flex-col gap-2">
       <a
+        v-if="isFetchedBells"
         title="К звонкам"
         :class="{
           'bg-green-400': isChangesBells,

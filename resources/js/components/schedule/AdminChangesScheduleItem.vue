@@ -24,6 +24,8 @@
 
   import ToggleSwitch from 'primevue/toggleswitch';
 
+  import BlockUI from 'primevue/blockui';
+
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
   // import RCESelect from '../ui/RCESelect.vue';
@@ -366,50 +368,49 @@
 </script>
 
 <template>
-  <div
-    :class="{
-      'opacity-50':
-        (isOneDayDifference(dateRef) && !Boolean(enabledEdit)) || disabled,
-    }"
-    class="schedule-item"
+  <BlockUI
+    :blocked="
+      (isOneDayDifference(dateRef) && !Boolean(enabledEdit)) || disabled
+    "
   >
-    <div
-      class="flex items-center justify-between rounded-t bg-surface-0 p-2 dark:bg-surface-950"
-    >
-      <div class="flex items-center gap-2">
-        <span
-          class="text-left text-xl font-medium text-surface-800 dark:text-white/80"
-        >
-          {{ props?.group?.name }}
-        </span>
+    <div class="schedule-item">
+      <div
+        class="flex items-center justify-between rounded-t bg-surface-0 p-2 dark:bg-surface-950"
+      >
+        <div class="flex items-center gap-2">
+          <span
+            class="text-left text-xl font-medium text-surface-800 dark:text-white/80"
+          >
+            {{ props?.group?.name }}
+          </span>
 
-        <Button
-          :disabled="isOneDayDifference(dateRef) && !Boolean(enabledEdit)"
-          severity="secondary"
-          text
-          icon="pi pi-pen-to-square"
-          :class="{ '!text-indigo-500': isEdit }"
-          :title="
-            isOneDayDifference(dateRef) && !Boolean(enabledEdit)
-              ? 'Редактирование для прошедших дней отключено'
-              : 'Редактировать'
-          "
-          @click="isEdit = !isEdit"
-        />
-        <ToggleSwitch
-          v-if="props.type !== 'main'"
-          v-model="published"
-          :disabled="
-            !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
-          "
-          :title="published ? 'Снять с публикации' : 'Опубликовать'"
-          @change="handlePublished"
-        />
-      </div>
+          <Button
+            :disabled="isOneDayDifference(dateRef) && !Boolean(enabledEdit)"
+            severity="secondary"
+            text
+            icon="pi pi-pen-to-square"
+            :class="{ '!text-indigo-500': isEdit }"
+            :title="
+              isOneDayDifference(dateRef) && !Boolean(enabledEdit)
+                ? 'Редактирование для прошедших дней отключено'
+                : 'Редактировать'
+            "
+            @click="isEdit = !isEdit"
+          />
+          <ToggleSwitch
+            v-if="props.type !== 'main'"
+            v-model="published"
+            :disabled="
+              !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
+            "
+            :title="published ? 'Снять с публикации' : 'Опубликовать'"
+            @change="handlePublished"
+          />
+        </div>
 
-      <span>{{ props?.weekType }}</span>
-      <!-- <div v-if="props.type !== 'main'" class="flex items-center"> -->
-      <!-- <ToggleButton
+        <span>{{ props?.weekType }}</span>
+        <!-- <div v-if="props.type !== 'main'" class="flex items-center"> -->
+        <!-- <ToggleButton
           v-model="published"
           :disabled="
             !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
@@ -420,82 +421,82 @@
           on-icon="pi pi-check"
           @change="handlePublished"
         /> -->
-      <!-- </div> -->
-      <span
-        :class="{
-          'text-green-400': props?.type !== 'main',
-          'text-surface-400': props?.type === 'main',
-        }"
-        class="rounded-lg px-2 py-1 text-right text-sm"
-        >{{ props?.type === 'main' ? 'Основное' : 'Изменения' }}</span
-      >
-    </div>
-    <table class="schedule-table rounded bg-surface-50 dark:bg-surface-900">
-      <thead>
-        <tr>
-          <th>
-            <!-- <div class="">№</div> -->
-          </th>
-          <th>
-            <!-- <div class="">Предмет / Преподаватели</div> -->
-          </th>
+        <!-- </div> -->
+        <span
+          :class="{
+            'text-green-400': props?.type !== 'main',
+            'text-surface-400': props?.type === 'main',
+          }"
+          class="rounded-lg px-2 py-1 text-right text-sm"
+          >{{ props?.type === 'main' ? 'Основное' : 'Изменения' }}</span
+        >
+      </div>
+      <table class="schedule-table rounded bg-surface-50 dark:bg-surface-900">
+        <thead>
+          <tr>
+            <th>
+              <!-- <div class="">№</div> -->
+            </th>
+            <th>
+              <!-- <div class="">Предмет / Преподаватели</div> -->
+            </th>
 
-          <th>
-            <!-- <div class="">Корпус</div> -->
-          </th>
-          <!-- <th> -->
-          <!-- <div class="">Кабинет</div> -->
-          <!-- </th> -->
-          <th v-if="isEdit">
-            <!-- <div class="">Действия</div> -->
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <template v-for="lesson in lessons" :key="lesson.id">
-          <AdminChangesScheduleItemRow
-            :is-edit="isEdit"
-            :subjects="subjects"
-            :teachers="teachers"
-            :lesson="lesson"
-            @remove-lesson="removeLesson"
-            @edit-lesson="editLesson"
-          />
-        </template>
-
-        <tr v-if="isEdit" class="border-t-4 border-surface-600">
-          <td>
-            <InputText
-              v-model="newLesson.index"
-              v-keyfilter="/^\d+$/"
-              size="small"
-              class="w-full text-center"
-              placeholder="№"
+            <th>
+              <!-- <div class="">Корпус</div> -->
+            </th>
+            <!-- <th> -->
+            <!-- <div class="">Кабинет</div> -->
+            <!-- </th> -->
+            <th v-if="isEdit">
+              <!-- <div class="">Действия</div> -->
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <template v-for="lesson in lessons" :key="lesson.id">
+            <AdminChangesScheduleItemRow
+              :is-edit="isEdit"
+              :subjects="subjects"
+              :teachers="teachers"
+              :lesson="lesson"
+              @remove-lesson="removeLesson"
+              @edit-lesson="editLesson"
             />
-          </td>
+          </template>
 
-          <td v-show="newLessonMessageState" colspan="2/1">
-            <div class="table-subrow">
-              <Textarea
-                v-model="newLesson.message"
-                placeholder="Введите сообщение для группы"
-                class="w-full"
+          <tr v-if="isEdit" class="border-t-4 border-surface-600">
+            <td>
+              <InputText
+                v-model="newLesson.index"
+                v-keyfilter="/^\d+$/"
+                size="small"
+                class="w-full text-center"
+                placeholder="№"
               />
-            </div>
-          </td>
+            </td>
 
-          <td v-show="!newLessonMessageState">
-            <div class="table-subrow flex flex-col">
-              <CustomSelect
-                v-model="newLesson.subject"
-                data-key="name"
-                editable
-                placeholder="Предмет"
-                class="w-full text-left"
-                :options="subjects"
-                option-label="name"
-              ></CustomSelect>
-              <!-- <Select
+            <td v-show="newLessonMessageState" colspan="2/1">
+              <div class="table-subrow">
+                <Textarea
+                  v-model="newLesson.message"
+                  placeholder="Введите сообщение для группы"
+                  class="w-full"
+                />
+              </div>
+            </td>
+
+            <td v-show="!newLessonMessageState">
+              <div class="table-subrow flex flex-col">
+                <CustomSelect
+                  v-model="newLesson.subject"
+                  data-key="name"
+                  editable
+                  placeholder="Предмет"
+                  class="w-full text-left"
+                  :options="subjects"
+                  option-label="name"
+                ></CustomSelect>
+                <!-- <Select
                 v-model="newLesson.subject"
                 data-key="name"
                 editable
@@ -504,73 +505,73 @@
                 :options="subjects"
                 option-label="name"
               /> -->
-            </div>
-            <div class="table-subrow">
-              <MultiSelect
-                v-model="newLesson.teachers"
-                data-key="name"
-                :reset-filter-on-hide="true"
-                :auto-filter-focus="true"
-                filter
-                placeholder="Преподаватели"
-                class="w-full"
-                :options="teachersFromSubject"
-                option-label="name"
-                @filter="filterTeachers"
-              >
-                <template #footer>
-                  <div class="px-3 py-2">Для остальных начните поиск</div>
-                </template>
-              </MultiSelect>
-            </div>
-          </td>
+              </div>
+              <div class="table-subrow">
+                <MultiSelect
+                  v-model="newLesson.teachers"
+                  data-key="name"
+                  :reset-filter-on-hide="true"
+                  :auto-filter-focus="true"
+                  filter
+                  placeholder="Преподаватели"
+                  class="w-full"
+                  :options="teachersFromSubject"
+                  option-label="name"
+                  @filter="filterTeachers"
+                >
+                  <template #footer>
+                    <div class="px-3 py-2">Для остальных начните поиск</div>
+                  </template>
+                </MultiSelect>
+              </div>
+            </td>
 
-          <td v-show="!newLessonMessageState">
-            <div class="table-subrow">
-              <InputText
-                v-model="newLesson.cabinet"
-                size="small"
-                class="w-full text-center"
-                placeholder="Кабинет"
-              />
-            </div>
-            <div class="table-subrow">
-              <InputText
-                v-model="newLesson.building"
-                size="small"
-                class="w-full text-center"
-                placeholder="Корпус"
-              />
-            </div>
-          </td>
+            <td v-show="!newLessonMessageState">
+              <div class="table-subrow">
+                <InputText
+                  v-model="newLesson.cabinet"
+                  size="small"
+                  class="w-full text-center"
+                  placeholder="Кабинет"
+                />
+              </div>
+              <div class="table-subrow">
+                <InputText
+                  v-model="newLesson.building"
+                  size="small"
+                  class="w-full text-center"
+                  placeholder="Корпус"
+                />
+              </div>
+            </td>
 
-          <!-- <td v-show="!newLessonMessageState"></td> -->
+            <!-- <td v-show="!newLessonMessageState"></td> -->
 
-          <td>
-            <div class="table-subrow">
-              <Button
-                :disabled="
-                  (!newLessonMessageState &&
-                    (!newLesson.index ||
-                      !newLesson.subject ||
-                      typeof newLesson.subject === 'string')) ||
-                  (newLessonMessageState && !newLesson.message)
-                "
-                icon="pi pi-save"
-                @click="addNewLesson()"
-              />
-              <Button
-                :title="`${newLessonMessageState ? 'Переключиться на обычную пару' : 'Переключиться на комментарий'}`"
-                text
-                :icon="`pi ${newLessonMessageState ? 'pi-table' : 'pi-comment'}`"
-                @click="handlenewLessonMessage"
-              />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <!-- <div v-if="isEdit" class="mt-2 flex items-center justify-center">
+            <td>
+              <div class="table-subrow">
+                <Button
+                  :disabled="
+                    (!newLessonMessageState &&
+                      (!newLesson.index ||
+                        !newLesson.subject ||
+                        typeof newLesson.subject === 'string')) ||
+                    (newLessonMessageState && !newLesson.message)
+                  "
+                  icon="pi pi-save"
+                  @click="addNewLesson()"
+                />
+                <Button
+                  :title="`${newLessonMessageState ? 'Переключиться на обычную пару' : 'Переключиться на комментарий'}`"
+                  text
+                  :icon="`pi ${newLessonMessageState ? 'pi-table' : 'pi-comment'}`"
+                  @click="handlenewLessonMessage"
+                />
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <!-- <div v-if="isEdit" class="mt-2 flex items-center justify-center">
       <Button
         label="Новая пара"
         title="Открыть форму для добавления пары"
@@ -582,7 +583,8 @@
         @click="hideAddNewLesson = !hideAddNewLesson"
       />
     </div> -->
-  </div>
+    </div>
+  </BlockUI>
 </template>
 
 <style scoped>
