@@ -6,10 +6,12 @@
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
   import { useSubjectsQuery } from '@/queries/subjects';
-  import { useTeachersQuery } from '@/queries/teachers';
+  import {
+    useTeachersFromSubjectQuery,
+    useTeachersQuery,
+  } from '@/queries/teachers';
   import {
     useCreateScheduleWithChanges,
-    // useFromMainToChangesSchedule,
     useStoreScheduleChange,
     useUpdateSchedule,
   } from '@/queries/schedules';
@@ -19,13 +21,11 @@
     useUpdateLesson,
   } from '@/queries/lessons';
   import { useToast } from 'primevue/usetoast';
-  import { computed, reactive, ref, toRef, watch } from 'vue';
+  import { computed, reactive, ref, toRef, watch, watchEffect } from 'vue';
   // import ToggleButton from 'primevue/togglebutton';
 
   import ToggleSwitch from 'primevue/toggleswitch';
-
   import BlockUI from 'primevue/blockui';
-
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
   // import RCESelect from '../ui/RCESelect.vue';
@@ -49,8 +49,9 @@
   // const subjects: any = toRef<any>(() => props.subjects)
   const dateRef: any = toRef<any>(() => props.date);
   const semester: any = toRef<any>(() => props.semester);
-  const group: any = toRef<any>(() => props.group);
+  const group = toRef(() => props.group);
   const disabled: any = toRef<any>(() => props.disabled);
+  const date: any = toRef<any>(() => props.date);
 
   const published = ref(props.published);
 
@@ -219,14 +220,12 @@
           schedule_id: scheduleId,
         },
       });
-      newLesson = reactive<LessonWithWeekTypes>({
-        index: Number(newLesson.index) + 1,
-        subject: null,
-        teachers: [],
-        building: newLesson.building,
-        cabinet: null,
-        message: null,
-      });
+      newLesson.index = Number(newLesson.index) + 1;
+      newLesson.subject = null;
+      newLesson.teachers = [];
+      newLesson.building = props.schedule?.lessons?.at(-1)?.building;
+      newLesson.cabinet = null;
+      newLesson.message = null;
     } catch (e) {
       toast.add({
         severity: 'error',
@@ -340,31 +339,47 @@
 
   const enabledEdit = useStorage('enableEdit', false);
 
-  const searchTeacher = ref('');
-  const queryTeacher = computed(() => {
-    return { name: searchTeacher.value };
-  });
-
-  const { data: teachers } = useTeachersQuery(queryTeacher.value);
   const { data: subjects } = useSubjectsQuery({ teachers: true });
 
-  const teachersFromSubject = computed(() => {
-    const subjectTeachers = newLesson.subject?.teachers || [];
-    if (searchTeacher.value) {
-      return [...subjectTeachers, ...teachers.value];
-    }
-    return [...subjectTeachers];
-  });
+  const { data: teachers } = useTeachersQuery({ subjects: true });
 
+  const subject = toRef(() => newLesson?.subject);
+
+  const { data: teachersFromSubjectMain, isSuccess } =
+    useTeachersFromSubjectQuery(subject, group, date);
+
+  watchEffect(() => {
+    if (isSuccess.value) {
+      newLesson.teachers = teachersFromSubjectMain.value;
+    }
+  });
+  const searchTeacher = ref('');
   function filterTeachers(e) {
     searchTeacher.value = e.value;
   }
-  watch(
-    () => newLesson.subject,
-    () => {
-      newLesson.teachers = [];
+  const teachersFromSubject = computed(() => {
+    const subjectTeachers = newLesson.subject?.teachers || [];
+    let allTeachers = [];
+
+    if (searchTeacher.value) {
+      allTeachers = [
+        ...subjectTeachers,
+        ...teachers.value,
+        ...newLesson.teachers,
+      ];
+    } else if (subjectTeachers?.length === 0) {
+      allTeachers = [...teachers.value, ...newLesson.teachers];
+    } else {
+      allTeachers = [...subjectTeachers, ...newLesson.teachers];
     }
-  );
+
+    const uniqueTeachers = allTeachers.filter(
+      (teacher, index, self) =>
+        index === self.findIndex(t => t.id === teacher.id)
+    );
+
+    return uniqueTeachers;
+  });
 </script>
 
 <template>
@@ -409,19 +424,6 @@
         </div>
 
         <span>{{ props?.weekType }}</span>
-        <!-- <div v-if="props.type !== 'main'" class="flex items-center"> -->
-        <!-- <ToggleButton
-          v-model="published"
-          :disabled="
-            !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
-          "
-          class="text-sm"
-          fluid
-          off-icon="pi pi-times"
-          on-icon="pi pi-check"
-          @change="handlePublished"
-        /> -->
-        <!-- </div> -->
         <span
           :class="{
             'text-green-400': props?.type !== 'main',

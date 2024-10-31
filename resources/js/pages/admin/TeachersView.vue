@@ -19,7 +19,7 @@
   import { FilterMatchMode } from '@primevue/core/api';
   import Dialog from 'primevue/dialog';
 
-  const { data: teachers } = useTeachersQuery();
+  const { data: teachers } = useTeachersQuery({ subjects: true });
 
   const toast = useToast();
 

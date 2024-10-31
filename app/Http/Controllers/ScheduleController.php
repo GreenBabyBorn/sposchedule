@@ -12,10 +12,13 @@ use App\Http\Resources\SkinnyGroup;
 use App\Models\Group;
 use App\Models\Lesson;
 use App\Models\Schedule;
+use App\Models\Teacher;
+use App\Models\Subject;
 use App\Models\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Http\Resources\TeacherResource;
 
 class ScheduleController extends Controller
 {
@@ -1060,4 +1063,77 @@ class ScheduleController extends Controller
 
         return response()->json($finalSchedules);
     }
+
+    public function getMainScheduleSubjects(Request $request)
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'group_id' => 'required|integer|exists:groups,id',
+        ]);
+
+        // Получаем семестр, к которому относится дата
+        $semester = Semester::whereDate('start', '<=', $data['date'])
+            ->whereDate('end', '>=', $data['date'])
+            ->first();
+
+        if (!$semester) {
+            return response()->json(['message' => 'Семестр не найден для указанной даты'], 404);
+        }
+
+        // Получаем все расписания с типом 'main' для нужного семестра и группы
+        $schedules = Schedule::where('type', 'main')
+            ->where('semester_id', $semester->id)
+            ->where('group_id', $data['group_id'])
+            ->pluck('id');
+
+        if ($schedules->isEmpty()) {
+            return response()->json(['message' => 'Основное расписание не найдено для указанной группы'], 404);
+        }
+
+        // Получаем уникальные предметы, связанные с уроками всех расписаний
+        $subjects = Subject::whereHas('lessons', function ($query) use ($schedules) {
+            $query->whereIn('schedule_id', $schedules);
+        })->distinct()->get();
+
+        return response()->json($subjects);
+    }
+
+    public function getMainScheduleTeachers(Request $request)
+    {
+        $data = $request->validate([
+            'date' => 'required|date',
+            'group_id' => 'required|integer|exists:groups,id',
+            'subject_id' => 'required|integer|exists:subjects,id',
+        ]);
+
+        // Получаем семестр, к которому относится дата
+        $semester = Semester::whereDate('start', '<=', Carbon::parse($data['date']))
+            ->whereDate('end', '>=', Carbon::parse($data['date']))
+            ->first();
+
+        if (!$semester) {
+            return response()->json(['message' => 'Семестр не найден для указанной даты'], 404);
+        }
+
+        // Получаем все расписания с типом 'main' для нужного семестра и группы
+        $schedules = Schedule::where('type', 'main')
+            ->where('semester_id', $semester->id)
+            ->where('group_id', $data['group_id'])
+            ->pluck('id');
+
+        if ($schedules->isEmpty()) {
+            return response()->json(['message' => 'Основное расписание не найдено для указанной группы'], 404);
+        }
+
+        // Получаем уникальных преподавателей, которые ведут указанный предмет в этих расписаниях
+        $teachers = Teacher::whereHas('lessons', function ($query) use ($schedules, $data) {
+            $query->whereIn('schedule_id', $schedules)
+                  ->where('subject_id', $data['subject_id']);
+        })->distinct()->get();
+
+        return TeacherResource::collection($teachers);
+
+    }
+
+
 }

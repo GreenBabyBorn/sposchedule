@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
+import { computed } from 'vue';
 
 export function useTeachersQuery(query?) {
   return useQuery({
@@ -59,4 +60,25 @@ export function useMergeTeachers() {
     },
   });
   return storeSubjectMutation;
+}
+
+export function useTeachersFromSubjectQuery(subject, group, date) {
+  const enabled = computed(() => {
+    // console.log(subject.value?.id, group.value?.id, date.value);
+    return Boolean(subject.value?.id && group.value?.id && date.value);
+  });
+  return useQuery({
+    enabled: enabled,
+    queryKey: ['teachersFromSubject', subject, group, date],
+    queryFn: async () =>
+      (
+        await axios.get(`/api/teachers/schedules/main`, {
+          params: {
+            subject_id: subject.value?.id,
+            group_id: group.value?.id,
+            date: date.value,
+          },
+        })
+      ).data,
+  });
 }

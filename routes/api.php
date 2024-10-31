@@ -37,6 +37,8 @@ Route::middleware('throttle:api')->group(function () {
     Route::apiResource('groups', GroupController::class)->only(['index', 'show']);
     Route::apiResource('lessons', LessonController::class)->only(['show']);
     Route::apiResource('schedules', ScheduleController::class)->only(['show']);
+    Route::get('/subjects/schedules/main', [ScheduleController::class, 'getMainScheduleSubjects']);
+    Route::get('/teachers/schedules/main', [ScheduleController::class, 'getMainScheduleTeachers']);
     Route::apiResource('subjects', SubjectController::class)->only(['index', 'show']);
     Route::apiResource('teachers', TeacherController::class)->only(['index', 'show']);
     Route::apiResource('semesters', SemesterController::class)->only(['index', 'show']);

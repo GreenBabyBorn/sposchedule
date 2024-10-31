@@ -14,12 +14,17 @@ class TeacherResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $includeTeachers = $request->query('teachers', false);
+        $includeSubjects = $request->query('subjects', false);
 
-        return [
+        $data = [
             'id' => $this->id,
             'name' => $this->name,
-            'subjects' => $this->when(! $includeTeachers, SubjectResource::collection($this->subjects)),
         ];
+
+        if ($includeSubjects) {
+            $data['subjects'] = SubjectResource::collection($this->subjects);
+        }
+
+        return $data;
     }
 }

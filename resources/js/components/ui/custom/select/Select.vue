@@ -451,6 +451,7 @@
       'show',
       'hide',
       'filter',
+      'selected',
     ],
     outsideClickListener: null,
     scrollHandler: null,
@@ -1078,7 +1079,6 @@
         event.preventDefault();
       },
       onEnterKey(event) {
-        console.log('d');
         if (!this.overlayVisible) {
           this.focusedOptionIndex = -1; // reset
           this.onArrowDownKey(event);
