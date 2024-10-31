@@ -68,19 +68,23 @@ class LessonController extends Controller
         HistoryLogger::logAction("Удалена {$lesson->index} пара {$lesson->subject?->name}");
         $lesson->delete();
 
-        // Используйте метод find() для поиска расписания по ID
         $schedule = Schedule::find($schedule_id_of_lesson);
 
-        // Проверяем, существует ли расписание
         if ($schedule) {
-            // Используйте метод count() для подсчета уроков, связанных с расписанием
             if ($schedule->lessons()->count() === 0) {
-                $schedule->delete();
+                if ($schedule->type === 'changes' && $schedule->date) {
+                    // Удаляем все расписания с типом 'changes' и той же датой
+                    Schedule::where('type', 'changes')
+                        ->where('date', $schedule->date)
+                        ->delete();
+                } else {
+                    // Удаляем только текущий пустой график
+                    $schedule->delete();
+                }
             }
         }
 
         return response()->noContent();
-        // return empty($schedule->lessons);
     }
 
 
