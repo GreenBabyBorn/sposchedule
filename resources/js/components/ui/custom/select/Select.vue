@@ -31,6 +31,8 @@
       @blur="onBlur"
       @keydown="onKeyDown"
       @input="onEditableInput"
+      @vue:mounted="onFilterUpdated"
+      @vue:updated="onFilterUpdated"
     />
     <span
       v-else
@@ -838,10 +840,8 @@
         this.$emit('filter', { originalEvent: event, value });
         const matched = this.searchOptions(event, value);
 
-        !matched && (this.focusedOptionIndex = -1);
-
         this.updateModel(event, value);
-
+        !matched && (this.focusedOptionIndex = -1);
         !this.overlayVisible && isNotEmpty(value) && this.show();
       },
       onContainerClick(event) {
