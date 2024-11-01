@@ -1,17 +1,18 @@
 <script setup lang="ts">
   import { toRef } from 'vue';
+  import type { PublicLesson, ScheduleType } from './types';
 
-  const props = defineProps({
-    groupName: { required: true, type: [String, null], default: null },
-    date: { required: false },
-    weekType: { required: false },
-    type: { required: true },
-    semester: { required: false, type: [Object, null] }, // разрешаем Object или null
-    lessons: { required: true },
-    schedule: { required: true, type: [Object, null] }, // разрешаем Object или null
-    published: { required: false, type: Boolean },
-  });
-  const lessons: any = toRef<any>(() => props.lessons);
+  interface Props {
+    groupName: string | null;
+    date?: string | Date;
+    weekType?: 'ЧИСЛ' | 'ЗНАМ' | null;
+    type: ScheduleType;
+    lessons: PublicLesson[];
+    published?: boolean;
+  }
+
+  const props = defineProps<Props>();
+  const lessons = toRef(() => props.lessons);
 </script>
 
 <template>

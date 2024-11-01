@@ -552,13 +552,11 @@
             :key="item?.id"
             class="schedule"
             :date="isoDate"
-            :schedule="item?.schedule"
-            :semester="item?.semester"
-            :type="item?.schedule?.type"
+            :type="item?.type"
             :group-name="item?.group_name"
-            :lessons="item?.schedule?.lessons"
+            :lessons="item?.lessons"
             :week-type="item?.week_type"
-            :published="item?.schedule?.published"
+            :published="item?.published"
           />
         </template>
       </div>

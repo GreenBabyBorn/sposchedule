@@ -18,3 +18,14 @@ export type Lesson = {
   message: string;
   teachers?: Teacher[];
 };
+
+export type PublicLesson = {
+  id: number;
+  index: number;
+  subject_name: string;
+  week_type: string;
+  cabinet: string;
+  building: string;
+  message: string;
+  teachers?: Teacher[];
+};

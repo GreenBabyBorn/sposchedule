@@ -581,18 +581,17 @@ class ScheduleController extends Controller
 
             $groupSchedules[$schedule->group_name] = [
                 'group_name' => $schedule->group_name,
-                'schedule' => [
-                    'week_day' => $schedule->week_day,
-                    'type' => $schedule->type,
-                    'lessons' => $filteredLessons,
-                ],
+                'week_day' => $schedule->week_day,
+                'type' => $schedule->type,
+                'lessons' => $filteredLessons,
+
             ];
         }
 
         $finalSchedules['schedules'] = array_values($groupSchedules);
 
         usort($finalSchedules['schedules'], function ($a, $b) {
-            return ! empty($b['schedule']) <=> ! empty($a['schedule']);
+            return ! empty($b) <=> ! empty($a);
         });
 
         return response()->json($finalSchedules);
