@@ -15,7 +15,7 @@ export function useBellsQuery(type, building, weekDay?, date?) {
   };
 
   return useQuery({
-    queryKey: ['bells', building, type, weekDay, date],
+    queryKey: ['bells', building, type, weekDayOrDate, typeValues[type.value]],
     queryFn: async () =>
       (
         await axios.get(

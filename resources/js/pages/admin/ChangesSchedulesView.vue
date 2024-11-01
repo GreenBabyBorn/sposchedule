@@ -58,6 +58,7 @@
     data: changesSchedules,
     isError,
     isFetching,
+    isFetched,
     isSuccess,
   } = useChangesSchedulesQuery(
     formattedDate,
@@ -277,7 +278,10 @@
       добавления
       <RouterLink class="underline" to="/admin/semesters">семестра</RouterLink>
     </span>
-    <div v-if="isSuccess && schedulesChanges?.schedules" class="schedules z-50">
+    <div
+      v-if="isSuccess && isFetched && schedulesChanges?.schedules"
+      class="schedules z-50"
+    >
       <!-- <BlockUI  :blocked="isFetching"> -->
       <ChangesScheduleItem
         v-for="item in schedulesChanges?.schedules"
@@ -287,10 +291,10 @@
         :date="formattedDate"
         :schedule="item?.schedule"
         :semester="schedulesChanges?.semester"
-        :schedule-id="item.schedule_id"
-        :type="item?.type"
+        :schedule-id="item?.schedule_id || NaN"
+        :type="item?.type || 'undefined'"
         :group="item?.group"
-        :lessons="item?.lessons"
+        :lessons="item?.lessons || []"
         :week-type="item?.week_type"
         :published="item?.published"
       />

@@ -4,7 +4,7 @@ import { computed } from 'vue';
 
 export function useTeachersQuery(query?) {
   return useQuery({
-    queryKey: ['teachers'],
+    queryKey: ['teachers', query],
     queryFn: async () =>
       (
         await axios.get(`/api/teachers`, {

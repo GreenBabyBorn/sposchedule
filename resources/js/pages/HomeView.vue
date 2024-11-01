@@ -533,8 +533,8 @@
       <span
         v-if="isFetched && !schedulesChanges?.schedules.length"
         class="text-center text-2xl"
-        >Ничего не найдено...</span
-      >
+        >Ничего не найдено 🧐
+      </span>
       <span v-else-if="isError" class="text-2xl"
         >Расписание ещё не выложили, либо в расписании ошибка.</span
       >
@@ -574,7 +574,7 @@
       >
       <div class="">
         <h2 v-if="!publicBells && isFetchedBells" class="text-center text-2xl">
-          На эту дату расписание звонков не найдено
+          Звонки не найдены 🙁
         </h2>
         <div v-if="publicBells" class="">
           <table class="bells-table rounded bg-surface-50 dark:bg-surface-900">

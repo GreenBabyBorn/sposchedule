@@ -8,6 +8,7 @@
     "lint": "eslint --fix 'resources/**/*.{js,jsx,ts,tsx,vue}' --ignore-pattern 'resources/js/presets/*' "
   },
   "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.59.7",
     "@vue/tsconfig": "^0.5.1",
     "autoprefixer": "^10.4.19",
     "axios": "^1.7.7",

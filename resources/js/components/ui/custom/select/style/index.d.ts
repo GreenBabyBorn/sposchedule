@@ -84,4 +84,5 @@ export enum SelectClasses {
   emptyMessage = 'p-select-empty-message',
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface SelectStyle extends BaseStyle {}

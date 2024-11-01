@@ -39,9 +39,7 @@ export function useChangesSchedulesQuery(
 
   return useQuery({
     enabled: enabled,
-
     queryKey: ['scheduleChanges', date, building, course, selectedGroup],
-    retry: 0,
     queryFn: async () => {
       // Формируем параметры запроса в зависимости от их наличия
       const queryParams = new URLSearchParams();
@@ -53,9 +51,8 @@ export function useChangesSchedulesQuery(
 
       // Выполняем запрос с параметрами
       return (
-        (await axios.get(`/api/schedules/changes?${queryParams.toString()}`))
-          .data || []
-      );
+        await axios.get(`/api/schedules/changes?${queryParams.toString()}`)
+      ).data;
     },
   });
   // return useQuery({
