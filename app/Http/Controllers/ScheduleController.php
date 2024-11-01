@@ -342,15 +342,14 @@ class ScheduleController extends Controller
 
         $groupSchedules = [];
 
-        // foreach ($groups as $group) {
-        //     $groupSchedules[$group->name] = [
-        //         'group' => [
-        //             'id' => $group->id,
-        //             'name' => $group->name,
-        //         ],
-        //         'schedule' => [],
-        //     ];
-        // }
+        foreach ($groups as $group) {
+            $groupSchedules[$group->name] = [
+                'group' => [
+                    'id' => $group->id,
+                    'name' => $group->name,
+                ],
+            ];
+        }
 
         foreach ($schedules as $schedule) {
             $schedule->lessons = json_decode($schedule->lessons, true);
