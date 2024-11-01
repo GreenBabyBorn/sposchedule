@@ -1,6 +1,9 @@
 export type Teacher = { id: number; name: string };
 
 export type Subject = { id: number; name: string };
+export type SubjectWithTeachers = Subject & {
+  teachers: Teacher[];
+};
 
 export type ScheduleType = 'changes' | 'main';
 

@@ -28,7 +28,12 @@
   import BlockUI from 'primevue/blockui';
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
-  import type { Lesson, ScheduleType } from './types';
+  import type {
+    Lesson,
+    ScheduleType,
+    SubjectWithTeachers,
+    Teacher,
+  } from './types';
   // import RCESelect from '../ui/RCESelect.vue';
 
   interface Props {
@@ -49,11 +54,11 @@
   const lessons = toRef(() => props.lessons);
   // const teachers: any = toRef<any>(() => props.teachers)
   // const subjects: any = toRef<any>(() => props.subjects)
-  const dateRef: any = toRef<any>(() => props.date);
-  const semester: any = toRef<any>(() => props.semester);
+  const dateRef = toRef(() => props.date);
+  const semester = toRef(() => props.semester);
   const group = toRef(() => props.group);
-  const disabled: any = toRef<any>(() => props.disabled);
-  const date: any = toRef<any>(() => props.date);
+  const disabled = toRef(() => props.disabled);
+  const date = toRef(() => props.date);
   const scheduleId = toRef(() => props.scheduleId);
   const type = toRef(() => props.type);
 
@@ -70,9 +75,9 @@
 
   const { mutateAsync: createScheduleWithChanges, data: newChanges } =
     useCreateScheduleWithChanges();
-  async function editLesson(item) {
+  async function editLesson(item: Lesson) {
     if (!item.id) return;
-    if (!item.message == !item.subject) return;
+    // if (!item.message == !item.subject) return;
 
     if (props.type === 'main') {
       try {
@@ -130,15 +135,15 @@
     }
   }
 
-  type LessonWithWeekTypes = {
+  type newLessonType = {
     index: number;
-    subject: any | null;
-    teachers: [] | null;
+    subject: SubjectWithTeachers | null;
+    teachers: Teacher[] | null;
     building: string | null;
     cabinet: string | null;
     message?: string | null;
   };
-  let newLesson = reactive<LessonWithWeekTypes>({
+  let newLesson = reactive<newLessonType>({
     index: lessons.value?.slice(-1)?.[0]?.index + 1 || null,
     subject: null,
     teachers: [],
@@ -310,7 +315,7 @@
   function handlenewLessonMessage() {
     newLessonMessageState.value = !newLessonMessageState.value;
     if (newLessonMessageState.value) {
-      newLesson = reactive<LessonWithWeekTypes>({
+      newLesson = reactive<newLessonType>({
         index: newLesson.index,
         subject: null,
         teachers: [],
