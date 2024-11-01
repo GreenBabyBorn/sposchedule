@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import DatePicker from 'primevue/datepicker';
   import ChangesScheduleItem from '@/components/schedule/AdminChangesScheduleItem.vue';
-  import { computed, onMounted, ref, watch } from 'vue';
+  import { computed, onMounted, watch } from 'vue';
   import {
     useChangesSchedulesQuery,
     useCoursesQuery,
@@ -20,15 +20,16 @@
 
   const route = useRoute();
   const scheduleStore = useScheduleStore();
-  const { course, date, schedulesChanges } = storeToRefs(scheduleStore);
+  const {
+    course,
+    date,
+    formattedDate,
+    selectedCourse,
+    schedulesChanges,
+    selectedGroup,
+    building,
+  } = storeToRefs(scheduleStore);
   const { setSchedulesChanges } = scheduleStore;
-
-  const isoDate = computed(() => {
-    return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
-  });
-
-  const selectedGroup = ref();
-  const building = ref(null);
 
   const { data: courses } = useCoursesQuery(building);
 
@@ -41,15 +42,11 @@
     );
   });
 
-  const selectedCourse = computed(() => {
-    return course.value;
-  });
-
   const updateQueryParams = () => {
     router.replace({
       query: {
         ...route.query,
-        date: isoDate.value || undefined,
+        date: formattedDate.value || undefined,
         building: building.value || undefined,
         course: selectedCourse.value || undefined,
         group: selectedGroup.value || undefined,
@@ -63,7 +60,7 @@
     isFetching,
     isSuccess,
   } = useChangesSchedulesQuery(
-    isoDate,
+    formattedDate,
     building,
     selectedCourse,
     selectedGroup
@@ -80,7 +77,7 @@
   );
 
   watch(
-    [isoDate, building, selectedCourse, selectedGroup],
+    [formattedDate, building, selectedCourse, selectedGroup],
     () => {
       updateQueryParams();
     },
@@ -268,7 +265,7 @@
           :to="{
             path: '/print/changes',
             query: {
-              date: isoDate,
+              date: formattedDate,
             },
           }"
         />
@@ -287,7 +284,7 @@
         :key="item?.id"
         :disabled="isFetching"
         class="schedule"
-        :date="isoDate"
+        :date="formattedDate"
         :schedule="item?.schedule"
         :semester="item?.semester"
         :type="item?.schedule?.type"

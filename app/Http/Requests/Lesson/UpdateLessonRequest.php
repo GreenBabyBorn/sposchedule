@@ -41,6 +41,7 @@ class UpdateLessonRequest extends FormRequest
                 ->ignore($this->route('lesson')->id)
             ],
             'building' => 'nullable|integer|min:1',
+            'message' => 'nullable|string|max:255',
         ];
     }
 
