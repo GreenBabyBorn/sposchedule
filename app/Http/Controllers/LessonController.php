@@ -76,6 +76,7 @@ class LessonController extends Controller
                     // Удаляем все расписания с типом 'changes' и той же датой
                     Schedule::where('type', 'changes')
                         ->where('date', $schedule->date)
+                    ->where('group_id', $schedule->group_id)
                         ->delete();
                 } else {
                     // Удаляем только текущий пустой график

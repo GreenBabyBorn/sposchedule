@@ -30,19 +30,31 @@
   import { useNow, useStorage } from '@vueuse/core';
   // import RCESelect from '../ui/RCESelect.vue';
 
-  const toast = useToast();
+  type Subject = { id: number; name: string };
+  type Lesson = {
+    id: number;
+    index: number;
+    schedule_id: number;
+    subject: Subject;
+    week_type: string;
+    cabinet: string;
+    building: string;
+    message: string;
+  };
+  type ScheduleType = 'changes' | 'main';
   interface Props {
     group?: Record<string, any> | null;
     date?: string | Date;
-    weekType?: string;
-    type: string;
+    weekType?: 'ЧИСЛ' | 'ЗНАМ' | null;
+    type: ScheduleType;
     semester?: Record<string, any>;
-    lessons: any[]; // Замените `any` на конкретный тип уроков, если он у вас есть, например, `Lesson[]`
+    lessons: Lesson[];
     scheduleId: number;
     published?: boolean;
     disabled?: boolean;
   }
 
+  const toast = useToast();
   const props = defineProps<Props>();
 
   const lessons = toRef(() => props.lessons);
@@ -95,22 +107,23 @@
         return;
       }
     }
+
     try {
       await updateLesson({
         id:
-          props.type === 'main'
+          type.value === 'main'
             ? newChanges.value.data.lessons.find(x => x.index === item.index).id
             : item.id,
         body: {
           ...item,
           subject_id: item.subject?.id,
           id:
-            props.type === 'main'
+            type.value === 'main'
               ? newChanges.value.data.lessons.find(x => x.index === item.index)
                   .id
               : item.id,
           schedule_id:
-            props.type === 'main'
+            type.value === 'main'
               ? newChanges.value.data.lessons.find(x => x.index === item.index)
                   .schedule_id
               : item.schedule_id,
@@ -137,7 +150,7 @@
     message?: string | null;
   };
   let newLesson = reactive<LessonWithWeekTypes>({
-    index: lessons.value?.slice(-1)?.[0]?.index + 1 || '',
+    index: lessons.value?.slice(-1)?.[0]?.index + 1 || null,
     subject: null,
     teachers: [],
     building: lessons.value?.slice(-1)?.[0]?.building,

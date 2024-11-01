@@ -266,7 +266,10 @@ class ScheduleController extends Controller
                             'id', l.id, 
                             'index', l.index, 
                             'schedule_id', s.id, 
-                            'subject', subj, 
+                            'subject', json_build_object(
+                                'id', subj.id,
+                                'name', subj.name
+                            ), 
                             'week_type', l.week_type, 
                             'cabinet', l.cabinet,
                             'building', l.building,
