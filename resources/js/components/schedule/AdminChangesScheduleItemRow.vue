@@ -8,14 +8,16 @@
   import InputText from 'primevue/inputtext';
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
+  import type { Lesson } from './types';
 
-  const props = defineProps<{
-    lesson: any;
+  interface Props {
+    lesson: Lesson;
     teachers: any;
     subjects: any;
     isEdit: boolean;
     disabled: boolean;
-  }>();
+  }
+  const props = defineProps<Props>();
 
   const teachers: any = toRef<any>(() => props.teachers);
   const subjects: any = toRef<any>(() => props.subjects);

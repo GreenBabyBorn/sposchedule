@@ -28,20 +28,9 @@
   import BlockUI from 'primevue/blockui';
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
+  import type { Lesson, ScheduleType } from './types';
   // import RCESelect from '../ui/RCESelect.vue';
 
-  type Subject = { id: number; name: string };
-  type Lesson = {
-    id: number;
-    index: number;
-    schedule_id: number;
-    subject: Subject;
-    week_type: string;
-    cabinet: string;
-    building: string;
-    message: string;
-  };
-  type ScheduleType = 'changes' | 'main';
   interface Props {
     group?: Record<string, any> | null;
     date?: string | Date;
