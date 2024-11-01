@@ -383,11 +383,7 @@
 </script>
 
 <template>
-  <BlockUI
-    :blocked="
-      (isOneDayDifference(dateRef) && !Boolean(enabledEdit)) || disabled
-    "
-  >
+  <BlockUI :blocked="isOneDayDifference(dateRef) && !Boolean(enabledEdit)">
     <div class="schedule-item">
       <div
         class="flex items-center justify-between rounded-t bg-surface-0 p-2 dark:bg-surface-950"
@@ -461,6 +457,7 @@
               :subjects="subjects"
               :teachers="teachers"
               :lesson="lesson"
+              :disabled="disabled"
               @remove-lesson="removeLesson"
               @edit-lesson="editLesson"
             />
@@ -557,7 +554,8 @@
                       (!newLesson.index ||
                         !newLesson.subject ||
                         typeof newLesson.subject === 'string')) ||
-                    (newLessonMessageState && !newLesson.message)
+                    (newLessonMessageState && !newLesson.message) ||
+                    disabled
                   "
                   icon="pi pi-save"
                   @click="addNewLesson()"

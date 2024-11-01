@@ -14,11 +14,13 @@
     teachers: any;
     subjects: any;
     isEdit: boolean;
+    disabled: boolean;
   }>();
 
   const teachers: any = toRef<any>(() => props.teachers);
   const subjects: any = toRef<any>(() => props.subjects);
   const isEdit: any = toRef<any>(() => props.isEdit);
+  const disabled = toRef(() => props.disabled);
 
   const lesson = toRef(() => props.lesson);
 
@@ -144,6 +146,7 @@
           text
           icon="pi pi-trash"
           severity="danger"
+          :disabled="disabled"
           @click="removeLesson(lesson?.id)"
         />
       </div>
