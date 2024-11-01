@@ -333,21 +333,21 @@ class ScheduleController extends Controller
         $finalSchedules = [
             'week_type' => $weekType,
             'last_updated' => null,
+            'semester' => $semester,
             'schedules' => [],
         ];
 
         $groupSchedules = [];
 
-        foreach ($groups as $group) {
-            $groupSchedules[$group->name] = [
-                'semester' => $semester,
-                'group' => [
-                    'id' => $group->id,
-                    'name' => $group->name,
-                ],
-                'schedule' => [],
-            ];
-        }
+        // foreach ($groups as $group) {
+        //     $groupSchedules[$group->name] = [
+        //         'group' => [
+        //             'id' => $group->id,
+        //             'name' => $group->name,
+        //         ],
+        //         'schedule' => [],
+        //     ];
+        // }
 
         foreach ($schedules as $schedule) {
             $schedule->lessons = json_decode($schedule->lessons, true);
@@ -373,16 +373,24 @@ class ScheduleController extends Controller
             }
 
             if ($schedule->type === 'changes') {
-                $groupSchedules[$schedule->group->name]['schedule'] = [
-                    'id' => $schedule->schedule_id,
+                $groupSchedules[$schedule->group->name] = [
+                    'group' => [
+                    'id' => $schedule->group->id,
+                    'name' => $schedule->group->name,
+                ],
+                    'schedule_id' => $schedule->schedule_id,
                     'week_day' => $schedule->week_day,
                     'published' => $schedule->published,
                     'type' => 'changes',
                     'lessons' => $filteredLessons,
                 ];
-            } elseif (! isset($groupSchedules[$schedule->group->name]['schedule']['lessons'])) {
-                $groupSchedules[$schedule->group->name]['schedule'] = [
-                    'id' => $schedule->schedule_id,
+            } elseif (! isset($groupSchedules[$schedule->group->name]['lessons'])) {
+                $groupSchedules[$schedule->group->name] = [
+                    'group' => [
+                    'id' => $schedule->group->id,
+                    'name' => $schedule->group->name,
+                ],
+                    'schedule_id' => $schedule->schedule_id,
                     'week_day' => $schedule->week_day,
                     'published' => $schedule->published,
                     'type' => $schedule->type,

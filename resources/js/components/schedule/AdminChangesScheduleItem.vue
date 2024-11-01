@@ -31,20 +31,21 @@
   // import RCESelect from '../ui/RCESelect.vue';
 
   const toast = useToast();
-  const props = defineProps({
-    group: { required: false, type: [Object, null], default: null },
-    date: { required: false },
-    weekType: { required: false },
-    type: { required: true },
-    semester: { required: false, type: Object },
-    lessons: { required: true },
-    schedule: { required: true, type: Object },
-    published: { required: false, type: Boolean },
-    disabled: { requierd: false, type: Boolean },
-    // teachers: { required: true },
-    // subjects: { required: true }
-  });
-  const lessons: any = toRef<any>(() => props.lessons);
+  interface Props {
+    group?: Record<string, any> | null;
+    date?: string | Date;
+    weekType?: string;
+    type: string;
+    semester?: Record<string, any>;
+    lessons: any[]; // Замените `any` на конкретный тип уроков, если он у вас есть, например, `Lesson[]`
+    scheduleId: number;
+    published?: boolean;
+    disabled?: boolean;
+  }
+
+  const props = defineProps<Props>();
+
+  const lessons = toRef(() => props.lessons);
   // const teachers: any = toRef<any>(() => props.teachers)
   // const subjects: any = toRef<any>(() => props.subjects)
   const dateRef: any = toRef<any>(() => props.date);
@@ -52,6 +53,8 @@
   const group = toRef(() => props.group);
   const disabled: any = toRef<any>(() => props.disabled);
   const date: any = toRef<any>(() => props.date);
+  const scheduleId = toRef(() => props.scheduleId);
+  const type = toRef(() => props.type);
 
   const published = ref(props.published);
 
@@ -75,7 +78,7 @@
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
-            lessons: props.schedule.lessons,
+            lessons: lessons.value,
             date: props.date,
             semester_id: props.semester.id,
           },
@@ -134,10 +137,10 @@
     message?: string | null;
   };
   let newLesson = reactive<LessonWithWeekTypes>({
-    index: props.schedule?.lessons?.at(-1)?.index + 1 || '',
+    index: lessons.value?.slice(-1)?.[0]?.index + 1 || '',
     subject: null,
     teachers: [],
-    building: props.schedule?.lessons?.at(-1)?.building,
+    building: lessons.value?.slice(-1)?.[0]?.building,
     cabinet: null,
     message: null,
   });
@@ -147,14 +150,14 @@
   const { mutateAsync: storeLesson } = useStoreLesson();
 
   async function addNewLesson() {
-    const loadedSchedule = toRef(() => props.schedule).value.id || false;
+    const loadedSchedule = scheduleId.value || false;
     // Если тип расписания 'main', конвертируем его в изменения
-    if (props.schedule.type === 'main') {
+    if (type.value === 'main') {
       try {
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
-            lessons: props.schedule.lessons,
+            lessons: lessons.value,
             date: props.date,
             semester_id: props.semester.id,
           },
@@ -199,13 +202,13 @@
     }
 
     // Определяем правильный ID для использования в storeLesson
-    let scheduleId;
-    if (loadedSchedule && props.schedule.type !== 'main') {
-      scheduleId = loadedSchedule;
-    } else if (props.schedule.type === 'main') {
-      scheduleId = newChanges.value?.data?.schedule_id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
+    let scheduleIdforLesson;
+    if (loadedSchedule && type.value !== 'main') {
+      scheduleIdforLesson = loadedSchedule;
+    } else if (type.value === 'main') {
+      scheduleIdforLesson = newChanges.value?.data?.schedule_id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
     } else {
-      scheduleId = newSchedule.value?.data?.id; // Тоже необходимо проверить наличие значения
+      scheduleIdforLesson = newSchedule.value?.data?.id; // Тоже необходимо проверить наличие значения
     }
     try {
       await storeLesson({
@@ -217,13 +220,13 @@
           cabinet: newLesson.cabinet,
           teachers: newLesson.teachers,
           subject_id: newLesson.subject?.id,
-          schedule_id: scheduleId,
+          schedule_id: scheduleIdforLesson,
         },
       });
       newLesson.index = Number(newLesson.index) + 1;
       newLesson.subject = null;
       newLesson.teachers = [];
-      newLesson.building = props.schedule?.lessons?.at(-1)?.building;
+      newLesson.building = lessons.value?.slice(-1)?.[0].building;
       newLesson.cabinet = null;
       newLesson.message = null;
     } catch (e) {
@@ -242,9 +245,7 @@
   async function removeLesson(id) {
     if (props.type === 'main') {
       try {
-        let lesspnsForChanges = props.schedule.lessons.filter(
-          (l: any) => l.id !== id
-        );
+        let lesspnsForChanges = lessons.value.filter((l: any) => l.id !== id);
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
@@ -283,7 +284,7 @@
   async function handlePublished() {
     try {
       await updateChangesSchedule({
-        id: props.schedule.id,
+        id: scheduleId.value,
 
         body: {
           published: published.value,

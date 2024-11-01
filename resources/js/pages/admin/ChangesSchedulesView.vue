@@ -286,12 +286,13 @@
         class="schedule"
         :date="formattedDate"
         :schedule="item?.schedule"
-        :semester="item?.semester"
-        :type="item?.schedule?.type"
+        :semester="schedulesChanges?.semester"
+        :schedule-id="item.schedule_id"
+        :type="item?.type"
         :group="item?.group"
-        :lessons="item?.schedule?.lessons"
+        :lessons="item?.lessons"
         :week-type="item?.week_type"
-        :published="item?.schedule?.published"
+        :published="item?.published"
       />
       <!-- </BlockUI> -->
     </div>
