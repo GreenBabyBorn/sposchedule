@@ -1,3 +1,4 @@
+import type { Teacher } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 import { computed } from 'vue';
@@ -10,7 +11,7 @@ export function useTeachersQuery(query?) {
         await axios.get(`/api/teachers`, {
           params: query,
         })
-      ).data,
+      ).data as Teacher[],
   });
 }
 

@@ -18,6 +18,7 @@ export const useSchedulePublicStore = defineStore(
     function setSchedules(scheduless) {
       schedules.value = toRaw(scheduless ?? []);
     }
+
     function setSchedulesChanges(scheduless) {
       schedulesChanges.value = toRaw(scheduless ?? []);
     }
@@ -26,7 +27,6 @@ export const useSchedulePublicStore = defineStore(
       schedules,
       setSchedules,
       selectedGroup,
-
       queryParams,
       schedulesChanges,
       setSchedulesChanges,

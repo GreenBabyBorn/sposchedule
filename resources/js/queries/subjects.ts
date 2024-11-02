@@ -1,16 +1,16 @@
+import type { Subject } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 
 export function useSubjectsQuery(query?: object) {
   return useQuery({
     queryKey: ['subjects', query],
-
     queryFn: async () =>
       (
         await axios.get('/api/subjects', {
           params: query,
         })
-      ).data,
+      ).data as Subject[],
   });
 }
 

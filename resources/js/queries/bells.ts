@@ -3,41 +3,43 @@ import axios from 'axios';
 import { computed } from 'vue';
 
 export function useBellsQuery(type, building, weekDay?, date?) {
-  const weekDayOrDate = computed(() =>
-    type.value === 'Основное'
-      ? `&week_day=${weekDay.value}`
-      : `&date=${date.value}`
-  );
-
   const typeValues = {
     Основное: 'main',
     Изменения: 'changes',
   };
 
   return useQuery({
-    queryKey: ['bells', building, type, weekDayOrDate, typeValues[type.value]],
+    queryKey: ['bells', building, type, weekDay, typeValues[type.value], date],
     queryFn: async () =>
       (
-        await axios.get(
-          `/api/bells?type=${typeValues[type.value]}&building=${building.value || ''}${weekDayOrDate.value}`
-        )
+        await axios.get(`/api/bells`, {
+          params: {
+            building: building.value,
+            type: typeValues[type.value],
+            week_day: weekDay?.value,
+            date: date?.value,
+          },
+        })
       ).data,
   });
 }
 
 export function usePublicBellsQuery(building, date) {
-  const enabled = computed(() => Boolean(date?.value || building?.value));
+  // const enabled = computed(() => Boolean(date?.value || building?.value));
 
   return useQuery({
     queryKey: ['bells', date, building],
-    enabled: enabled,
+    // enabled: enabled,
     retry: 0,
     queryFn: async () => {
-      const queryParams = new URLSearchParams();
-      if (building?.value) queryParams.append('building', building.value);
-      if (date?.value) queryParams.append('date', date.value);
-      return (await axios.get(`/api/bells/public?${queryParams.toString()}`))
-        .data;
+      return (
+        await axios.get(`/api/bells/public`, {
+          params: {
+            building: building.value,
+            date: date.value,
+          },
+        })
+      ).data;
     },
   });
 }

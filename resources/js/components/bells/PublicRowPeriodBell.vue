@@ -1,10 +1,9 @@
 <script setup lang="ts">
   import { toRef } from 'vue';
-  const props = defineProps({
-    period: {
-      type: Object,
-    },
-  });
+  import type { BellsPeriod } from './types';
+  const props = defineProps<{
+    period: BellsPeriod;
+  }>();
 
   const period = toRef(() => props.period);
 </script>

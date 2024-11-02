@@ -1,6 +1,6 @@
-export type Teacher = { id: number; name: string };
+export type Teacher = { id: number; name: string; subjects?: Subject[] };
 
-export type Subject = { id: number; name: string };
+export type Subject = { id: number; name: string; teachers?: Teacher[] };
 
 export type SubjectWithTeachers = Subject & {
   teachers: Teacher[];

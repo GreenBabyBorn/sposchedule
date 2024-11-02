@@ -15,9 +15,7 @@ export function useSemesterShowQuery(id) {
     enabled: enabled,
     queryKey: ['semesters', id],
     queryFn: async () => {
-      const url = `/api/semesters/${id?.value}`;
-      const response = await axios.get(url);
-      return response.data;
+      return await axios.get(`/api/semesters/${id?.value}`);
     },
   });
 }
@@ -53,7 +51,7 @@ export function useDestroySemester() {
   const destroySemesterMutation = useMutation({
     mutationFn: id => axios.delete(`/api/semesters/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['semesters'], exact: true });
+      queryClient.invalidateQueries({ queryKey: ['semesters'] });
     },
   });
   return destroySemesterMutation;

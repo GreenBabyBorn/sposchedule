@@ -14,17 +14,20 @@
   import { useToast } from 'primevue/usetoast';
   import { reactive, ref, toRef, watch } from 'vue';
   import ToggleSwitch from 'primevue/toggleswitch';
+  import type { Subject, Teacher } from './types';
   // import ToggleButton from 'primevue/togglebutton';
 
   const toast = useToast();
 
-  const props = defineProps({
-    weekDay: { type: String, required: true },
-    group: { required: false, type: Object },
-    semester: { required: true, type: Object },
-    item: { required: true, type: [Object] },
-    published: { required: false, type: Boolean },
-  });
+  interface Props {
+    weekDay: string;
+    group?: Record<string, any>;
+    semester: Record<string, any>;
+    item: Record<string, any>;
+    published?: boolean;
+  }
+
+  const props = defineProps<Props>();
 
   const group = toRef(() => props.group);
   const semester = toRef(() => props.semester);
@@ -69,14 +72,14 @@
   type LessonWithWeekTypes = {
     index: number;
     ЧИСЛ: {
-      subject: any | null;
-      teachers: [] | null;
+      subject: Subject | null;
+      teachers: Teacher[] | null;
       building: string | null;
       cabinet: string | null;
     };
     ЗНАМ?: {
-      subject: any | null;
-      teachers: [] | null;
+      subject: Subject | null;
+      teachers: Teacher[] | null;
       building: string | null;
       cabinet: string | null;
     };
