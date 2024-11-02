@@ -362,7 +362,7 @@ class ScheduleController extends Controller
                 }
             }
 
-            if (empty($filteredLessons)) {
+            if (empty($filteredLessons) && !$schedule->type) {
                 continue;
             }
 
@@ -377,9 +377,9 @@ class ScheduleController extends Controller
             if ($schedule->type === 'changes') {
                 $groupSchedules[$schedule->group->name] = [
                     'group' => [
-                    'id' => $schedule->group->id,
-                    'name' => $schedule->group->name,
-                ],
+                        'id' => $schedule->group->id,
+                        'name' => $schedule->group->name,
+                    ],
                     'schedule_id' => $schedule->schedule_id,
                     'week_day' => $schedule->week_day,
                     'published' => $schedule->published,
@@ -389,9 +389,9 @@ class ScheduleController extends Controller
             } elseif (! isset($groupSchedules[$schedule->group->name]['lessons'])) {
                 $groupSchedules[$schedule->group->name] = [
                     'group' => [
-                    'id' => $schedule->group->id,
-                    'name' => $schedule->group->name,
-                ],
+                        'id' => $schedule->group->id,
+                        'name' => $schedule->group->name,
+                    ],
                     'schedule_id' => $schedule->schedule_id,
                     'week_day' => $schedule->week_day,
                     'published' => $schedule->published,

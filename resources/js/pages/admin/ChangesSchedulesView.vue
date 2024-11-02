@@ -282,7 +282,7 @@
         :date="formattedDate"
         :semester="schedulesChanges?.semester"
         :schedule-id="item?.schedule_id || NaN"
-        :type="item?.type || 'undefined'"
+        :type="item?.type || undefined"
         :group="item?.group"
         :lessons="item?.lessons || []"
         :published="item?.published"

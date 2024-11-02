@@ -39,7 +39,7 @@
   interface Props {
     group?: Record<string, any> | null;
     date?: string | Date;
-    type: ScheduleType | 'undefined';
+    type: ScheduleType | undefined;
     semester?: Record<string, any>;
     lessons: Lesson[];
     scheduleId: number;
@@ -150,8 +150,9 @@
     message: null,
   });
   watch(lessons, () => {
-    newLesson.index = Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || null;
-    newLesson.building = lessons.value?.slice(-1)?.[0]?.building;
+    newLesson.index =
+      Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || newLesson.index;
+    newLesson.building = lessons?.value?.slice(-1)?.[0]?.building;
   });
 
   const { mutateAsync: storeSchedule, data: newSchedule } =
@@ -193,11 +194,11 @@
             group_id: group.value.id,
             semester_id: semester.value.id,
             type: 'changes',
-            // view_mode: 'table',
             date: props.date,
           },
         });
       } catch (e) {
+        console.log(e, 'f');
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -232,10 +233,11 @@
           schedule_id: scheduleIdforLesson,
         },
       });
-      newLesson.index = Number(newLesson.index) + 1;
+      // newLesson.index =
+      //   Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || null;
       newLesson.subject = null;
       newLesson.teachers = [];
-      newLesson.building = lessons.value?.slice(-1)?.[0].building;
+      newLesson.building = lessons.value?.slice(-1)?.[0]?.building;
       newLesson.cabinet = null;
       newLesson.message = null;
     } catch (e) {
@@ -390,6 +392,11 @@
 
     return uniqueTeachers;
   });
+
+  const scheduleTypes = {
+    main: 'Основное',
+    changes: 'Изменения',
+  };
 </script>
 
 <template>
@@ -419,7 +426,7 @@
             @click="isEdit = !isEdit"
           />
           <ToggleSwitch
-            v-if="props.type !== 'main'"
+            v-if="type === 'changes'"
             v-model="published"
             :disabled="
               !lessons || (isOneDayDifference(dateRef) && !Boolean(enabledEdit))
@@ -431,11 +438,11 @@
 
         <span
           :class="{
-            'text-green-400': props?.type !== 'main',
+            'text-green-400': props?.type === 'changes',
             'text-surface-400': props?.type === 'main',
           }"
           class="rounded-lg px-2 py-1 text-right text-sm"
-          >{{ props?.type === 'main' ? 'Основное' : 'Изменения' }}</span
+          >{{ scheduleTypes[props?.type] }}</span
         >
       </div>
       <table class="schedule-table rounded bg-surface-50 dark:bg-surface-900">
