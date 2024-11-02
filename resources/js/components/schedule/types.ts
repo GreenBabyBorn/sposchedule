@@ -1,6 +1,7 @@
 export type Teacher = { id: number; name: string };
 
 export type Subject = { id: number; name: string };
+
 export type SubjectWithTeachers = Subject & {
   teachers: Teacher[];
 };
@@ -28,4 +29,22 @@ export type PublicLesson = {
   building: string;
   message: string;
   teachers?: Teacher[];
+};
+
+export type weekType = 'ЧИСЛ' | 'ЗНАМ' | '';
+
+export type Schedule = {
+  schedule_id: number;
+  week_day: 'ПН' | 'ВТ' | 'СР' | 'ЧТ' | 'ПТ' | 'СБ' | 'ВС' | '';
+  published: boolean;
+  type: ScheduleType;
+  group: object;
+  lessons: Lesson[];
+};
+
+export type ChangesSchedules = {
+  week_type: weekType;
+  last_updated: string;
+  schedules: Schedule[];
+  semester: any;
 };

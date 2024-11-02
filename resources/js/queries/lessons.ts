@@ -1,20 +1,21 @@
+import type {
+  ChangesSchedules,
+  Lesson,
+  Schedule,
+} from '@/components/schedule/types';
 import { useScheduleStore } from '@/stores/schedule';
 import { useMutation, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 import { storeToRefs } from 'pinia';
 
-const scheduleStore = useScheduleStore();
-const { formattedDate, selectedCourse, selectedGroup, building } =
-  storeToRefs(scheduleStore);
-
 export function useUpdateLesson() {
   const queryClient = useQueryClient();
-
+  const scheduleStore = useScheduleStore();
+  const { formattedDate, selectedCourse, selectedGroup, building } =
+    storeToRefs(scheduleStore);
   const updateLessonMutation = useMutation({
     mutationFn: ({ id, body }: any) => axios.patch(`/api/lessons/${id}`, body),
     onMutate: async ({ id, body }) => {
-      // Отмена любого исходящего рефетча для предотвращения перезаписи оптимистичных обновлений
-      await queryClient.cancelQueries({ queryKey: ['scheduleMain'] });
       await queryClient.cancelQueries({
         queryKey: [
           'scheduleChanges',
@@ -25,30 +26,13 @@ export function useUpdateLesson() {
         ],
       });
 
-      // Сохранение предыдущих данных для отката в случае ошибки
-      const previousMain = queryClient.getQueryData(['scheduleMain']);
-      const previousChanges = queryClient.getQueryData([
+      const previousChanges: ChangesSchedules = queryClient.getQueryData([
         'scheduleChanges',
         formattedDate,
         building,
         selectedCourse,
         selectedGroup,
       ]);
-
-      // Оптимистичное обновление данных
-      queryClient.setQueryData(['scheduleMain'], (oldData: any) => {
-        if (!oldData) return;
-        const newData = { ...oldData };
-        newData.schedules = newData.schedules.map((schedule: any) => {
-          if (schedule.id === body.schedule_id) {
-            schedule.lessons = schedule.lessons.map((lesson: any) =>
-              lesson.id === id ? { ...lesson, ...body } : lesson
-            );
-          }
-          return schedule;
-        });
-        return newData;
-      });
 
       queryClient.setQueryData(
         [
@@ -60,10 +44,10 @@ export function useUpdateLesson() {
         ],
         (oldData: any) => {
           if (!oldData) return;
-          const newData = { ...oldData };
-          newData.schedules = newData.schedules.map((schedule: any) => {
-            if (schedule.id === body.schedule_id) {
-              schedule.lessons = schedule.lessons.map((lesson: any) =>
+          const newData: ChangesSchedules = JSON.parse(JSON.stringify(oldData));
+          newData.schedules = newData.schedules.map((schedule: Schedule) => {
+            if (schedule.schedule_id === body.schedule_id) {
+              schedule.lessons = schedule.lessons.map((lesson: Lesson) =>
                 lesson.id === id ? { ...lesson, ...body } : lesson
               );
             }
@@ -73,34 +57,19 @@ export function useUpdateLesson() {
         }
       );
 
-      // Возврат контекста для использования в случае ошибки
-      return { previousMain, previousChanges };
+      return { previousChanges };
     },
-    onError: (err, data, context) => {
-      queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
-      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
-      // Откат данных в случае ошибки
-      console.log(context.previousChanges);
-      if (context?.previousMain) {
-        queryClient.setQueryData(['scheduleMain'], context.previousMain);
-      }
-      if (context?.previousChanges) {
-        queryClient.setQueryData(
-          [
-            'scheduleChanges',
-            formattedDate,
-            building,
-            selectedCourse,
-            selectedGroup,
-          ],
-          context.previousChanges
-        );
-      }
-    },
-    onSettled: () => {
-      // При успешном завершении можно дополнительно инвалировать запросы для актуализации данных
-      // queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
-      // queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+    onError: (err, item: Lesson, context) => {
+      queryClient.setQueryData(
+        [
+          'scheduleChanges',
+          formattedDate,
+          building,
+          selectedCourse,
+          selectedGroup,
+        ],
+        context.previousChanges
+      );
     },
   });
 

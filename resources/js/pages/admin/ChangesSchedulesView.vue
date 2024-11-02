@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import DatePicker from 'primevue/datepicker';
   import ChangesScheduleItem from '@/components/schedule/AdminChangesScheduleItem.vue';
-  import { computed, onMounted, watch } from 'vue';
+  import { computed, onMounted, watch, watchEffect } from 'vue';
   import {
     useChangesSchedulesQuery,
     useCoursesQuery,
@@ -16,7 +16,6 @@
   import { useBuildingsQuery } from '@/queries/buildings';
   import { useGroupsPublicQuery } from '@/queries/groups';
   import { reducedWeekDays, dateRegex } from '@/composables/constants';
-  // import BlockUI from 'primevue/blockui';
 
   const route = useRoute();
   const scheduleStore = useScheduleStore();
@@ -67,15 +66,9 @@
     selectedGroup
   );
 
-  watch(
-    changesSchedules,
-    newData => {
-      if (newData) {
-        setSchedulesChanges(newData);
-      }
-    },
-    { deep: true }
-  );
+  watchEffect(() => {
+    setSchedulesChanges(changesSchedules.value);
+  });
 
   watch(
     [formattedDate, building, selectedCourse, selectedGroup],
@@ -104,20 +97,19 @@
 
   onMounted(() => {
     if (route.query.date && dateRegex.test(route.query.date as string)) {
-      // Если дата есть в query параметрах, используем ее
       const [day, month, year] = (route.query.date as string)
         .split('.')
         .map(Number);
       date.value = new Date(year, month - 1, day);
     } else {
-      // Если нет даты ни в query, ни в localStorage, используем текущую дату
       date.value = new Date();
     }
+
     if (route.query.building) {
       building.value = route.query.building as string;
     }
+
     if (route.query.course) {
-      // Если курс есть в query параметрах, используем его
       course.value = Number(route.query.course as string);
     }
 
@@ -282,23 +274,19 @@
       v-if="isSuccess && isFetched && schedulesChanges?.schedules"
       class="schedules z-50"
     >
-      <!-- <BlockUI  :blocked="isFetching"> -->
       <ChangesScheduleItem
-        v-for="item in schedulesChanges?.schedules"
-        :key="item?.id"
+        v-for="(item, index) in schedulesChanges?.schedules"
+        :key="index"
         :disabled="isFetching"
         class="schedule"
         :date="formattedDate"
-        :schedule="item?.schedule"
         :semester="schedulesChanges?.semester"
         :schedule-id="item?.schedule_id || NaN"
         :type="item?.type || 'undefined'"
         :group="item?.group"
         :lessons="item?.lessons || []"
-        :week-type="item?.week_type"
         :published="item?.published"
       />
-      <!-- </BlockUI> -->
     </div>
   </div>
 </template>
@@ -329,7 +317,5 @@
       justify-self: center;
       width: 100%;
     }
-  }
-  .schedule {
   }
 </style>

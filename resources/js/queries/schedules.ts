@@ -1,3 +1,4 @@
+import type { ChangesSchedules } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 import { computed } from 'vue';
@@ -41,32 +42,18 @@ export function useChangesSchedulesQuery(
     enabled: enabled,
     queryKey: ['scheduleChanges', date, building, course, selectedGroup],
     queryFn: async () => {
-      // Формируем параметры запроса в зависимости от их наличия
-      const queryParams = new URLSearchParams();
-      if (date?.value) queryParams.append('date', date.value);
-      if (building?.value) queryParams.append('building', building.value);
-      if (course?.value) queryParams.append('course', course.value);
-      if (selectedGroup?.value)
-        queryParams.append('group', selectedGroup.value);
-
-      // Выполняем запрос с параметрами
       return (
-        await axios.get(`/api/schedules/changes?${queryParams.toString()}`)
-      ).data;
+        await axios.get(`/api/schedules/changes`, {
+          params: {
+            date: date?.value,
+            building: building.value,
+            course: course.value,
+            group: selectedGroup.value,
+          },
+        })
+      ).data as ChangesSchedules;
     },
   });
-  // return useQuery({
-  //   enabled: enabled,
-  //   queryKey: ['scheduleChanges', date, course],
-  //   retry: 0,
-  //   // staleTime: 300000,
-  //   queryFn: async () =>
-  //     (
-  //       await axios.get(
-  //         `/api/schedules/changes?date=${date.value}&course=${course.value || ''}`
-  //       )
-  //     ).data,
-  // });
 }
 
 export function usePrintChangesSchedulesQuery(date) {
@@ -91,9 +78,14 @@ export function usePrintMainSchedulesQuery(semester_id, course, buildings) {
     enabled: enabled,
     queryKey: ['PrintScheduleMain', semester_id, course, buildings],
     queryFn: async () => {
-      // Выполнение запроса, если все параметры валидны
       const response = await axios.get(
-        `/api/schedules/main/semester/${semester_id?.value}/print?course=${course?.value}&buildings=${buildings?.value?.toString()}`
+        `/api/schedules/main/semester/${semester_id?.value}/print`,
+        {
+          params: {
+            course: course?.value,
+            buildings: buildings?.value?.toString(),
+          },
+        }
       );
 
       return response.data;
@@ -146,18 +138,19 @@ export function useUpdateSchedule() {
 }
 
 export function useCoursesQuery(building?) {
-  // Условие enabled всегда true, если building не передается, или true если building задан
-  const enabled = computed(() => Boolean(building?.value || true));
+  // const enabled = computed(() => Boolean(building?.value));
 
   return useQuery({
-    enabled,
+    // enabled,
     queryKey: ['courses', building],
     queryFn: async () => {
-      // Формируем параметры запроса в зависимости от наличия building
-      const queryParams = building?.value ? `?building=${building.value}` : '';
-
-      // Выполняем запрос с параметрами или без них
-      return (await axios.get(`/api/groups/courses${queryParams}`)).data;
+      return (
+        await axios.get(`/api/groups/courses`, {
+          params: {
+            building: building?.value,
+          },
+        })
+      ).data;
     },
   });
 }
@@ -170,12 +163,10 @@ export function usePublicSchedulesQuery(
   searchedTeacher,
   searchedSubject
 ) {
-  // Условие enabled проверяет только наличие параметра date
   const enabled = computed(() => Boolean(date?.value || building?.value));
 
   return useQuery({
     enabled: enabled,
-
     queryKey: [
       'scheduleChanges',
       date,
@@ -188,31 +179,24 @@ export function usePublicSchedulesQuery(
     ],
     retry: 0,
     queryFn: async () => {
-      // Формируем параметры запроса в зависимости от их наличия
-      const queryParams = new URLSearchParams();
-      if (date?.value) queryParams.append('date', date.value);
-      if (building?.value) queryParams.append('building', building.value);
-      if (course?.value) queryParams.append('course', course.value);
-      if (searchedCabinet?.value)
-        queryParams.append('cabinet', searchedCabinet.value);
-      if (searchedTeacher?.value)
-        queryParams.append('teacher', searchedTeacher.value);
-      if (searchedSubject?.value)
-        queryParams.append('subject', searchedSubject.value);
-      if (selectedGroup?.value)
-        queryParams.append('group', selectedGroup.value);
-
-      // Выполняем запрос с параметрами
       return (
-        (await axios.get(`/api/schedules/public?${queryParams.toString()}`))
-          .data || []
-      );
+        await axios.get(`/api/schedules/public`, {
+          params: {
+            date: date.value,
+            building: building.value,
+            course: course.value,
+            cabinet: searchedCabinet.value,
+            teacher: searchedTeacher.value,
+            subject: searchedSubject.value,
+            group: selectedGroup.value,
+          },
+        })
+      ).data;
     },
   });
 }
 
 export function useAnalyticsSchedulesQuery(start_date, end_date, groups_ids) {
-  // Условие enabled проверяет только наличие параметра date
   const enabled = computed(() => Boolean(end_date?.value && start_date?.value));
 
   return useQuery({
@@ -220,23 +204,15 @@ export function useAnalyticsSchedulesQuery(start_date, end_date, groups_ids) {
 
     queryKey: ['schedulesAnalytics', start_date, end_date, groups_ids],
     queryFn: async () => {
-      // Формируем параметры запроса в зависимости от их наличия
-      const queryParams = new URLSearchParams();
-      if (start_date?.value && end_date?.value) {
-        queryParams.append('start_date', start_date.value);
-        queryParams.append('end_date', end_date.value);
-      }
-
-      if (groups_ids?.value) queryParams.append('group_ids', groups_ids.value);
-
-      // Выполняем запрос с параметрами
       return (
-        (
-          await axios.get(
-            `/api/groups/schedules/hours?${queryParams.toString()}`
-          )
-        ).data || []
-      );
+        await axios.get(`/api/groups/schedules/hours`, {
+          params: {
+            start_date: start_date.value,
+            end_date: end_date.value,
+            groups_ids: groups_ids.value,
+          },
+        })
+      ).data;
     },
   });
 }

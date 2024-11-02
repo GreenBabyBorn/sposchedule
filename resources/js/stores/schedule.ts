@@ -1,3 +1,4 @@
+import type { ChangesSchedules } from '@/components/schedule/types';
 import { useDateFormat } from '@vueuse/core';
 import { defineStore } from 'pinia';
 import { computed, ref, toRaw } from 'vue';
@@ -10,7 +11,7 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
   const queryParams = ref(route.query);
   const schedules = ref();
 
-  const schedulesChanges = ref();
+  const schedulesChanges = ref<ChangesSchedules>();
 
   const date = ref(null);
   const formattedDate = computed(() => {
@@ -20,15 +21,16 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
   const selectedCourse = computed(() => {
     return course.value;
   });
+  const selectedGroup = ref();
+  const building = ref(null);
 
   function setSchedules(newSchedules) {
     schedules.value = toRaw(newSchedules ?? []);
   }
-  function setSchedulesChanges(scheduless) {
-    schedulesChanges.value = toRaw(scheduless ?? []);
+
+  function setSchedulesChanges(fetchedSchedules: ChangesSchedules) {
+    schedulesChanges.value = JSON.parse(JSON.stringify(fetchedSchedules ?? []));
   }
-  const selectedGroup = ref();
-  const building = ref(null);
 
   return {
     building,

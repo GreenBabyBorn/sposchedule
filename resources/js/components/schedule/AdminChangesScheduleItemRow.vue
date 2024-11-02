@@ -1,29 +1,26 @@
 <script setup lang="ts">
   import { toRef } from 'vue';
   import MultiSelect from 'primevue/multiselect';
-
   import Select from 'primevue/select';
-  // import Select from '../ui/Select.vue';
-
   import InputText from 'primevue/inputtext';
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
-  import type { Lesson } from './types';
+  import type { Lesson, Subject, Teacher } from './types';
 
   interface Props {
     lesson: Lesson;
-    teachers: any;
-    subjects: any;
+    teachers: Teacher[];
+    subjects: Subject[];
     isEdit: boolean;
     disabled: boolean;
   }
+
   const props = defineProps<Props>();
 
-  const teachers: any = toRef<any>(() => props.teachers);
-  const subjects: any = toRef<any>(() => props.subjects);
-  const isEdit: any = toRef<any>(() => props.isEdit);
+  const teachers = toRef(() => props.teachers);
+  const subjects = toRef(() => props.subjects);
+  const isEdit = toRef(() => props.isEdit);
   const disabled = toRef(() => props.disabled);
-
   const lesson = toRef(() => props.lesson);
 
   const emit = defineEmits<{

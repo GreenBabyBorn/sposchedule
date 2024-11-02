@@ -39,8 +39,7 @@
   interface Props {
     group?: Record<string, any> | null;
     date?: string | Date;
-    weekType?: 'ЧИСЛ' | 'ЗНАМ' | null;
-    type: ScheduleType;
+    type: ScheduleType | 'undefined';
     semester?: Record<string, any>;
     lessons: Lesson[];
     scheduleId: number;
@@ -48,12 +47,10 @@
     disabled?: boolean;
   }
 
-  const toast = useToast();
   const props = defineProps<Props>();
 
   const lessons = toRef(() => props.lessons);
-  // const teachers: any = toRef<any>(() => props.teachers)
-  // const subjects: any = toRef<any>(() => props.subjects)
+  // const lessons = ref(props.lessons);
   const dateRef = toRef(() => props.date);
   const semester = toRef(() => props.semester);
   const group = toRef(() => props.group);
@@ -63,6 +60,7 @@
   const type = toRef(() => props.type);
 
   const published = ref(props.published);
+  const toast = useToast();
 
   watch(
     () => props.published,
@@ -144,12 +142,16 @@
     message?: string | null;
   };
   let newLesson = reactive<newLessonType>({
-    index: lessons.value?.slice(-1)?.[0]?.index + 1 || null,
+    index: Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || null,
     subject: null,
     teachers: [],
     building: lessons.value?.slice(-1)?.[0]?.building,
     cabinet: null,
     message: null,
+  });
+  watch(lessons, () => {
+    newLesson.index = Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || null;
+    newLesson.building = lessons.value?.slice(-1)?.[0]?.building;
   });
 
   const { mutateAsync: storeSchedule, data: newSchedule } =
@@ -427,7 +429,6 @@
           />
         </div>
 
-        <span>{{ props?.weekType }}</span>
         <span
           :class="{
             'text-green-400': props?.type !== 'main',
@@ -462,8 +463,8 @@
           <template v-for="lesson in lessons" :key="lesson.id">
             <AdminChangesScheduleItemRow
               :is-edit="isEdit"
-              :subjects="subjects"
-              :teachers="teachers"
+              :subjects="subjects || []"
+              :teachers="teachers || []"
               :lesson="lesson"
               :disabled="disabled"
               @remove-lesson="removeLesson"
