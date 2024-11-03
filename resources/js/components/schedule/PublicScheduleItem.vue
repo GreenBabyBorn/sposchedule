@@ -35,7 +35,7 @@
     </div>
     <table
       v-if="lessons"
-      class="schedule-table rounded bg-surface-50 dark:bg-surface-900"
+      class="schedule-table rounded bg-surface-100 dark:bg-surface-900"
     >
       <tbody>
         <template v-for="item in lessons" :key="item.index">

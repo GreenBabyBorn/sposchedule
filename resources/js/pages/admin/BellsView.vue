@@ -109,7 +109,10 @@
   });
 
   let newPeriod = ref({
-    index: 0,
+    index:
+      Number(
+        bells?.value?.periods?.[bells?.value?.periods?.length - 1]?.index
+      ) + 1,
     period_from: '',
     period_to: '',
     has_break: false,
@@ -176,14 +179,14 @@
     }
     try {
       await storePeriod(bodyBellPeriod.value);
-      newPeriod = ref({
+      newPeriod.value = {
         index: Number(newPeriod.value.index) + 1,
         period_from: '',
         period_to: '',
         has_break: false,
         period_from_after: null,
         period_to_after: null,
-      });
+      };
     } catch (e) {
       toast.add({
         severity: 'error',
@@ -223,6 +226,7 @@
 
   const visible = ref(false);
   const presetName = ref('');
+
   async function savePreset() {
     visible.value = false;
     try {
@@ -373,7 +377,7 @@
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-2 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-2 rounded-lg bg-surface-100 p-4 dark:bg-surface-900"
       >
         <div class="flex flex-wrap items-center gap-2">
           <SelectButton
@@ -484,11 +488,11 @@
     </div>
     <div class="">
       <div class="">
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto rounded-md">
           <table class="w-full border-collapse">
             <thead>
               <tr
-                class="border border-surface-200 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
+                class="bg-surface-100 dark:border-surface-700 dark:bg-surface-900"
               >
                 <th>№</th>
                 <th>Начало - Конец</th>
@@ -506,12 +510,13 @@
               />
 
               <tr
-                class="border border-t-4 border-surface-200 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
+                class="border-t-4 border-surface-200 bg-surface-100 dark:border-surface-700 dark:bg-surface-900"
               >
                 <td class="">
                   <div class="flex justify-center">
                     <InputText
                       v-model="newPeriod.index"
+                      v-keyfilter="/^\d+$/"
                       class="max-w-12 text-center"
                     />
                   </div>
@@ -524,6 +529,7 @@
                       <DatePicker
                         id="datepicker-timeonly"
                         v-model="newPeriod.period_from"
+                        input-class="text-center"
                         time-only
                         fluid
                       />
@@ -531,6 +537,7 @@
                       <DatePicker
                         id="datepicker-timeonly"
                         v-model="newPeriod.period_to"
+                        input-class="text-center"
                         time-only
                         fluid
                       />
@@ -542,6 +549,7 @@
                       <DatePicker
                         id="datepicker-timeonly"
                         v-model="newPeriod.period_from_after"
+                        input-class="text-center"
                         time-only
                         fluid
                       />
@@ -549,6 +557,7 @@
                       <DatePicker
                         id="datepicker-timeonly"
                         v-model="newPeriod.period_to_after"
+                        input-class="text-center"
                         time-only
                         fluid
                       />

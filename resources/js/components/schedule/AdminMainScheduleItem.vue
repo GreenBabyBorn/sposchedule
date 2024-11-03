@@ -257,7 +257,9 @@
 <template>
   <div class="schedule-item relative overflow-x-auto py-1">
     <div class="">
-      <div class="flex h-full items-center gap-4 px-4 py-2 dark:bg-surface-800">
+      <div
+        class="flex h-full items-center gap-4 rounded-t-md px-4 py-2 dark:bg-surface-900"
+      >
         <span class="text-2xl font-medium">{{ props.weekDay }}</span>
         <!-- <ToggleButton
           v-model="published"

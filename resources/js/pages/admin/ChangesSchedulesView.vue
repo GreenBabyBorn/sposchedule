@@ -179,7 +179,7 @@
       </div>
     </div>
     <div
-      class="flex items-center justify-between gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
+      class="flex items-center justify-between gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-900"
     >
       <div class="flex w-full flex-wrap items-center gap-2">
         <DatePicker

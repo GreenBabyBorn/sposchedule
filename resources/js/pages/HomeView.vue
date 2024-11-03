@@ -324,7 +324,7 @@
     <nav
       ref="headerRef"
       :class="{ '-translate-y-full': headerHidden }"
-      class="fixed left-0 right-0 top-0 z-50 mx-auto flex max-w-screen-xl flex-wrap justify-between gap-4 rounded-lg rounded-t-none bg-surface-100 p-4 transition-transform dark:bg-surface-800"
+      class="fixed left-0 right-0 top-0 z-50 mx-auto flex max-w-screen-xl flex-wrap justify-between gap-4 rounded-lg rounded-t-none bg-surface-100 p-4 transition-transform dark:bg-surface-900"
     >
       <div class="flex w-full flex-col flex-wrap justify-between gap-4">
         <div class="flex flex-wrap items-center gap-2">
@@ -514,7 +514,7 @@
         >
           <path
             d="M3.57628e-07 0L27.8028 0C20.64 0 20.1127 5.32394 13.883 5.32394C7.65323 5.32394 6.71518 0 3.57628e-07 0Z"
-            class="fill-surface-100 dark:fill-surface-800"
+            class="fill-surface-100 dark:fill-surface-900"
           />
         </svg>
         <span

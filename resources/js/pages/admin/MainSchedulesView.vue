@@ -79,7 +79,7 @@
       <h1 class="text-2xl">Расписание</h1>
     </div>
     <div
-      class="flex flex-wrap items-center justify-between gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
+      class="flex flex-wrap items-center justify-between gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-900"
     >
       <div class="flex flex-wrap items-center gap-2">
         <Select

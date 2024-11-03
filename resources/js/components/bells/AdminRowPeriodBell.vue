@@ -85,12 +85,11 @@
 </script>
 
 <template>
-  <tr
-    class="border border-surface-200 bg-surface-100 dark:border-surface-700 dark:bg-surface-800"
-  >
+  <tr class="bg-surface-100 dark:border-surface-700 dark:bg-surface-900">
     <td class="text-center text-lg">
       <InputText
         v-model="period.index"
+        v-keyfilter="/^\d+$/"
         class="max-w-12 text-center"
         @blur="editPeriod(period)"
       />
@@ -103,6 +102,7 @@
           <DatePicker
             id="datepicker-timeonly"
             v-model="period.period_from"
+            input-class="text-center"
             time-only
             fluid
             @blur="editPeriod(period)"
@@ -111,6 +111,7 @@
           <DatePicker
             id="datepicker-timeonly"
             v-model="period.period_to"
+            input-class="text-center"
             time-only
             fluid
             @blur="editPeriod(period)"
@@ -120,6 +121,7 @@
           <DatePicker
             id="datepicker-timeonly"
             v-model="period.period_from_after"
+            input-class="text-center"
             time-only
             fluid
             @blur="editPeriod(period)"
@@ -128,6 +130,7 @@
           <DatePicker
             id="datepicker-timeonly"
             v-model="period.period_to_after"
+            input-class="text-center"
             time-only
             fluid
             @blur="editPeriod(period)"

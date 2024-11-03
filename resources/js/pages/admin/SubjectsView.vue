@@ -199,7 +199,7 @@
     </div>
     <div class="">
       <form
-        class="flex flex-wrap items-center gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-800"
+        class="flex flex-wrap items-center gap-4 rounded-lg bg-surface-100 p-4 dark:bg-surface-900"
       >
         <InputText
           v-model="newSubjectName"
