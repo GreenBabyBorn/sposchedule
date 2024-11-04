@@ -1,3 +1,4 @@
+import type { Group } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 
@@ -13,7 +14,7 @@ export function useGroupsQuery(name?, building?, course?) {
             course: course?.value,
           },
         })
-      ).data;
+      ).data as Group[];
     },
   });
 }

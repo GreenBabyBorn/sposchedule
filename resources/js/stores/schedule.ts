@@ -1,18 +1,25 @@
-import type { ChangesSchedules } from '@/components/schedule/types';
+import type {
+  ChangesSchedules,
+  Group,
+  MainSchedule,
+} from '@/components/schedule/types';
 import { useDateFormat } from '@vueuse/core';
 import { defineStore } from 'pinia';
-import { computed, ref, toRaw } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 export const useScheduleStore = defineStore('useScheduleStore', () => {
   const route = useRoute();
-  const selectedMainGroupName = ref(null);
-  const selectedMainSemester = ref(null);
   const queryParams = ref(route.query);
-  const schedules = ref();
+  const schedulesMain = ref<MainSchedule[]>([]);
+  const selectedMainGroup = ref<Group>(null);
+  const selectedMainSemester = ref(null);
+
+  function setMainSchedules(newSchedules) {
+    schedulesMain.value = JSON.parse(JSON.stringify(newSchedules ?? []));
+  }
 
   const schedulesChanges = ref<ChangesSchedules>();
-
   const date = ref(null);
   const formattedDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
@@ -24,21 +31,17 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
   const selectedGroup = ref();
   const building = ref(null);
 
-  function setSchedules(newSchedules) {
-    schedules.value = toRaw(newSchedules ?? []);
-  }
-
-  function setSchedulesChanges(fetchedSchedules: ChangesSchedules) {
-    schedulesChanges.value = JSON.parse(JSON.stringify(fetchedSchedules ?? []));
+  function setSchedulesChanges(newSchedules: ChangesSchedules) {
+    schedulesChanges.value = JSON.parse(JSON.stringify(newSchedules ?? []));
   }
 
   return {
     building,
     selectedGroup,
-    schedules,
+    schedulesMain,
     formattedDate,
-    setSchedules,
-    selectedMainGroupName,
+    setMainSchedules,
+    selectedMainGroup,
     selectedMainSemester,
     queryParams,
     schedulesChanges,

@@ -8,66 +8,56 @@
   import { storeToRefs } from 'pinia';
   import { useRoute } from 'vue-router';
   import router from '@/router';
-  import { useStorage } from '@vueuse/core';
   import Button from 'primevue/button';
 
   const route = useRoute();
 
   const scheduleStore = useScheduleStore();
-  const { schedules, selectedMainGroupName, selectedMainSemester } =
+  const { schedulesMain, selectedMainGroup, selectedMainSemester } =
     storeToRefs(scheduleStore);
-  const { data: groups, isFetched } = useGroupsQuery();
-  const { setSchedules } = scheduleStore;
+  const { setMainSchedules } = scheduleStore;
 
-  // Используем useStorage для сохранения query параметров в localStorage
-  const storedParams = useStorage('mainSchedules', { group: '', semester: '' });
-  // Запросы данных
-  const selectedMainGroup = computed(() =>
-    groups.value?.find(group => group.name == selectedMainGroupName.value)
-  );
+  const { data: groups, isFetched } = useGroupsQuery();
   const semesters = computed(() => selectedMainGroup.value?.semesters);
   const { data: mainSchedules } = useMainSchedulesQuery(
     selectedMainGroup,
     selectedMainSemester
   );
 
-  // Обновление query параметров в URL и localStorage
   const updateQueryParams = () => {
     const newQuery = {
       ...route.query,
-      group: selectedMainGroupName.value,
+      group: selectedMainGroup.value?.name || undefined,
+      semester: selectedMainSemester.value?.id || undefined,
     };
 
     router.replace({ query: newQuery });
-
-    // Сохраняем новые параметры в localStorage
-    storedParams.value.group = selectedMainGroupName.value;
   };
 
-  // Следим за изменениями выбранной группы и семестра для обновления query параметров
-  watch([selectedMainGroupName], updateQueryParams, { deep: true });
+  watch([selectedMainGroup, selectedMainSemester], updateQueryParams, {
+    deep: true,
+  });
 
-  // Следим за изменениями данных расписания и устанавливаем их в store
-  watch(mainSchedules, newData => {
-    if (newData) {
-      setSchedules(newData);
-    }
+  watch(mainSchedules, () => {
+    setMainSchedules(mainSchedules.value);
   });
 
   watchEffect(() => {
+    console.log('aaaa');
     if (isFetched.value) {
       if (
         route.query.group &&
-        groups.value?.find(item => item.name === route.query.group)
+        groups.value?.find(item => item.name === route.query.group) &&
+        !selectedMainGroup.value
       ) {
-        // Если группы нет в query, используем из localStorage
-        selectedMainGroupName.value = route.query.group;
-        storedParams.value.group = route.query.group as string; // Сохраняем в localStorage
-      } else if (
-        storedParams.value.group &&
-        groups.value?.find(item => item.name === storedParams.value.group)
-      ) {
-        selectedMainGroupName.value = storedParams.value.group;
+        selectedMainGroup.value = groups.value.find(
+          item => item.name === route.query.group
+        );
+        if (route.query.semester && selectedMainGroup.value.semesters) {
+          selectedMainSemester.value = selectedMainGroup.value.semesters.find(
+            item => item.id === +route.query.semester
+          );
+        }
       }
     }
   });
@@ -83,11 +73,10 @@
     >
       <div class="flex flex-wrap items-center gap-2">
         <Select
-          v-model="selectedMainGroupName"
+          v-model="selectedMainGroup"
           fluid
           filter
           :options="groups"
-          option-value="name"
           option-label="name"
           placeholder="Группа"
           class=""
@@ -112,17 +101,18 @@
     </div>
     <div class="flex flex-col gap-6">
       <ScheduleItem
-        v-for="(item, index) in schedules"
+        v-for="(schedule, index) in schedulesMain"
         :key="index"
         :group="selectedMainGroup"
         :semester="selectedMainSemester"
-        :item="item"
-        :lessons="item.lessons"
-        :published="item?.published"
-        :week-day="index.toString()"
+        :item="schedule"
+        :lessons="schedule?.lessons"
+        :published="schedule?.published"
+        :schedule-id="schedule.schedule_id || 0"
+        :week-day="schedule?.week_day"
       />
     </div>
-    <div v-if="!schedules" class="">
+    <div v-if="!schedulesMain" class="">
       <p class="text-lg">
         Здесь заполняется Основное расписание, которое в дальнейшем можно будет
         использовать при заполнении изменений. Оно заполняется один раз.

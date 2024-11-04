@@ -1,11 +1,14 @@
-import type { ChangesSchedules } from '@/components/schedule/types';
+import type {
+  ChangesSchedules,
+  MainSchedule,
+} from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
 import { computed } from 'vue';
 
 export function useMainSchedulesQuery(mainGroup, mainSemester) {
   const enabled = computed(() =>
-    Boolean(mainGroup.value || mainSemester.value)
+    Boolean(mainGroup.value && mainSemester.value)
   );
 
   return useQuery({
@@ -14,9 +17,9 @@ export function useMainSchedulesQuery(mainGroup, mainSemester) {
     queryFn: async () =>
       (
         await axios.get(
-          `/api/groups/${mainGroup.value.id}/semester/${mainSemester.value.id}/schedules/main/`
+          `/api/groups/${mainGroup.value?.id}/semester/${mainSemester.value?.id}/schedules/main/`
         )
-      ).data,
+      ).data as MainSchedule[],
   });
 }
 export function useStoreSchedule() {
@@ -124,16 +127,48 @@ export function useCreateScheduleWithChanges() {
   });
   return updateSemesterMutation;
 }
+// export function useUpdateSchedule() {
+//   const queryClient = useQueryClient();
+//   const updateSemesterMutation = useMutation({
+//     mutationFn: ({ id, body }: any) =>
+//       axios.patch(`/api/schedules/${id}`, body),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+//       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+//     },
+//   });
+//   return updateSemesterMutation;
+// }
 export function useUpdateSchedule() {
   const queryClient = useQueryClient();
+
   const updateSemesterMutation = useMutation({
     mutationFn: ({ id, body }: any) =>
       axios.patch(`/api/schedules/${id}`, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
-      queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
+    onMutate: async ({ id, body }) => {
+      await queryClient.cancelQueries({ queryKey: ['scheduleChanges'] });
+      const previousSchedule = queryClient.getQueryData(['scheduleChanges']);
+
+      // Оптимистичное обновление кэша
+      queryClient.setQueryData(['scheduleChanges'], (old: any) => {
+        if (!old) return;
+        return old.map((item: any) =>
+          item.id === id ? { ...item, ...body } : item
+        );
+      });
+
+      // Возвращаем "контекст", чтобы использовать его в случае ошибки
+      return { previousSchedule };
+    },
+    onError: (err, item, context: any) => {
+      // Восстанавливаем старое состояние в случае ошибки
+      if (context?.previousSchedule) {
+        queryClient.setQueryData(['scheduleChanges'], context.previousSchedule);
+      }
+      console.error('Ошибка обновления:', err);
     },
   });
+
   return updateSemesterMutation;
 }
 

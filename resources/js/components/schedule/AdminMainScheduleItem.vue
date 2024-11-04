@@ -12,19 +12,26 @@
     useUpdateLesson,
   } from '@/queries/lessons';
   import { useToast } from 'primevue/usetoast';
-  import { reactive, ref, toRef, watch } from 'vue';
+  import { reactive, ref, toRef } from 'vue';
   import ToggleSwitch from 'primevue/toggleswitch';
-  import type { Subject, Teacher } from './types';
+  import type {
+    LessonMainSchedule,
+    Subject,
+    Teacher,
+    WeekDays,
+    WeekTypeLesson,
+  } from './types';
   // import ToggleButton from 'primevue/togglebutton';
 
   const toast = useToast();
 
   interface Props {
-    weekDay: string;
-    group?: Record<string, any>;
-    semester: Record<string, any>;
-    item: Record<string, any>;
-    published?: boolean;
+    weekDay: WeekDays;
+    group: Record<string, any>;
+    semester: Record<string, any> | null;
+    lessons: LessonMainSchedule[];
+    published: boolean | undefined;
+    scheduleId: number;
   }
 
   const props = defineProps<Props>();
@@ -32,22 +39,25 @@
   const group = toRef(() => props.group);
   const semester = toRef(() => props.semester);
   const weekDay = toRef(() => props.weekDay);
-  const items = toRef(() => props.item);
+  const lessons = toRef(() => props.lessons);
+  const scheduleId = toRef(() => props.scheduleId);
+
+  const published = ref(props.published || false);
 
   const { data: subjects } = useSubjectsQuery();
 
   const { data: teachers } = useTeachersQuery();
 
   const { mutateAsync: updateLesson } = useUpdateLesson();
-  async function editLesson(item) {
-    if (!item.id) return;
+  async function editLesson(lesson?: WeekTypeLesson) {
+    if (!lesson.lesson_id) return;
 
     try {
       await updateLesson({
-        id: item.id,
+        id: lesson.lesson_id,
         body: {
-          ...item,
-          subject_id: item.subject.id,
+          ...lesson,
+          subject_id: lesson.subject.id,
         },
       });
     } catch (e) {
@@ -86,7 +96,7 @@
   };
 
   let newLesson = reactive<LessonWithWeekTypes>({
-    index: null,
+    index: lessons.value?.[lessons.value.length - 1]?.index + 1 || null,
     ЧИСЛ: {
       subject: null,
       teachers: [],
@@ -100,9 +110,7 @@
   const { mutateAsync: destroyLesson } = useDestroyLesson();
 
   async function addOrUpdateSchedule() {
-    const loadedSchedule = items.value.find(item => item.schedule_id);
-
-    if (!loadedSchedule?.schedule_id) {
+    if (!scheduleId.value) {
       try {
         await storeSchedule({
           body: {
@@ -119,7 +127,7 @@
       }
     }
 
-    return loadedSchedule?.schedule_id || newSchedule.value.data.id;
+    return scheduleId.value || newSchedule.value.data.id;
   }
 
   async function addNewLesson() {
@@ -162,13 +170,13 @@
     }
   }
 
-  async function createLesson(weekType, schedule_id, item?) {
+  async function createLesson(weekType, schedule_id, item?, index?) {
     let lessonData =
       weekType === 'ЧИСЛ' || weekType === ''
         ? newLesson['ЧИСЛ']
         : newLesson['ЗНАМ'];
     if (item) {
-      lessonData = item[weekType];
+      lessonData = item;
     }
     if (!lessonData || Object.keys(lessonData).length === 0) {
       // showToast('Ошибка', 'Недозаполненно');
@@ -179,9 +187,9 @@
       await storeLesson({
         body: {
           ...lessonData,
+          index: !item ? newLesson.index : index,
           teachers: lessonData.teachers,
           week_type: weekType,
-          index: !item ? newLesson.index : item.index,
           subject_id: lessonData.subject?.id,
           schedule_id: schedule_id,
         },
@@ -220,20 +228,11 @@
     });
   }
 
-  const published = ref(props.item?.[0]?.published || null);
-
-  watch(
-    () => props.published,
-    newValue => {
-      published.value = newValue;
-    }
-  );
-
   const { mutateAsync: updateChangesSchedule } = useUpdateSchedule();
   async function handlePublished() {
     try {
       await updateChangesSchedule({
-        id: props.item?.[0].schedule_id,
+        id: scheduleId.value,
 
         body: {
           published: published.value,
@@ -271,195 +270,127 @@
           @change="handlePublished"
         /> -->
         <ToggleSwitch
+          v-if="props.lessons.length"
           v-model="published"
-          :disabled="!props.item.length"
+          :disabled="!props.lessons.length"
           :title="published ? 'Снять с публикации' : 'Опубликовать'"
           @change="handlePublished"
         />
       </div>
       <table class="schedule-table dark:bg-surface-900">
         <!-- <caption class="text-2xl font-medium  mb-2">{{ props.weekDay }}</caption> -->
-        <thead v-show="items.length > 0 || hideAddNewLesson">
+        <thead v-show="lessons.length > 0 || hideAddNewLesson">
           <tr>
-            <th>№</th>
-            <th>Предмет</th>
-            <th>Преподаватели</th>
-            <th>Корпус</th>
-            <th>Кабинет</th>
-            <th>Действия</th>
+            <th>
+              <!-- № -->
+            </th>
+            <th>
+              <!-- Предмет -->
+            </th>
+            <th>
+              <!-- Преподаватели -->
+            </th>
+            <th>
+              <!-- Корпус -->
+            </th>
+            <th>
+              <!-- Кабинет -->
+            </th>
+            <th>
+              <!-- Действия -->
+            </th>
           </tr>
         </thead>
         <tbody>
-          <template v-for="item in items" :key="item.index">
+          <template v-for="item in lessons" :key="item.index">
             <tr>
               <td>
                 <span class="text-xl font-medium">
                   {{ item.index }}
+                  <!-- <InputText
+                    v-model="item.index"
+                    class="w-full text-center"
+                  /> -->
                 </span>
               </td>
               <td>
-                <div v-if="item['ЧИСЛ']" class="table-subrow">
-                  <Select
-                    v-model="item['ЧИСЛ'].subject"
-                    filter
-                    class="w-full text-left"
-                    :options="subjects"
-                    option-label="name"
-                    @change="editLesson(item['ЧИСЛ'])"
-                  />
-                </div>
-
-                <div v-if="item.lesson" class="table-subrow">
-                  <Select
-                    v-if="item.lesson.subject"
-                    v-model="item.lesson.subject"
-                    filter
-                    class="w-full text-left"
-                    :options="subjects"
-                    option-label="name"
-                    @change="editLesson(item.lesson)"
-                  />
-                  <span v-else class="text-red-400">Предмет был удален</span>
-                </div>
-
-                <div v-if="item['ЗНАМ']" class="table-subrow">
-                  <Select
-                    v-model="item['ЗНАМ'].subject"
-                    filter
-                    class="w-full text-left"
-                    :options="subjects"
-                    option-label="name"
-                    @change="editLesson(item['ЗНАМ'])"
-                  />
-                </div>
+                <template v-for="lesson in item.types" :key="lesson?.week_type">
+                  <div class="table-subrow">
+                    <Select
+                      v-model="lesson.subject"
+                      filter
+                      class="w-full text-left"
+                      :options="subjects"
+                      option-label="name"
+                      @change="editLesson(lesson)"
+                    />
+                  </div>
+                </template>
               </td>
               <td>
-                <div v-if="item['ЧИСЛ']" class="table-subrow">
-                  <MultiSelect
-                    v-model="item['ЧИСЛ'].teachers"
-                    filter
-                    placeholder="Выберите преподавателя"
-                    class="w-full"
-                    :options="teachers"
-                    option-label="name"
-                    @change="editLesson(item['ЧИСЛ'])"
-                  />
-                </div>
-                <div v-if="item.lesson" class="table-subrow">
-                  <MultiSelect
-                    v-model="item.lesson.teachers"
-                    filter
-                    placeholder="Выберите преподавателя"
-                    class="w-full"
-                    :options="teachers"
-                    option-label="name"
-                    @change="editLesson(item.lesson)"
-                  />
-                </div>
-                <div v-if="item['ЗНАМ']" class="table-subrow">
-                  <MultiSelect
-                    v-model="item['ЗНАМ'].teachers"
-                    filter
-                    placeholder="Выберите преподавателя"
-                    class="w-full"
-                    :options="teachers"
-                    option-label="name"
-                    @change="editLesson(item['ЗНАМ'])"
-                  />
-                </div>
+                <template v-for="lesson in item.types" :key="lesson?.week_type">
+                  <div class="table-subrow">
+                    <MultiSelect
+                      v-model="lesson.teachers"
+                      filter
+                      placeholder="Выберите преподавателя"
+                      class="w-full"
+                      :options="teachers"
+                      option-label="name"
+                      @change="editLesson(lesson)"
+                    />
+                  </div>
+                </template>
               </td>
               <td>
-                <div v-if="item['ЧИСЛ']" class="table-subrow">
-                  <InputText
-                    v-model="item['ЧИСЛ'].building"
-                    class="w-full text-center"
-                    @change="editLesson(item['ЧИСЛ'])"
-                  />
-                </div>
-                <div v-if="item.lesson" class="table-subrow">
-                  <InputText
-                    v-model="item.lesson.building"
-                    class="w-full text-center"
-                    @change="editLesson(item.lesson)"
-                  />
-                </div>
-                <div v-if="item['ЗНАМ']" class="table-subrow">
-                  <InputText
-                    v-model="item['ЗНАМ'].building"
-                    class="w-full text-center"
-                    @change="editLesson(item['ЗНАМ'])"
-                  />
-                </div>
+                <template v-for="lesson in item.types" :key="lesson?.week_type">
+                  <div class="table-subrow">
+                    <InputText
+                      v-model="lesson.building"
+                      class="w-full text-center"
+                      @change="editLesson(lesson)"
+                    />
+                  </div>
+                </template>
               </td>
               <td>
-                <div v-if="item['ЧИСЛ']" class="table-subrow">
-                  <InputText
-                    v-model="item['ЧИСЛ'].cabinet"
-                    class="w-full text-center"
-                    @change="editLesson(item['ЧИСЛ'])"
-                  />
-                </div>
-                <div v-if="item.lesson" class="table-subrow">
-                  <InputText
-                    v-model="item.lesson.cabinet"
-                    class="w-full text-center"
-                    @change="editLesson(item.lesson)"
-                  />
-                </div>
-                <div v-if="item['ЗНАМ']" class="table-subrow">
-                  <InputText
-                    v-model="item['ЗНАМ'].cabinet"
-                    class="w-full text-center"
-                    @change="editLesson(item['ЗНАМ'])"
-                  />
-                </div>
+                <template v-for="lesson in item.types" :key="lesson?.week_type">
+                  <div class="table-subrow">
+                    <InputText
+                      v-model="lesson.cabinet"
+                      class="w-full text-center"
+                      @change="editLesson(lesson)"
+                    />
+                  </div>
+                </template>
               </td>
               <td>
-                <div v-if="item.lesson" class="table-subrow">
-                  <!-- <Button v-if="!item['ЗНАМ']" @click="addRowLesson(item['ЧИСЛ'], 'ЗНАМ')" text
-                                        :icon="`pi pi-percentage`"></Button> -->
-                  <Button
-                    text
-                    icon="pi pi-trash"
-                    severity="danger"
-                    @click="removeLesson(item.lesson.id)"
-                  />
-                </div>
-                <div v-if="item['ЧИСЛ']" class="table-subrow">
-                  <Button
-                    v-if="!item['ЧИСЛ'].id"
-                    text
-                    :disabled="!item['ЧИСЛ'].subject"
-                    icon="pi pi-check"
-                    @click="createLesson('ЧИСЛ', item.schedule_id, item)"
-                  />
+                <template v-for="lesson in item.types" :key="lesson?.week_type">
+                  <div class="table-subrow">
+                    <Button
+                      v-if="!lesson?.lesson_id"
+                      text
+                      :disabled="!lesson?.subject"
+                      icon="pi pi-check"
+                      @click="
+                        createLesson(
+                          lesson?.week_type,
+                          scheduleId,
+                          lesson,
+                          item.index
+                        )
+                      "
+                    />
 
-                  <Button
-                    v-if="item['ЧИСЛ'].id"
-                    text
-                    icon="pi pi-trash"
-                    severity="danger"
-                    @click="removeLesson(item['ЧИСЛ'].id)"
-                  />
-                </div>
-
-                <div v-if="item['ЗНАМ']" class="table-subrow">
-                  <Button
-                    v-if="!item['ЗНАМ'].id"
-                    text
-                    :disabled="!item['ЗНАМ'].subject"
-                    icon="pi pi-check"
-                    @click="createLesson('ЗНАМ', item.schedule_id, item)"
-                  />
-
-                  <Button
-                    v-if="item['ЗНАМ'].id"
-                    text
-                    icon="pi pi-trash"
-                    severity="danger"
-                    @click="removeLesson(item['ЗНАМ'].id)"
-                  />
-                </div>
+                    <Button
+                      v-if="lesson?.lesson_id"
+                      text
+                      icon="pi pi-trash"
+                      severity="danger"
+                      @click="removeLesson(lesson?.lesson_id)"
+                    />
+                  </div>
+                </template>
               </td>
             </tr>
           </template>

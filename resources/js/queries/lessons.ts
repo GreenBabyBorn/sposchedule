@@ -11,8 +11,14 @@ import { storeToRefs } from 'pinia';
 export function useUpdateLesson() {
   const queryClient = useQueryClient();
   const scheduleStore = useScheduleStore();
-  const { formattedDate, selectedCourse, selectedGroup, building } =
-    storeToRefs(scheduleStore);
+  const {
+    formattedDate,
+    selectedCourse,
+    selectedGroup,
+    building,
+    selectedMainGroup,
+    selectedMainSemester,
+  } = storeToRefs(scheduleStore);
   const updateLessonMutation = useMutation({
     mutationFn: ({ id, body }: any) => axios.patch(`/api/lessons/${id}`, body),
     onMutate: async ({ id, body }) => {
@@ -70,6 +76,12 @@ export function useUpdateLesson() {
         ],
         context.previousChanges
       );
+    },
+    onSettled: () => {
+      console.log('ffsssssssssssssssssss');
+      queryClient.invalidateQueries({
+        queryKey: ['scheduleMain', selectedMainGroup, selectedMainSemester],
+      });
     },
   });
 
