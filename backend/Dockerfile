@@ -27,9 +27,10 @@ RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
 # Загружаем актуальную версию Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Создаём пользователя и группу www для приложения Laravel
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+
+# Создаём пользователя и группу www для приложения Laravel, если они не существуют
+RUN if ! getent group www; then groupadd -g 1000 www; fi && \
+    if ! id -u www; then useradd -u 1000 -ms /bin/bash -g www www; fi
 
 # Устанавливаем рабочую директорию
 WORKDIR /var/www/backend
