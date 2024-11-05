@@ -33,7 +33,7 @@ services:
             - "445:443"
         volumes:
             - .:/var/www/
-            - ./nginx/conf.d:/etc/nginx/conf.d
+            - ./docker/nginx/conf.d:/etc/nginx/conf.d
         networks:
             - app-network
 
