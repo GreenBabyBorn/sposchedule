@@ -36,7 +36,7 @@ RUN if ! getent group www; then groupadd -g 1000 www; fi && \
 WORKDIR /var/www/backend
 
 # Копируем содержимое текущего каталога в рабочую директорию
-COPY . /var/www
+# COPY . /var/www
 
 # Меняем пользователя на www
 USER www
