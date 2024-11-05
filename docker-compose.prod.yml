@@ -4,7 +4,7 @@ services:
         build:
             context: .
             dockerfile: backend/Dockerfile
-        image: php:8.3-fpm
+        image: php:8.3
         restart: unless-stopped
         tty: true
         environment:
@@ -12,8 +12,7 @@ services:
             SERVICE_TAGS: dev
         working_dir: /var/www/backend
         volumes:
-            - ./backend:/var/www/backend
-            - ./backend/storage:/var/www/backend/storage # Монтируем storage отдельно
+            - .:/var/www
         networks:
             - app-network
 
@@ -23,10 +22,7 @@ services:
             context: .
             dockerfile: frontend/Dockerfile
         volumes:
-            - ./frontend:/var/www/frontend # Монтируем только фронтенд
-        networks:
-            - app-network
-
+            - .:/var/www
     # Nginx Service
     webserver:
         image: nginx:latest
@@ -36,9 +32,8 @@ services:
             - "82:80"
             - "445:443"
         volumes:
+            - .:/var/www/
             - ./docker/nginx/conf.d:/etc/nginx/conf.d
-            - ./backend/public:/var/www/backend/public # Монтируем только public директорию
-            - ./frontend/dist:/var/www/frontend/dist # Монтируем dist для Vue
         networks:
             - app-network
 

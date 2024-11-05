@@ -4,7 +4,7 @@ FROM php:8.3-fpm
 WORKDIR /var/www/backend
 
 # Копируем composer.lock и composer.json
-# COPY ./backend/composer.lock ./backend/composer.json ./
+COPY ./backend/composer.lock ./backend/composer.json ./
 
 # Устанавливаем зависимости от имени root
 RUN apt-get update && apt-get install -y \
