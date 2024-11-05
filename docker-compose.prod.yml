@@ -3,14 +3,14 @@ services:
     app:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: backend/Dockerfile
         image: php:8.3
         restart: unless-stopped
         tty: true
         environment:
             SERVICE_NAME: app
             SERVICE_TAGS: dev
-        working_dir: /var/www
+        working_dir: /var/www/backend
         volumes:
             - .:/var/www
         networks:
@@ -20,7 +20,7 @@ services:
     node:
         build:
             context: .
-            dockerfile: node/Dockerfile
+            dockerfile: frontend/Dockerfile
         volumes:
             - .:/var/www
     # Nginx Service
@@ -43,6 +43,8 @@ services:
         restart: always
         ports:
             - 5434:5432
+        env_file:
+            - ./backend/.env
         environment:
             POSTGRES_PASSWORD: ${DB_PASSWORD}
             POSTGRES_USER: ${DB_USERNAME}
