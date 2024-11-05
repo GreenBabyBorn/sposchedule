@@ -1,11 +1,10 @@
 FROM php:8.3-fpm
 
 # Устанавливаем рабочую директорию 
-#WORKDIR /var/www
+WORKDIR /var/www/backend
 
 # Копируем composer.lock и composer.json
-#COPY composer.lock composer.json /var/www
-
+COPY ./backend/composer.lock ./backend/composer.json ./
 
 # Устанавливаем зависимости
 RUN apt-get update && apt-get install -y \
@@ -22,24 +21,17 @@ RUN apt-get update && apt-get install -y \
     curl \
     libpq-dev \
     libonig-dev \
-    libzip-dev 
+    libzip-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_pgsql mbstring zip exif pcntl gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Очищаем кэш
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Устанавливаем расширения PHP
-RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
-
-# Загружаем актуальную версию Composer
+# Устанавливаем Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Создаём пользователя и группу www для приложения Laravel
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
-
-# Копируем содержимое текущего каталога в рабочую директорию
-#COPY . /var/www
-#COPY --chown=www:www . /var/www
+RUN groupadd -g 1000 www && \
+    useradd -u 1000 -ms /bin/bash -g www www
 
 # Меняем пользователя на www
 USER www
