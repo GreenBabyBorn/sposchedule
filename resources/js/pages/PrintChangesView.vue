@@ -175,7 +175,7 @@
             }`
           }}
           года ({{
-            changesSchedules?.week_type === 'ЗНАМ'
+            changesSchedules?.['1-5']?.week_type === 'ЗНАМ'
               ? 'знаменатель'
               : 'числитель'
           }})
@@ -303,7 +303,7 @@
             }`
           }}
           года ({{
-            changesSchedules?.week_type === 'ЗНАМ'
+            changesSchedules?.['6']?.week_type === 'ЗНАМ'
               ? 'знаменатель'
               : 'числитель'
           }})
