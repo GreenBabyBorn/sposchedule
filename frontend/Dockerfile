@@ -13,5 +13,3 @@ RUN apt-get update && apt-get install -y \
 USER node
 
 CMD ["sh", "-c", "npm install &&  npm run build"]
-
-

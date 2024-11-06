@@ -4,7 +4,6 @@ services:
         build:
             context: .
             dockerfile: ./backend/Dockerfile
-        image: php:8.3
         restart: unless-stopped
         tty: true
         environment:
@@ -22,7 +21,7 @@ services:
             context: .
             dockerfile: ./frontend/Dockerfile
         volumes:
-            - .:/var/www/frontend
+            - .:/var/www
     # Nginx Service
     webserver:
         image: nginx:latest
@@ -32,8 +31,7 @@ services:
             - "82:80"
             - "445:443"
         volumes:
-            - ./backend:/var/www/backend
-            - ./frontend:/var/www/frontend
+            - .:/var/www
             - ./docker/nginx/conf.d:/etc/nginx/conf.d
         networks:
             - app-network

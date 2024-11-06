@@ -20,9 +20,7 @@ declare module '@tanstack/vue-query' {
   }
 }
 
-axios.defaults.baseURL = import.meta.env.VITE_API_URL
-  ? import.meta.env.VITE_API_URL
-  : '';
+axios.defaults.baseURL = '';
 
 axios.defaults.withCredentials = true;
 axios.defaults.withXSRFToken = true;
