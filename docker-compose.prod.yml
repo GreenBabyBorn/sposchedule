@@ -3,7 +3,7 @@ services:
     app:
         build:
             context: .
-            dockerfile: backend/Dockerfile
+            dockerfile: ./backend/Dockerfile
         image: php:8.3
         restart: unless-stopped
         tty: true
@@ -20,10 +20,9 @@ services:
     node:
         build:
             context: .
-            dockerfile: frontend/Dockerfile
+            dockerfile: ./frontend/Dockerfile
         volumes:
-            - .:/var/www
-
+            - .:/var/www/frontend
     # Nginx Service
     webserver:
         image: nginx:latest
@@ -33,7 +32,8 @@ services:
             - "82:80"
             - "445:443"
         volumes:
-            - .:/var/www/
+            - ./backend:/var/www/backend
+            - ./frontend:/var/www/frontend
             - ./docker/nginx/conf.d:/etc/nginx/conf.d
         networks:
             - app-network
@@ -45,8 +45,8 @@ services:
         ports:
             - 5434:5432
         environment:
-            POSTGRES_PASSWORD: ${DB_PASSWORD}
-            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: 123123
+            POSTGRES_USER: green
             POSTGRES_DB: sposchedule
         volumes:
             - db:/var/lib/postgresql/data
