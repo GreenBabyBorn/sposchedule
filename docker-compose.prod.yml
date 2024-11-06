@@ -2,13 +2,9 @@ services:
     # PHP Service
     app:
         build:
-            context: .
+            context: ./
             dockerfile: ./backend/Dockerfile
         restart: unless-stopped
-        tty: true
-        environment:
-            SERVICE_NAME: app
-            SERVICE_TAGS: dev
         working_dir: /var/www/backend
         volumes:
             - .:/var/www
@@ -26,7 +22,6 @@ services:
     webserver:
         image: nginx:latest
         restart: unless-stopped
-        tty: true
         ports:
             - "82:80"
             - "445:443"
@@ -43,8 +38,8 @@ services:
         ports:
             - 5434:5432
         environment:
-            POSTGRES_PASSWORD: 123123
-            POSTGRES_USER: green
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_USER: ${DB_USERNAME}
             POSTGRES_DB: sposchedule
         volumes:
             - db:/var/lib/postgresql/data
