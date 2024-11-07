@@ -96,6 +96,7 @@
           />
           <DatePicker
             v-model="rangeDates"
+            :max-date="new Date()"
             append-to="self"
             placeholder="Период"
             date-format="dd.mm.yy"
