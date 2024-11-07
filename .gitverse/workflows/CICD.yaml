@@ -13,4 +13,5 @@ jobs:
         run: |
           cd /home/green/sposchedule
           git pull origin dev
+          docker compose -f docker-compose.prod.yml -p sposchedule down
           docker compose -f docker-compose.prod.yml -p sposchedule up -d --build
