@@ -6,6 +6,7 @@
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
   import type { Lesson, Subject, Teacher } from './types';
+  import InputNumber from 'primevue/inputnumber';
 
   interface Props {
     lesson: Lesson;
@@ -45,7 +46,18 @@
       >
         {{ lesson?.index }}
       </span>
-      <InputText
+      <InputNumber
+        v-else
+        v-model="lesson.index"
+        input-id="integeronly"
+        input-class="w-full text-center"
+        placeholder="№"
+        :min="0"
+        :max="10"
+        size="small"
+        @value-change="editLesson(lesson)"
+      />
+      <!-- <InputText
         v-else
         v-model="lesson.index"
         v-keyfilter="/^\d+$/"
@@ -53,7 +65,7 @@
         placeholder="№"
         size="small"
         @change="editLesson(lesson)"
-      />
+      /> -->
     </td>
     <td v-show="lesson?.message" colspan="2/1">
       <div class="table-subrow">

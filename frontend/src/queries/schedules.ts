@@ -1,12 +1,17 @@
 import type {
   ChangesSchedules,
+  Group,
   MainSchedule,
+  Schedule,
 } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
-import { computed } from 'vue';
+import { computed, type Ref } from 'vue';
 
-export function useMainSchedulesQuery(mainGroup, mainSemester) {
+export function useMainSchedulesQuery(
+  mainGroup: Ref<any>,
+  mainSemester: Ref<any>
+) {
   const enabled = computed(() =>
     Boolean(mainGroup.value && mainSemester.value)
   );
@@ -34,15 +39,14 @@ export function useStoreSchedule() {
 }
 
 export function useChangesSchedulesQuery(
-  date,
-  building,
-  course,
-  selectedGroup
+  date: Ref<any>,
+  building: Ref<any | null>,
+  course: Ref<number | null>,
+  selectedGroup: Ref<Group | null>
 ) {
   const enabled = computed(() => Boolean(date?.value || building?.value));
-
-  return useQuery({
-    enabled: enabled,
+  const query = useQuery({
+    enabled,
     queryKey: ['scheduleChanges', date, building, course, selectedGroup],
     queryFn: async () => {
       return (
@@ -57,9 +61,44 @@ export function useChangesSchedulesQuery(
       ).data as ChangesSchedules;
     },
   });
+
+  return query;
 }
 
-export function usePrintChangesSchedulesQuery(date) {
+// export function useChangesScheduleQuery(schedule_id: number, enabled: any) {
+//   const e = computed(() => Boolean(enabled.value));
+//   return useQuery({
+//     enabled: e,
+//     queryKey: ['schedule', schedule_id],
+//     queryFn: async () => {
+//       console.log('ФЕТЧ ОДНОГО РАСПИАНИЯ');
+//       return (await axios.get(`/api/schedules/${schedule_id}`))
+//         .data as Schedule;
+//     },
+//   });
+// }
+
+export function useChangesGroupScheduleQuery(
+  date: Ref<any>,
+  selectedGroup: Ref<Group>,
+  enabled: Ref<boolean>
+) {
+  return useQuery({
+    enabled: enabled,
+    queryKey: ['schedule', date, selectedGroup],
+    queryFn: async () => {
+      return (
+        await axios.get(`/api/groups/${selectedGroup.value.id}/schedule`, {
+          params: {
+            date: date?.value,
+          },
+        })
+      ).data as Schedule;
+    },
+  });
+}
+
+export function usePrintChangesSchedulesQuery(date: Ref<any>) {
   const enabled = computed(() => Boolean(date.value));
 
   return useQuery({
@@ -69,7 +108,11 @@ export function usePrintChangesSchedulesQuery(date) {
       (await axios.get(`/api/schedules/changes/print?date=${date.value}`)).data,
   });
 }
-export function usePrintMainSchedulesQuery(semester_id, course, buildings) {
+export function usePrintMainSchedulesQuery(
+  semester_id: Ref<any>,
+  course: Ref<any>,
+  buildings: Ref<any>
+) {
   const enabled = computed(
     () =>
       Boolean(semester_id?.value) &&
@@ -99,7 +142,8 @@ export function usePrintMainSchedulesQuery(semester_id, course, buildings) {
 export function useStoreScheduleChange() {
   const queryClient = useQueryClient();
   const updateSemesterMutation = useMutation({
-    mutationFn: ({ body }: any) => axios.post(`/api/schedules`, body),
+    mutationFn: async ({ body }: any) =>
+      (await axios.post(`/api/schedules`, body)).data,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
     },
@@ -118,12 +162,13 @@ export function useFromMainToChangesSchedule() {
   return updateSemesterMutation;
 }
 export function useCreateScheduleWithChanges() {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
   const updateSemesterMutation = useMutation({
-    mutationFn: ({ body }: any) => axios.post(`/api/schedules/changes`, body),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
-    },
+    mutationFn: async ({ body }: any) =>
+      (await axios.post(`/api/schedules/changes`, body)).data as any,
+    // onSuccess: () => {
+    //   queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+    // },
   });
   return updateSemesterMutation;
 }
@@ -172,7 +217,11 @@ export function useUpdateSchedule() {
   return updateSemesterMutation;
 }
 
-export function useCoursesQuery(building?) {
+export type Course = {
+  course: number;
+};
+
+export function useCoursesQuery(building?: Ref<any>) {
   // const enabled = computed(() => Boolean(building?.value));
 
   return useQuery({
@@ -185,18 +234,18 @@ export function useCoursesQuery(building?) {
             building: building?.value,
           },
         })
-      ).data;
+      ).data as Course[];
     },
   });
 }
 export function usePublicSchedulesQuery(
-  date,
-  building,
-  course,
-  selectedGroup,
-  searchedCabinet,
-  searchedTeacher,
-  searchedSubject
+  date: Ref<any>,
+  building: Ref<any>,
+  course: Ref<any>,
+  selectedGroup: Ref<any>,
+  searchedCabinet: Ref<any>,
+  searchedTeacher: Ref<any>,
+  searchedSubject: Ref<any>
 ) {
   const enabled = computed(() => Boolean(date?.value || building?.value));
 
@@ -231,7 +280,11 @@ export function usePublicSchedulesQuery(
   });
 }
 
-export function useAnalyticsSchedulesQuery(start_date, end_date, groups_ids) {
+export function useAnalyticsSchedulesQuery(
+  start_date: Ref<any>,
+  end_date: Ref<any>,
+  groups_ids: Ref<any>
+) {
   const enabled = computed(() => Boolean(end_date?.value && start_date?.value));
 
   return useQuery({

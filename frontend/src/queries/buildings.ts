@@ -1,14 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
-import { useDebounceFn } from '@vueuse/core';
 import axios from 'axios';
+
+export type Building = {
+  name: string;
+  location: string;
+  created_at?: Date;
+  updated_at?: Date;
+};
 
 export function useBuildingsQuery() {
   return useQuery({
     queryKey: ['buildings'],
-    queryFn: useDebounceFn(
-      async () => (await axios.get(`/api/buildings`)).data,
-      300
-    ),
+    queryFn: async () => (await axios.get(`/api/buildings`)).data as Building[],
   });
 }
 

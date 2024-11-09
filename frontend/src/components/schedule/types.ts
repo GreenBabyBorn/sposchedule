@@ -34,11 +34,11 @@ export type PublicLesson = {
 export type weekType = 'ЧИСЛ' | 'ЗНАМ' | null;
 
 export type Schedule = {
-  schedule_id: number;
+  id: number;
   week_day: WeekDays | '';
   published: boolean;
   type: ScheduleType;
-  group: object;
+  group: Group;
   lessons: Lesson[];
 };
 

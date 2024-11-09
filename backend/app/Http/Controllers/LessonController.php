@@ -6,6 +6,7 @@ use App\Facades\HistoryLogger;
 use App\Http\Requests\Lesson\StoreLessonRequest;
 use App\Http\Requests\Lesson\UpdateLessonRequest;
 use App\Http\Resources\LessonResource;
+use App\Http\Resources\ScheduleResource;
 use App\Models\Lesson;
 // use App\Models\Teacher;
 // use Illuminate\Http\Request;
@@ -58,6 +59,29 @@ class LessonController extends Controller
 
         return new LessonResource($lesson);
     }
+
+
+    public function updateScheduleLesson(UpdateLessonRequest $request, Schedule $schedule, Lesson $lesson)
+    {
+        // Update the lesson with the validated data from the request
+        $lesson->update($request->validated());
+
+        // If 'teachers' are provided, synchronize the lesson's teachers
+        if ($request->has('teachers') && is_array($request->teachers)) {
+            $teachersIds = array_column($request->teachers, 'id');
+            $lesson->teachers()->sync($teachersIds);
+        }
+
+        // Log the update action
+        HistoryLogger::logAction("Обновлена {$lesson->index} пара {$lesson->subject?->name}");
+
+        // Reload the schedule with all related lessons and teachers to ensure it's up-to-date
+        $schedule->load(['lessons.teachers']);
+
+        // Return the updated schedule with all its lessons
+        return new ScheduleResource($schedule);
+    }
+
 
     /**
      * Remove the specified resource from storage.

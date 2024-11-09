@@ -380,7 +380,7 @@ class ScheduleController extends Controller
                         'id' => $schedule->group->id,
                         'name' => $schedule->group->name,
                     ],
-                    'schedule_id' => $schedule->schedule_id,
+                    'id' => $schedule->schedule_id,
                     'week_day' => $schedule->week_day,
                     'published' => $schedule->published,
                     'type' => 'changes',
@@ -392,7 +392,7 @@ class ScheduleController extends Controller
                         'id' => $schedule->group->id,
                         'name' => $schedule->group->name,
                     ],
-                    'schedule_id' => $schedule->schedule_id,
+                    'id' => $schedule->schedule_id,
                     'week_day' => $schedule->week_day,
                     'published' => $schedule->published,
                     'type' => $schedule->type,
@@ -405,6 +405,147 @@ class ScheduleController extends Controller
 
         return response()->json($finalSchedules);
     }
+
+    public function getScheduleForGroupAndDate(Group $group, Request $request)
+    {
+        $request->validate([
+            'date' => ['required', 'date'],
+            ]);
+
+        $date = $request->input('date');
+        $carbonDate = Carbon::parse($date);
+        $groupId = $group->id;
+
+        $weekDayMapping = [
+            0 => 'ВС',
+            1 => 'ПН',
+            2 => 'ВТ',
+            3 => 'СР',
+            4 => 'ЧТ',
+            5 => 'ПТ',
+            6 => 'СБ',
+        ];
+        $weekDay = $weekDayMapping[$carbonDate->dayOfWeek];
+
+        $semester = DB::table('semesters')
+            ->where('start', '<=', $carbonDate)
+            ->where('end', '>=', $carbonDate)
+            ->first();
+
+        if (! $semester) {
+            return response()->json([
+                'error' => 404,
+                'message' => 'Семестра на данную дату не найдено',
+            ], 404);
+        }
+
+        $semesterStart = Carbon::parse($semester->start);
+        $weekNumber = $semesterStart->diffInWeeks($carbonDate);
+        $weekType = ($weekNumber % 2 === 0) ? 'ЧИСЛ' : 'ЗНАМ';
+
+        $query = "
+        SELECT  g.id as group_id,
+                g.name as group_name,
+                s.id as schedule_id, 
+                s.published as published, 
+                s.week_day, 
+                s.type, 
+                s.updated_at,
+                json_build_object(
+                    'id', g.id,
+                    'name', g.name
+                ) as group,
+                json_agg(
+                    json_build_object(
+                        'id', l.id, 
+                        'index', l.index, 
+                        'schedule_id', s.id, 
+                        'subject', json_build_object(
+                            'id', subj.id,
+                            'name', subj.name
+                        ), 
+                        'week_type', l.week_type, 
+                        'cabinet', l.cabinet,
+                        'building', l.building,
+                        'message', l.message,
+                        'teachers', COALESCE(
+                            (
+                                SELECT json_agg(
+                                    json_build_object(
+                                        'id', t.id,
+                                        'name', t.name
+                                    )
+                                )
+                                FROM lesson_teacher lt
+                                JOIN teachers t ON lt.teacher_id = t.id
+                                WHERE lt.lesson_id = l.id
+                            ), '[]'::json
+                        ) 
+                    )
+                ) as lessons
+        FROM groups g
+        LEFT JOIN schedules s ON g.id = s.group_id
+        LEFT JOIN lessons l ON s.id = l.schedule_id
+        LEFT JOIN subjects subj ON l.subject_id = subj.id
+     
+        WHERE g.id = :group_id
+        AND (
+            (s.type = 'changes' AND s.date = :date)
+            OR (s.type = 'main' AND s.published = TRUE AND s.week_day = :week_day AND s.semester_id = :semester_id)
+        )
+    ";
+
+        $params = [
+            'group_id' => $groupId,
+            'date' => $carbonDate->toDateString(),
+            'week_day' => $weekDay,
+            'semester_id' => $semester->id,
+        ];
+
+        $query .= ' GROUP BY g.name, s.id, g.id ORDER BY g.name';
+
+        $schedules = DB::select($query, $params);
+
+        $finalSchedule = null;
+
+        $groupSchedule = [
+            'group' => [
+                'id' => $groupId,
+                'name' => DB::table('groups')->where('id', $groupId)->value('name'),
+            ],
+        ];
+
+        foreach ($schedules as $schedule) {
+            $schedule->lessons = json_decode($schedule->lessons, true);
+            $schedule->group = json_decode($schedule->group);
+
+            $filteredLessons = [];
+            foreach ($schedule->lessons as $lesson) {
+                if ($lesson['week_type'] === $weekType || $lesson['week_type'] === null && $lesson['id'] !== null) {
+                    $filteredLessons[] = $lesson;
+                }
+            }
+
+            if (empty($filteredLessons) && !$schedule->type) {
+                continue;
+            }
+
+            usort($filteredLessons, function ($a, $b) {
+                return $a['index'] <=> $b['index'];
+            });
+
+            $groupSchedule['id'] = $schedule->schedule_id;
+            $groupSchedule['week_day'] = $schedule->week_day;
+            $groupSchedule['published'] = $schedule->published;
+            $groupSchedule['type'] = $schedule->type;
+            $groupSchedule['lessons'] = $filteredLessons;
+        }
+
+        $finalSchedule = $groupSchedule;
+
+        return response()->json($finalSchedule);
+    }
+
 
     /**
      * Summary of getPublicSchedules

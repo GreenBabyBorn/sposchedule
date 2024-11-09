@@ -30,6 +30,8 @@ Route::middleware('throttle:api')->group(function () {
     Route::apiResource('bells-periods', BellsPeriodController::class)->only(['index', 'show']);
     Route::get('/schedules/changes/print', [ScheduleController::class, 'getChangesSchedulesPrint']);
     Route::get('/schedules/main/semester/{semester}/print', [ScheduleController::class, 'getSchedulesMainPrint']);
+    Route::get('/groups/{group}/schedule', [ScheduleController::class, 'getScheduleForGroupAndDate']);
+
     Route::get('/groups/courses', [GroupController::class, 'getCourses']);
     Route::get('/groups/public', [GroupController::class, 'indexPublic']);
     Route::get('/groups/{group}/semester/{semester}/schedules/main', [GroupController::class, 'scheduleMain']);
@@ -72,6 +74,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTeacher'])->where(['lesson' => '[0-9]+']);
     Route::apiResource('lessons', LessonController::class)->except(['index', 'show']);
 
+    Route::patch('/schedules/{schedule}/lessons/{lesson}', [LessonController::class, 'updateScheduleLesson']);
     Route::patch('/schedules/{schedule}/changes', [ScheduleController::class, 'fromMainToChangesSchedule']);
     Route::post('/schedules/changes', [ScheduleController::class, 'createScheduleWithChanges']);
     Route::apiResource('schedules', ScheduleController::class)->except(['index', 'show']);

@@ -15,7 +15,11 @@
   import Button from 'primevue/button';
   import { useBuildingsQuery } from '@/queries/buildings';
   import { useGroupsPublicQuery } from '@/queries/groups';
-  import { reducedWeekDays, dateRegex } from '@/composables/constants';
+  import {
+    reducedWeekDays,
+    dateRegex,
+    type FullWeekDays,
+  } from '@/composables/constants';
 
   const route = useRoute();
   const scheduleStore = useScheduleStore();
@@ -67,7 +71,7 @@
   );
 
   watchEffect(() => {
-    setSchedulesChanges(changesSchedules.value);
+    return setSchedulesChanges(changesSchedules.value);
   });
 
   watch(
@@ -136,7 +140,7 @@
     );
   });
 
-  function handleDatePickerBtns(day) {
+  function handleDatePickerBtns(day: 'today' | 'tomorrow') {
     switch (day) {
       case 'today':
         date.value = new Date();
@@ -199,9 +203,9 @@
             >
               <small>{{
                 reducedWeekDays[
-                  useDateFormat(date, 'dddd', {
+                  useDateFormat(date as Date, 'dddd', {
                     locales: 'ru-RU',
-                  }).value
+                  }).value as FullWeekDays
                 ]
               }}</small>
               <small>{{ schedulesChanges?.week_type }}</small>
@@ -279,9 +283,9 @@
         :key="index"
         :disabled="isFetching"
         class="schedule"
-        :date="formattedDate"
+        :date="formattedDate as string"
         :semester="schedulesChanges?.semester"
-        :schedule-id="item?.schedule_id || NaN"
+        :schedule-id="item?.id || NaN"
         :type="item?.type || undefined"
         :group="item?.group"
         :lessons="item?.lessons || []"

@@ -1,4 +1,12 @@
-export const reducedWeekDays = {
+export type FullWeekDays =
+  | 'понедельник'
+  | 'вторник'
+  | 'среда'
+  | 'четверг'
+  | 'пятница'
+  | 'суббота'
+  | 'воскресенье';
+export const reducedWeekDays: Record<FullWeekDays, string> = {
   понедельник: 'ПН',
   вторник: 'ВТ',
   среда: 'СР',

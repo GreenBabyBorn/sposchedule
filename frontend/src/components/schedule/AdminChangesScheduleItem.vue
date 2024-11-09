@@ -1,8 +1,11 @@
 <script setup lang="ts">
   import MultiSelect from 'primevue/multiselect';
   // import Select from 'primevue/select';
-  import CustomSelect from '@/components/ui/custom/select/Select.vue';
+  import CustomSelect from '../ui/custom/select/index';
   import InputText from 'primevue/inputtext';
+
+  import InputNumber from 'primevue/inputnumber';
+
   import Textarea from 'primevue/textarea';
   import Button from 'primevue/button';
   import { useSubjectsQuery } from '@/queries/subjects';
@@ -11,6 +14,7 @@
     useTeachersQuery,
   } from '@/queries/teachers';
   import {
+    useChangesGroupScheduleQuery,
     useCreateScheduleWithChanges,
     useStoreScheduleChange,
     useUpdateSchedule,
@@ -18,29 +22,44 @@
   import {
     useDestroyLesson,
     useStoreLesson,
-    useUpdateLesson,
+    useUpdateScheduleLesson,
   } from '@/queries/lessons';
   import { useToast } from 'primevue/usetoast';
-  import { computed, reactive, ref, toRef, watch, watchEffect } from 'vue';
+  import {
+    computed,
+    reactive,
+    ref,
+    toRaw,
+    toRef,
+    watch,
+    watchEffect,
+  } from 'vue';
   // import ToggleButton from 'primevue/togglebutton';
-
   import ToggleSwitch from 'primevue/toggleswitch';
   import BlockUI from 'primevue/blockui';
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
   import type {
+    ChangesSchedules,
+    Group,
     Lesson,
+    Schedule,
     ScheduleType,
     SubjectWithTeachers,
     Teacher,
   } from './types';
+  import type { SelectFilterEvent } from 'primevue';
+  import AdminChangesScheduleItemRowPreview from './AdminChangesScheduleItemRowPreview.vue';
+  import { storeToRefs } from 'pinia';
+  import { useScheduleStore } from '@/stores/schedule';
+  import { useQueryClient } from '@tanstack/vue-query';
   // import RCESelect from '../ui/RCESelect.vue';
 
   interface Props {
-    group?: Record<string, any> | null;
-    date?: string | Date;
-    type: ScheduleType | undefined;
-    semester?: Record<string, any>;
+    group: Group;
+    date: string | Date;
+    type: ScheduleType;
+    semester: Record<string, any>;
     lessons: Lesson[];
     scheduleId: number;
     published?: boolean;
@@ -62,6 +81,48 @@
   const published = ref(props.published);
   const toast = useToast();
 
+  const isEdit = ref(false);
+
+  const rawSchedule = ref<Schedule>();
+  const {
+    data: schedule,
+    isSuccess: isSuccessSchedule,
+    refetch: refetchSchedule,
+  } = useChangesGroupScheduleQuery(date, group, isEdit);
+
+  const queryClient = useQueryClient();
+
+  async function invalidateChange() {
+    const scheduleStore = useScheduleStore();
+    const { formattedDate, selectedCourse, selectedGroup, building } =
+      storeToRefs(scheduleStore);
+    await refetchSchedule();
+    queryClient.setQueryData(
+      [
+        'scheduleChanges',
+        formattedDate,
+        building,
+        selectedCourse,
+        selectedGroup,
+      ],
+      (oldData: any) => {
+        if (!oldData) return;
+        const newData: ChangesSchedules = JSON.parse(JSON.stringify(oldData));
+        newData.schedules = newData.schedules.map((schedule: Schedule) => {
+          if (schedule.group.id === group.value.id) {
+            schedule = rawSchedule.value!;
+          }
+          return schedule;
+        });
+        return newData;
+      }
+    );
+  }
+
+  watch(schedule, () => {
+    rawSchedule.value = toRaw(schedule.value);
+  });
+
   watch(
     () => props.published,
     newValue => {
@@ -69,26 +130,28 @@
     }
   );
 
-  const { mutateAsync: updateLesson } = useUpdateLesson();
+  const { mutateAsync: updateScheduleLesson } = useUpdateScheduleLesson();
 
   const { mutateAsync: createScheduleWithChanges, data: newChanges } =
     useCreateScheduleWithChanges();
+
   async function editLesson(item: Lesson) {
     if (!item.id) return;
     // if (!item.message == !item.subject) return;
 
-    if (props.type === 'main') {
+    if (type.value === 'main') {
       try {
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
-            lessons: lessons.value,
+            lessons: rawSchedule.value?.lessons,
             date: props.date,
             semester_id: props.semester.id,
           },
         });
+        invalidateChange();
         return;
-      } catch (e) {
+      } catch (e: any) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -101,27 +164,34 @@
     }
 
     try {
-      await updateLesson({
-        id:
-          type.value === 'main'
-            ? newChanges.value.data.lessons.find(x => x.index === item.index).id
+      await updateScheduleLesson({
+        scheduleId: scheduleId.value,
+        lessonId:
+          (type.value as ScheduleType) === 'main'
+            ? newChanges.value?.lessons.find(
+                (lesson: Lesson) => lesson.index === item.index
+              )?.id
             : item.id,
         body: {
           ...item,
           subject_id: item.subject?.id,
           id:
-            type.value === 'main'
-              ? newChanges.value.data.lessons.find(x => x.index === item.index)
-                  .id
+            (type.value as ScheduleType) === 'main'
+              ? newChanges.value?.lessons.find(
+                  (lesson: Lesson) => lesson.index === item.index
+                )?.id
               : item.id,
           schedule_id:
-            type.value === 'main'
-              ? newChanges.value.data.lessons.find(x => x.index === item.index)
-                  .schedule_id
+            (type.value as ScheduleType) === 'main'
+              ? newChanges.value?.lessons.find(
+                  (lesson: Lesson) => lesson.index === item.index
+                )?.schedule_id
               : item.schedule_id,
         },
       });
-    } catch (e) {
+
+      invalidateChange();
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -134,7 +204,7 @@
   }
 
   type newLessonType = {
-    index: number;
+    index: number | null;
     subject: SubjectWithTeachers | null;
     teachers: Teacher[] | null;
     building: string | null;
@@ -142,18 +212,23 @@
     message?: string | null;
   };
   let newLesson = reactive<newLessonType>({
-    index: Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || null,
+    index: null,
     subject: null,
     teachers: [],
-    building: lessons.value?.slice(-1)?.[0]?.building,
+    building: rawSchedule.value?.lessons?.slice(-1)?.[0]?.building || null,
     cabinet: null,
     message: null,
   });
-  watch(lessons, () => {
-    newLesson.index =
-      Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || newLesson.index;
-    newLesson.building = lessons?.value?.slice(-1)?.[0]?.building;
-  });
+  watch(
+    () => rawSchedule.value?.lessons,
+    () => {
+      newLesson.index =
+        Number(rawSchedule.value?.lessons?.slice(-1)?.[0]?.index) + 1 ||
+        newLesson.index;
+      newLesson.building =
+        rawSchedule.value?.lessons?.slice(-1)?.[0]?.building || null;
+    }
+  );
 
   const { mutateAsync: storeSchedule, data: newSchedule } =
     useStoreScheduleChange();
@@ -167,12 +242,13 @@
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
-            lessons: lessons.value,
+            lessons: rawSchedule.value?.lessons,
             date: props.date,
             semester_id: props.semester.id,
           },
         });
-      } catch (e) {
+        invalidateChange();
+      } catch (e: any) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -197,8 +273,8 @@
             date: props.date,
           },
         });
-      } catch (e) {
-        console.log(e, 'f');
+        invalidateChange();
+      } catch (e: any) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -216,9 +292,9 @@
     if (loadedSchedule && type.value !== 'main') {
       scheduleIdforLesson = loadedSchedule;
     } else if (type.value === 'main') {
-      scheduleIdforLesson = newChanges.value?.data?.schedule_id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
+      scheduleIdforLesson = newChanges.value?.schedule_id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
     } else {
-      scheduleIdforLesson = newSchedule.value?.data?.id; // Тоже необходимо проверить наличие значения
+      scheduleIdforLesson = newSchedule.value?.id; // Тоже необходимо проверить наличие значения
     }
     try {
       await storeLesson({
@@ -233,14 +309,16 @@
           schedule_id: scheduleIdforLesson,
         },
       });
+      invalidateChange();
       // newLesson.index =
       //   Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || null;
       newLesson.subject = null;
       newLesson.teachers = [];
-      newLesson.building = lessons.value?.slice(-1)?.[0]?.building;
+      newLesson.building =
+        rawSchedule.value?.lessons?.slice(-1)?.[0]?.building || null;
       newLesson.cabinet = null;
       newLesson.message = null;
-    } catch (e) {
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -253,23 +331,26 @@
   }
 
   const { mutateAsync: destroyLesson } = useDestroyLesson();
-  async function removeLesson(id) {
-    if (props.type === 'main') {
+  async function removeLesson(id: number) {
+    if (type.value === 'main') {
       try {
-        let lesspnsForChanges = lessons.value.filter((l: any) => l.id !== id);
+        let lessonsForChanges = rawSchedule.value?.lessons?.filter(
+          (l: any) => l.id !== id
+        );
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
-            lessons: lesspnsForChanges,
+            lessons: lessonsForChanges,
             date: props.date,
             semester_id: props.semester.id,
           },
         });
-      } catch (e) {
+        invalidateChange();
+      } catch (e: any) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
-          detail: e?.response.data.message,
+          detail: e?.response?.data.message,
           life: 3000,
           closable: true,
         });
@@ -278,7 +359,8 @@
     } else {
       try {
         await destroyLesson({ id: id });
-      } catch (e) {
+        invalidateChange();
+      } catch (e: any) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -301,7 +383,7 @@
           published: published.value,
         },
       });
-    } catch (e) {
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -328,16 +410,15 @@
       });
     }
   }
-  const isEdit = ref(false);
 
   const now = useNow();
 
-  const parseDate = dateStr => {
+  const parseDate = (dateStr: any) => {
     const [day, month, year] = dateStr.split('.').map(Number);
     return new Date(year, month - 1, day);
   };
 
-  const isOneDayDifference = inputDate => {
+  const isOneDayDifference = (inputDate: any) => {
     const parsedDate: any = parseDate(inputDate);
     const today: any = new Date(
       now.value.getFullYear(),
@@ -366,7 +447,8 @@
     }
   });
   const searchTeacher = ref('');
-  function filterTeachers(e) {
+
+  function filterTeachers(e: SelectFilterEvent) {
     searchTeacher.value = e.value;
   }
   const teachersFromSubject = computed(() => {
@@ -376,13 +458,13 @@
     if (searchTeacher.value) {
       allTeachers = [
         ...subjectTeachers,
-        ...teachers.value,
-        ...newLesson.teachers,
+        ...(teachers.value || []),
+        ...(newLesson.teachers || []),
       ];
     } else if (subjectTeachers?.length === 0) {
-      allTeachers = [...teachers.value, ...newLesson.teachers];
+      allTeachers = [...(teachers.value || []), ...(newLesson.teachers || [])];
     } else {
-      allTeachers = [...subjectTeachers, ...newLesson.teachers];
+      allTeachers = [...subjectTeachers, ...(newLesson.teachers || [])];
     }
 
     const uniqueTeachers = allTeachers.filter(
@@ -438,11 +520,11 @@
 
         <span
           :class="{
-            'text-green-400': props?.type === 'changes',
-            'text-surface-400': props?.type === 'main',
+            'text-green-400': type === 'changes',
+            'text-surface-400': type === 'main',
           }"
           class="rounded-lg px-2 py-1 text-right text-sm"
-          >{{ scheduleTypes[props?.type] }}</span
+          >{{ scheduleTypes[type] }}</span
         >
       </div>
       <table class="schedule-table rounded bg-surface-50 dark:bg-surface-900">
@@ -461,33 +543,46 @@
             <!-- <th> -->
             <!-- <div class="">Кабинет</div> -->
             <!-- </th> -->
-            <th v-if="isEdit">
+            <th v-if="isEdit && isSuccessSchedule">
               <!-- <div class="">Действия</div> -->
             </th>
           </tr>
         </thead>
         <tbody>
-          <template v-for="lesson in lessons" :key="lesson.id">
-            <AdminChangesScheduleItemRow
-              :is-edit="isEdit"
-              :subjects="subjects || []"
-              :teachers="teachers || []"
-              :lesson="lesson"
-              :disabled="disabled"
-              @remove-lesson="removeLesson"
-              @edit-lesson="editLesson"
-            />
+          <template v-if="isEdit && isSuccessSchedule">
+            <template v-for="lesson in rawSchedule?.lessons" :key="lesson.id">
+              <AdminChangesScheduleItemRow
+                :is-edit="isEdit"
+                :subjects="subjects || []"
+                :teachers="teachers || []"
+                :lesson="lesson"
+                :disabled="disabled"
+                @remove-lesson="removeLesson"
+                @edit-lesson="editLesson"
+              />
+            </template>
           </template>
-
-          <tr v-if="isEdit" class="border-t-4 border-surface-600">
+          <tr
+            v-if="isEdit && isSuccessSchedule"
+            class="border-t-4 border-surface-600"
+          >
             <td>
-              <InputText
+              <InputNumber
+                v-model="newLesson.index"
+                input-id="integeronly"
+                input-class="w-full text-center"
+                placeholder="№"
+                :min="0"
+                :max="10"
+                size="small"
+              />
+              <!-- <InputText
                 v-model="newLesson.index"
                 v-keyfilter="/^\d+$/"
                 size="small"
                 class="w-full text-center"
                 placeholder="№"
-              />
+              /> -->
             </td>
 
             <td v-show="newLessonMessageState" colspan="2/1">
@@ -585,20 +680,16 @@
               </div>
             </td>
           </tr>
+          <template v-else>
+            <template v-for="lesson in lessons" :key="lesson.id">
+              <AdminChangesScheduleItemRowPreview
+                :is-edit="isEdit"
+                :lesson="lesson"
+              />
+            </template>
+          </template>
         </tbody>
       </table>
-      <!-- <div v-if="isEdit" class="mt-2 flex items-center justify-center">
-      <Button
-        label="Новая пара"
-        title="Открыть форму для добавления пары"
-        size="small"
-        outlined
-        severity="secondary"
-        class="w-full text-surface-800 dark:text-white/80"
-        :icon="!hideAddNewLesson ? 'pi pi-angle-down' : 'pi pi-angle-up'"
-        @click="hideAddNewLesson = !hideAddNewLesson"
-      />
-    </div> -->
     </div>
   </BlockUI>
 </template>
