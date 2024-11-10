@@ -279,17 +279,17 @@
       class="schedules z-50"
     >
       <ChangesScheduleItem
-        v-for="(item, index) in schedulesChanges?.schedules"
+        v-for="(schedule, index) in schedulesChanges?.schedules"
         :key="index"
         :disabled="isFetching"
         class="schedule"
         :date="formattedDate as string"
         :semester="schedulesChanges?.semester"
-        :schedule-id="item?.id || NaN"
-        :type="item?.type || undefined"
-        :group="item?.group"
-        :lessons="item?.lessons || []"
-        :published="item?.published"
+        :schedule="schedule"
+        :type="schedule?.type || undefined"
+        :group="schedule?.group"
+        :lessons="schedule?.lessons || []"
+        :published="schedule?.published"
       />
     </div>
   </div>

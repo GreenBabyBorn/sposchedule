@@ -14,7 +14,6 @@
     useTeachersQuery,
   } from '@/queries/teachers';
   import {
-    useChangesGroupScheduleQuery,
     useCreateScheduleWithChanges,
     useStoreScheduleChange,
     useUpdateSchedule,
@@ -22,25 +21,16 @@
   import {
     useDestroyLesson,
     useStoreLesson,
-    useUpdateScheduleLesson,
+    useUpdateLesson,
   } from '@/queries/lessons';
   import { useToast } from 'primevue/usetoast';
-  import {
-    computed,
-    reactive,
-    ref,
-    toRaw,
-    toRef,
-    watch,
-    watchEffect,
-  } from 'vue';
+  import { computed, reactive, ref, toRef, watch, watchEffect } from 'vue';
   // import ToggleButton from 'primevue/togglebutton';
   import ToggleSwitch from 'primevue/toggleswitch';
   import BlockUI from 'primevue/blockui';
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
   import type {
-    ChangesSchedules,
     Group,
     Lesson,
     Schedule,
@@ -50,24 +40,23 @@
   } from './types';
   import type { SelectFilterEvent } from 'primevue';
   import AdminChangesScheduleItemRowPreview from './AdminChangesScheduleItemRowPreview.vue';
-  import { storeToRefs } from 'pinia';
-  import { useScheduleStore } from '@/stores/schedule';
   import { useQueryClient } from '@tanstack/vue-query';
   // import RCESelect from '../ui/RCESelect.vue';
 
   interface Props {
     group: Group;
     date: string | Date;
-    type: ScheduleType;
+    type: ScheduleType | undefined;
     semester: Record<string, any>;
     lessons: Lesson[];
-    scheduleId: number;
+    schedule: Schedule;
     published?: boolean;
     disabled?: boolean;
   }
 
   const props = defineProps<Props>();
 
+  const schedule = toRef(() => props.schedule);
   const lessons = toRef(() => props.lessons);
   // const lessons = ref(props.lessons);
   const dateRef = toRef(() => props.date);
@@ -75,53 +64,13 @@
   const group = toRef(() => props.group);
   const disabled = toRef(() => props.disabled);
   const date = toRef(() => props.date);
-  const scheduleId = toRef(() => props.scheduleId);
   const type = toRef(() => props.type);
 
   const published = ref(props.published);
   const toast = useToast();
 
   const isEdit = ref(false);
-
-  const rawSchedule = ref<Schedule>();
-  const {
-    data: schedule,
-    isSuccess: isSuccessSchedule,
-    refetch: refetchSchedule,
-  } = useChangesGroupScheduleQuery(date, group, isEdit);
-
   const queryClient = useQueryClient();
-
-  async function invalidateChange() {
-    const scheduleStore = useScheduleStore();
-    const { formattedDate, selectedCourse, selectedGroup, building } =
-      storeToRefs(scheduleStore);
-    await refetchSchedule();
-    queryClient.setQueryData(
-      [
-        'scheduleChanges',
-        formattedDate,
-        building,
-        selectedCourse,
-        selectedGroup,
-      ],
-      (oldData: any) => {
-        if (!oldData) return;
-        const newData: ChangesSchedules = JSON.parse(JSON.stringify(oldData));
-        newData.schedules = newData.schedules.map((schedule: Schedule) => {
-          if (schedule.group.id === group.value.id) {
-            schedule = rawSchedule.value!;
-          }
-          return schedule;
-        });
-        return newData;
-      }
-    );
-  }
-
-  watch(schedule, () => {
-    rawSchedule.value = toRaw(schedule.value);
-  });
 
   watch(
     () => props.published,
@@ -130,81 +79,8 @@
     }
   );
 
-  const { mutateAsync: updateScheduleLesson } = useUpdateScheduleLesson();
-
-  const { mutateAsync: createScheduleWithChanges, data: newChanges } =
-    useCreateScheduleWithChanges();
-
-  async function editLesson(item: Lesson) {
-    if (!item.id) return;
-    // if (!item.message == !item.subject) return;
-
-    if (type.value === 'main') {
-      try {
-        await createScheduleWithChanges({
-          body: {
-            group_id: props.group.id,
-            lessons: rawSchedule.value?.lessons,
-            date: props.date,
-            semester_id: props.semester.id,
-          },
-        });
-        invalidateChange();
-        return;
-      } catch (e: any) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
-        return;
-      }
-    }
-
-    try {
-      await updateScheduleLesson({
-        scheduleId: scheduleId.value,
-        lessonId:
-          (type.value as ScheduleType) === 'main'
-            ? newChanges.value?.lessons.find(
-                (lesson: Lesson) => lesson.index === item.index
-              )?.id
-            : item.id,
-        body: {
-          ...item,
-          subject_id: item.subject?.id,
-          id:
-            (type.value as ScheduleType) === 'main'
-              ? newChanges.value?.lessons.find(
-                  (lesson: Lesson) => lesson.index === item.index
-                )?.id
-              : item.id,
-          schedule_id:
-            (type.value as ScheduleType) === 'main'
-              ? newChanges.value?.lessons.find(
-                  (lesson: Lesson) => lesson.index === item.index
-                )?.schedule_id
-              : item.schedule_id,
-        },
-      });
-
-      invalidateChange();
-    } catch (e: any) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response?.data.message,
-        life: 3000,
-        closable: true,
-      });
-      return;
-    }
-  }
-
   type newLessonType = {
-    index: number | null;
+    index: number;
     subject: SubjectWithTeachers | null;
     teachers: Teacher[] | null;
     building: string | null;
@@ -212,42 +88,36 @@
     message?: string | null;
   };
   let newLesson = reactive<newLessonType>({
-    index: null,
+    index: Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || 0,
     subject: null,
     teachers: [],
-    building: rawSchedule.value?.lessons?.slice(-1)?.[0]?.building || null,
+    building: lessons.value.slice(-1)?.[0]?.building || null,
     cabinet: null,
     message: null,
   });
-  watch(
-    () => rawSchedule.value?.lessons,
-    () => {
-      newLesson.index =
-        Number(rawSchedule.value?.lessons?.slice(-1)?.[0]?.index) + 1 ||
-        newLesson.index;
-      newLesson.building =
-        rawSchedule.value?.lessons?.slice(-1)?.[0]?.building || null;
-    }
-  );
+  watch(lessons, () => {
+    newLesson.index =
+      Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || newLesson.index;
+    newLesson.building = lessons.value?.slice(-1)?.[0]?.building || null;
+  });
 
   const { mutateAsync: storeSchedule, data: newSchedule } =
     useStoreScheduleChange();
   const { mutateAsync: storeLesson } = useStoreLesson();
 
   async function addNewLesson() {
-    const loadedSchedule = scheduleId.value || false;
     // Если тип расписания 'main', конвертируем его в изменения
     if (type.value === 'main') {
       try {
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
-            lessons: rawSchedule.value?.lessons,
+            lessons: lessons.value,
             date: props.date,
             semester_id: props.semester.id,
           },
         });
-        invalidateChange();
+        // invalidateChange();
       } catch (e: any) {
         toast.add({
           severity: 'error',
@@ -263,7 +133,7 @@
     }
 
     // Если расписание не загружено и тип 'changes', создаем новое расписание
-    if (!loadedSchedule) {
+    if (!schedule.value.id) {
       try {
         await storeSchedule({
           body: {
@@ -273,7 +143,7 @@
             date: props.date,
           },
         });
-        invalidateChange();
+        // invalidateChange();
       } catch (e: any) {
         toast.add({
           severity: 'error',
@@ -289,8 +159,8 @@
 
     // Определяем правильный ID для использования в storeLesson
     let scheduleIdforLesson;
-    if (loadedSchedule && type.value !== 'main') {
-      scheduleIdforLesson = loadedSchedule;
+    if (schedule.value.id && type.value !== 'main') {
+      scheduleIdforLesson = schedule.value.id;
     } else if (type.value === 'main') {
       scheduleIdforLesson = newChanges.value?.schedule_id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
     } else {
@@ -298,24 +168,16 @@
     }
     try {
       await storeLesson({
-        body: {
-          // ...newLesson,
-          index: newLesson.index,
-          building: newLesson.building,
-          message: newLesson.message,
-          cabinet: newLesson.cabinet,
-          teachers: newLesson.teachers,
-          subject_id: newLesson.subject?.id,
+        lesson: {
+          ...newLesson,
           schedule_id: scheduleIdforLesson,
+          subject_id: newLesson.subject?.id,
         },
       });
-      invalidateChange();
-      // newLesson.index =
-      //   Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || null;
+
       newLesson.subject = null;
       newLesson.teachers = [];
-      newLesson.building =
-        rawSchedule.value?.lessons?.slice(-1)?.[0]?.building || null;
+      newLesson.building = lessons.value?.slice(-1)?.[0]?.building || null;
       newLesson.cabinet = null;
       newLesson.message = null;
     } catch (e: any) {
@@ -330,12 +192,69 @@
     }
   }
 
-  const { mutateAsync: destroyLesson } = useDestroyLesson();
-  async function removeLesson(id: number) {
+  const { mutateAsync: updateLesson } = useUpdateLesson();
+
+  const { mutateAsync: createScheduleWithChanges, data: newChanges } =
+    useCreateScheduleWithChanges();
+
+  async function editLesson(item: Lesson) {
+    if (!item.id) return;
+    // if (!item.message == !item.subject) return;
+
     if (type.value === 'main') {
       try {
-        let lessonsForChanges = rawSchedule.value?.lessons?.filter(
-          (l: any) => l.id !== id
+        await createScheduleWithChanges({
+          body: {
+            group_id: props.group.id,
+            lessons: schedule.value?.lessons,
+            date: props.date,
+            semester_id: props.semester.id,
+          },
+        });
+        queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+        return;
+      } catch (e: any) {
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e?.response.data.message,
+          life: 3000,
+          closable: true,
+        });
+        return;
+      }
+    }
+
+    const updatingLesson: Lesson =
+      (type.value as ScheduleType) === 'main'
+        ? newChanges.value?.lessons.find(
+            (lesson: Lesson) => lesson.index === item.index
+          )
+        : item;
+
+    try {
+      await updateLesson({
+        schedule: schedule.value,
+        lesson: updatingLesson,
+      });
+    } catch (e: any) {
+      toast.add({
+        severity: 'error',
+        summary: 'Ошибка',
+        detail: e?.response?.data.message,
+        life: 3000,
+        closable: true,
+      });
+      return;
+    }
+  }
+
+  const { mutateAsync: destroyLesson } = useDestroyLesson();
+  async function removeLesson(lesson: Lesson) {
+    if (type.value === 'main') {
+      try {
+        let lessonsForChanges = lessons.value?.filter(
+          (l: any) => l.id !== lesson.id
         );
         await createScheduleWithChanges({
           body: {
@@ -345,7 +264,7 @@
             semester_id: props.semester.id,
           },
         });
-        invalidateChange();
+        queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
       } catch (e: any) {
         toast.add({
           severity: 'error',
@@ -358,8 +277,10 @@
       }
     } else {
       try {
-        await destroyLesson({ id: id });
-        invalidateChange();
+        await destroyLesson({ lesson: lesson, schedule: schedule.value });
+        if (schedule.value.lessons.length === 0) {
+          queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+        }
       } catch (e: any) {
         toast.add({
           severity: 'error',
@@ -377,7 +298,7 @@
   async function handlePublished() {
     try {
       await updateChangesSchedule({
-        id: scheduleId.value,
+        id: schedule.value.id,
 
         body: {
           published: published.value,
@@ -519,6 +440,7 @@
         </div>
 
         <span
+          v-if="type"
           :class="{
             'text-green-400': type === 'changes',
             'text-surface-400': type === 'main',
@@ -543,16 +465,15 @@
             <!-- <th> -->
             <!-- <div class="">Кабинет</div> -->
             <!-- </th> -->
-            <th v-if="isEdit && isSuccessSchedule">
+            <th v-if="isEdit">
               <!-- <div class="">Действия</div> -->
             </th>
           </tr>
         </thead>
         <tbody>
-          <template v-if="isEdit && isSuccessSchedule">
-            <template v-for="lesson in rawSchedule?.lessons" :key="lesson.id">
+          <template v-if="isEdit">
+            <template v-for="lesson in lessons" :key="lesson.id">
               <AdminChangesScheduleItemRow
-                :is-edit="isEdit"
                 :subjects="subjects || []"
                 :teachers="teachers || []"
                 :lesson="lesson"
@@ -562,10 +483,15 @@
               />
             </template>
           </template>
-          <tr
-            v-if="isEdit && isSuccessSchedule"
-            class="border-t-4 border-surface-600"
-          >
+          <template v-else>
+            <template v-for="lesson in lessons" :key="lesson.id">
+              <AdminChangesScheduleItemRowPreview
+                :is-edit="isEdit"
+                :lesson="lesson"
+              />
+            </template>
+          </template>
+          <tr v-if="isEdit" class="border-t-4 border-surface-600">
             <td>
               <InputNumber
                 v-model="newLesson.index"
@@ -662,7 +588,7 @@
                 <Button
                   :disabled="
                     (!newLessonMessageState &&
-                      (!newLesson.index ||
+                      (newLesson.index === null ||
                         !newLesson.subject ||
                         typeof newLesson.subject === 'string')) ||
                     (newLessonMessageState && !newLesson.message) ||
@@ -680,14 +606,6 @@
               </div>
             </td>
           </tr>
-          <template v-else>
-            <template v-for="lesson in lessons" :key="lesson.id">
-              <AdminChangesScheduleItemRowPreview
-                :is-edit="isEdit"
-                :lesson="lesson"
-              />
-            </template>
-          </template>
         </tbody>
       </table>
     </div>

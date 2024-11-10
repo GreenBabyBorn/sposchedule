@@ -12,7 +12,6 @@
     lesson: Lesson;
     teachers: Teacher[];
     subjects: Subject[];
-    isEdit: boolean;
     disabled: boolean;
   }
 
@@ -20,34 +19,26 @@
 
   const teachers = toRef(() => props.teachers);
   const subjects = toRef(() => props.subjects);
-  const isEdit = toRef(() => props.isEdit);
   const disabled = toRef(() => props.disabled);
   const lesson = toRef(() => props.lesson);
 
   const emit = defineEmits<{
-    (e: 'removeLesson', id: number): void;
-    (e: 'editLesson', lesson: any): void;
+    (e: 'removeLesson', lesson: Lesson): void;
+    (e: 'editLesson', lesson: Lesson): void;
   }>();
 
-  const removeLesson = (id: number) => {
-    emit('removeLesson', id);
+  const removeLesson = (lesson: Lesson) => {
+    emit('removeLesson', lesson);
   };
 
-  const editLesson = (lesson: any) => {
+  const editLesson = (lesson: Lesson) => {
     emit('editLesson', lesson);
   };
 </script>
 <template>
   <tr v-if="lesson?.index >= 0">
     <td>
-      <span
-        v-if="!isEdit"
-        class="text-lg font-bold text-surface-800 dark:text-white/80"
-      >
-        {{ lesson?.index }}
-      </span>
       <InputNumber
-        v-else
         v-model="lesson.index"
         input-id="integeronly"
         input-class="w-full text-center"
@@ -69,9 +60,7 @@
     </td>
     <td v-show="lesson?.message" colspan="2/1">
       <div class="table-subrow">
-        <span v-if="!isEdit">{{ lesson.message }}</span>
         <Textarea
-          v-else
           v-model="lesson.message"
           placeholder="Введите сообщение для группы"
           class="w-full"
@@ -81,9 +70,7 @@
     </td>
     <td v-if="!lesson?.message">
       <div v-if="lesson?.subject" class="text-left">
-        <span v-if="!isEdit">{{ lesson.subject.name }}</span>
         <Select
-          v-else
           v-model="lesson.subject"
           data-key="name"
           filter
@@ -96,16 +83,7 @@
       </div>
       <div v-else class="text-red-400">Предмет не найден</div>
       <div v-if="lesson.teachers" class="text-left">
-        <div v-if="!isEdit" class="">
-          <span
-            v-for="teacher in lesson.teachers"
-            :key="teacher.name"
-            class="opacity-50"
-            >{{ teacher.name + ' ' }}</span
-          >
-        </div>
         <MultiSelect
-          v-else
           v-model="lesson.teachers"
           data-key="name"
           filter
@@ -120,45 +98,39 @@
     </td>
     <td v-show="!lesson.message">
       <div v-if="lesson.id" class="text-right">
-        <span v-if="!isEdit" class="p-1">{{ lesson.cabinet }}</span>
         <InputText
-          v-else
           v-model="lesson.cabinet"
           class="w-full text-center"
           size="small"
           placeholder="Кабинет"
-          @change="editLesson(lesson)"
+          @blur="editLesson(lesson)"
         />
       </div>
       <div v-if="lesson.id" class="text-right">
-        <span v-if="!isEdit" class="p-1 opacity-50">{{
-          `${lesson.building ? lesson.building + ' корпус' : ''}`
-        }}</span>
         <InputText
-          v-else
           v-model="lesson.building"
           class="w-full text-center"
           placeholder="Корпус"
           size="small"
-          @change="editLesson(lesson)"
+          @blur="editLesson(lesson)"
         />
       </div>
     </td>
     <!-- <td v-show="!lesson.message">
       
     </td> -->
-    <td v-if="isEdit">
+    <td>
       <div class="table-subrow">
         <!-- <Button text :disabled="!lesson?.cabinet || !lesson?.building || !lesson?.subject" icon="pi pi-check"
                     v-if="!lesson?.id && isEdit" /> -->
 
         <Button
-          v-if="lesson?.id && isEdit"
+          v-if="lesson?.id"
+          :disabled="disabled"
           text
           icon="pi pi-trash"
           severity="danger"
-          :disabled="disabled"
-          @click="removeLesson(lesson?.id)"
+          @click="removeLesson(lesson)"
         />
       </div>
     </td>

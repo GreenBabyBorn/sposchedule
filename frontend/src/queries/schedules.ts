@@ -78,25 +78,25 @@ export function useChangesSchedulesQuery(
 //   });
 // }
 
-export function useChangesGroupScheduleQuery(
-  date: Ref<any>,
-  selectedGroup: Ref<Group>,
-  enabled: Ref<boolean>
-) {
-  return useQuery({
-    enabled: enabled,
-    queryKey: ['schedule', date, selectedGroup],
-    queryFn: async () => {
-      return (
-        await axios.get(`/api/groups/${selectedGroup.value.id}/schedule`, {
-          params: {
-            date: date?.value,
-          },
-        })
-      ).data as Schedule;
-    },
-  });
-}
+// export function useChangesGroupScheduleQuery(
+//   date: Ref<any>,
+//   group: Ref<Group>,
+//   enabled: Ref<boolean>
+// ) {
+//   return useQuery({
+//     enabled: enabled,
+//     queryKey: ['schedule', date, group],
+//     queryFn: async () => {
+//       return (
+//         await axios.get(`/api/groups/${group.value.id}/schedule`, {
+//           params: {
+//             date: date?.value,
+//           },
+//         })
+//       ).data as Schedule;
+//     },
+//   });
+// }
 
 export function usePrintChangesSchedulesQuery(date: Ref<any>) {
   const enabled = computed(() => Boolean(date.value));

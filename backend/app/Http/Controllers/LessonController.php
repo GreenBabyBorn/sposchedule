@@ -64,7 +64,7 @@ class LessonController extends Controller
     public function updateScheduleLesson(UpdateLessonRequest $request, Schedule $schedule, Lesson $lesson)
     {
         // Update the lesson with the validated data from the request
-        $lesson->update($request->validated());
+        $lesson->update($request->except([ 'teachers']));
 
         // If 'teachers' are provided, synchronize the lesson's teachers
         if ($request->has('teachers') && is_array($request->teachers)) {

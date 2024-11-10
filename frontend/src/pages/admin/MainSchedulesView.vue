@@ -39,11 +39,10 @@
   });
 
   watch(mainSchedules, () => {
-    setMainSchedules(mainSchedules.value);
+    setMainSchedules(mainSchedules.value!);
   });
 
   watchEffect(() => {
-    console.log('aaaa');
     if (isFetched.value) {
       if (
         route.query.group &&
@@ -53,9 +52,9 @@
         selectedMainGroup.value = groups.value.find(
           item => item.name === route.query.group
         );
-        if (route.query.semester && selectedMainGroup.value.semesters) {
+        if (route.query.semester && selectedMainGroup.value?.semesters) {
           selectedMainSemester.value = selectedMainGroup.value.semesters.find(
-            item => item.id === +route.query.semester
+            item => item.id === +route.query.semester!
           );
         }
       }
@@ -105,10 +104,9 @@
         :key="index"
         :group="selectedMainGroup"
         :semester="selectedMainSemester"
-        :item="schedule"
+        :schedule="schedule"
         :lessons="schedule?.lessons"
         :published="schedule?.published"
-        :schedule-id="schedule.schedule_id || 0"
         :week-day="schedule?.week_day"
       />
     </div>

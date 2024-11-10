@@ -15,23 +15,29 @@
   import { reactive, ref, toRef } from 'vue';
   import ToggleSwitch from 'primevue/toggleswitch';
   import type {
+    Group,
+    Lesson,
     LessonMainSchedule,
+    MainSchedule,
+    Schedule,
     Subject,
     Teacher,
     WeekDays,
+    weekType,
     WeekTypeLesson,
   } from './types';
+  import InputNumber from 'primevue/inputnumber';
   // import ToggleButton from 'primevue/togglebutton';
 
   const toast = useToast();
 
   interface Props {
     weekDay: WeekDays;
-    group: Record<string, any>;
+    group: Group | undefined;
     semester: Record<string, any> | null;
     lessons: LessonMainSchedule[];
     published: boolean | undefined;
-    scheduleId: number;
+    schedule: MainSchedule;
   }
 
   const props = defineProps<Props>();
@@ -40,7 +46,9 @@
   const semester = toRef(() => props.semester);
   const weekDay = toRef(() => props.weekDay);
   const lessons = toRef(() => props.lessons);
-  const scheduleId = toRef(() => props.scheduleId);
+  // const scheduleId = toRef(() => props.scheduleId);
+  const schedule = toRef(() => props.schedule);
+  console.log(schedule.value);
 
   const published = ref(props.published || false);
 
@@ -50,12 +58,11 @@
 
   const { mutateAsync: updateLesson } = useUpdateLesson();
   async function editLesson(lesson?: WeekTypeLesson) {
-    if (!lesson.lesson_id) return;
+    if (!lesson?.id) return;
 
     try {
       await updateLesson({
-        id: lesson.lesson_id,
-        body: {
+        lesson: {
           ...lesson,
           subject_id: lesson.subject.id,
         },
@@ -80,7 +87,7 @@
   }
 
   type LessonWithWeekTypes = {
-    index: number;
+    index: number | null;
     ЧИСЛ: {
       subject: Subject | null;
       teachers: Teacher[] | null;
@@ -92,11 +99,11 @@
       teachers: Teacher[] | null;
       building: string | null;
       cabinet: string | null;
-    };
+    } | null;
   };
 
   let newLesson = reactive<LessonWithWeekTypes>({
-    index: lessons.value?.[lessons.value.length - 1]?.index + 1 || null,
+    index: Number(lessons.value?.[lessons.value.length - 1]?.index) + 1 || null,
     ЧИСЛ: {
       subject: null,
       teachers: [],
@@ -110,12 +117,12 @@
   const { mutateAsync: destroyLesson } = useDestroyLesson();
 
   async function addOrUpdateSchedule() {
-    if (!scheduleId.value) {
+    if (!schedule.value.id) {
       try {
         await storeSchedule({
           body: {
-            group_id: group.value.id,
-            semester_id: semester.value.id,
+            group_id: group.value?.id,
+            semester_id: semester.value?.id,
             type: 'main',
             week_day: weekDay.value,
             // view_mode: 'table',
@@ -127,7 +134,7 @@
       }
     }
 
-    return scheduleId.value || newSchedule.value.data.id;
+    return schedule.value.id || newSchedule.value?.data.id;
   }
 
   async function addNewLesson() {
@@ -138,7 +145,7 @@
     if (addRowAddNewLessonState.value) {
       await createLesson('ЧИСЛ', schedule_id);
     } else {
-      await createLesson('', schedule_id);
+      await createLesson(null, schedule_id);
     }
 
     // Если 'ЗНАМ' также добавляется
@@ -170,13 +177,18 @@
     }
   }
 
-  async function createLesson(weekType, schedule_id, item?, index?) {
+  async function createLesson(
+    weekType: weekType,
+    schedule_id: number,
+    lesson?: any,
+    index?: number
+  ) {
     let lessonData =
-      weekType === 'ЧИСЛ' || weekType === ''
+      weekType === 'ЧИСЛ' || weekType === null
         ? newLesson['ЧИСЛ']
         : newLesson['ЗНАМ'];
-    if (item) {
-      lessonData = item;
+    if (lesson) {
+      lessonData = lesson;
     }
     if (!lessonData || Object.keys(lessonData).length === 0) {
       // showToast('Ошибка', 'Недозаполненно');
@@ -185,9 +197,9 @@
     if (!lessonData.subject) return;
     try {
       await storeLesson({
-        body: {
+        lesson: {
           ...lessonData,
-          index: !item ? newLesson.index : index,
+          index: !lesson ? newLesson.index : index,
           teachers: lessonData.teachers,
           week_type: weekType,
           subject_id: lessonData.subject?.id,
@@ -209,16 +221,16 @@
     }
   }
 
-  async function removeLesson(id) {
+  async function removeLesson(lesson) {
     try {
-      await destroyLesson({ id });
+      await destroyLesson({ lesson });
     } catch (e) {
       showError(e);
       return;
     }
   }
 
-  function showError(e) {
+  function showError(e: any) {
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
@@ -232,13 +244,13 @@
   async function handlePublished() {
     try {
       await updateChangesSchedule({
-        id: scheduleId.value,
+        id: schedule.value.id,
 
         body: {
           published: published.value,
         },
       });
-    } catch (e) {
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -368,14 +380,14 @@
                 <template v-for="lesson in item.types" :key="lesson?.week_type">
                   <div class="table-subrow">
                     <Button
-                      v-if="!lesson?.lesson_id"
+                      v-if="!lesson?.id"
                       text
                       :disabled="!lesson?.subject"
                       icon="pi pi-check"
                       @click="
                         createLesson(
                           lesson?.week_type,
-                          scheduleId,
+                          schedule.id,
                           lesson,
                           item.index
                         )
@@ -383,11 +395,11 @@
                     />
 
                     <Button
-                      v-if="lesson?.lesson_id"
+                      v-if="lesson?.id"
                       text
                       icon="pi pi-trash"
                       severity="danger"
-                      @click="removeLesson(lesson?.lesson_id)"
+                      @click="removeLesson(lesson)"
                     />
                   </div>
                 </template>
@@ -396,12 +408,21 @@
           </template>
           <tr v-show="hideAddNewLesson" class="new-schedule">
             <td>
-              <InputText
+              <InputNumber
+                v-model="newLesson.index"
+                input-id="integeronly"
+                input-class="w-full min-w-10 text-center"
+                placeholder="№"
+                :min="0"
+                :max="10"
+                size="small"
+              />
+              <!-- <InputText
                 v-model="newLesson.index"
                 placeholder="№"
                 size="small"
                 class="w-full min-w-10 text-center"
-              />
+              /> -->
             </td>
             <td>
               <div class="table-subrow">

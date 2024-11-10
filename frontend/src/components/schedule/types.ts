@@ -9,11 +9,11 @@ export type SubjectWithTeachers = Subject & {
 export type ScheduleType = 'changes' | 'main';
 
 export type Lesson = {
-  id: number;
+  id?: number;
   index: number;
   schedule_id: number;
   subject: Subject;
-  week_type: string;
+  week_type?: string;
   cabinet: string;
   building: string;
   message: string;
@@ -54,7 +54,7 @@ export type WeekDays = 'ПН' | 'ВТ' | 'СР' | 'ЧТ' | 'ПТ' | 'СБ' | 'В
 export type MainSchedule = {
   week_day: WeekDays;
   type: ScheduleType;
-  schedule_id: number;
+  id: number;
   published: boolean;
   lessons: LessonMainSchedule[];
 };
@@ -66,7 +66,7 @@ export type LessonMainSchedule = {
 
 export type WeekTypeLesson = {
   week_type: weekType;
-  lesson_id: number;
+  id: number;
   schedule_id: number;
   cabinet: string;
   building: string;

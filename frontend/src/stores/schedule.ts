@@ -12,10 +12,10 @@ export const useScheduleStore = defineStore('useScheduleStore', () => {
   const route = useRoute();
   const queryParams = ref(route.query);
   const schedulesMain = ref<MainSchedule[]>([]);
-  const selectedMainGroup = ref<Group | null>(null);
-  const selectedMainSemester = ref(null);
+  const selectedMainGroup = ref<Group | undefined>();
+  const selectedMainSemester = ref<any>(null);
 
-  function setMainSchedules(newSchedules) {
+  function setMainSchedules(newSchedules: MainSchedule[]) {
     schedulesMain.value = JSON.parse(JSON.stringify(newSchedules ?? []));
   }
 

@@ -232,7 +232,7 @@ class GroupController extends Controller
             $response[] = [
                 'week_day' => $day,
                 'type' => 'main',
-                'schedule_id' => null,
+                'id' => null,
                 'published' => null,
                 'lessons' => [],
             ];
@@ -244,7 +244,7 @@ class GroupController extends Controller
             $dayLessons = [];
 
             foreach ($scheduleGroup as $schedule) {
-                $response[$dayIndex]['schedule_id'] = $schedule->id;
+                $response[$dayIndex]['id'] = $schedule->id;
                 $response[$dayIndex]['published'] = $schedule->published;
 
                 foreach ($schedule->lessons as $lesson) {
@@ -256,7 +256,7 @@ class GroupController extends Controller
                             'types' => [
                                 [
                                     'week_type' => 'ЧИСЛ',
-                                    'lesson_id' => null,
+                                    'id' => null,
                                     'schedule_id' => null,
                                     'cabinet' => null,
                                     'building' => null,
@@ -265,7 +265,7 @@ class GroupController extends Controller
                                 ],
                                 [
                                     'week_type' => 'ЗНАМ',
-                                    'lesson_id' => null,
+                                    'id' => null,
                                     'schedule_id' => null,
                                     'cabinet' => null,
                                     'building' => null,
@@ -281,7 +281,7 @@ class GroupController extends Controller
                         $dayLessons[$index]['types'] = [
                             [
                                 'week_type' => null,
-                                'lesson_id' => $lesson->id,
+                                'id' => $lesson->id,
                                 'schedule_id' => $lesson->schedule_id,
                                 'cabinet' => $lesson->cabinet,
                                 'building' => $lesson->building,
@@ -292,7 +292,7 @@ class GroupController extends Controller
                     } elseif ($lesson->week_type === 'ЧИСЛ') {
                         $dayLessons[$index]['types'][0] = [
                             'week_type' => 'ЧИСЛ',
-                            'lesson_id' => $lesson->id,
+                            'id' => $lesson->id,
                             'schedule_id' => $lesson->schedule_id,
                             'cabinet' => $lesson->cabinet,
                             'building' => $lesson->building,
@@ -302,7 +302,7 @@ class GroupController extends Controller
                     } elseif ($lesson->week_type === 'ЗНАМ') {
                         $dayLessons[$index]['types'][1] = [
                             'week_type' => 'ЗНАМ',
-                            'lesson_id' => $lesson->id,
+                            'id' => $lesson->id,
                             'schedule_id' => $lesson->schedule_id,
                             'cabinet' => $lesson->cabinet,
                             'building' => $lesson->building,

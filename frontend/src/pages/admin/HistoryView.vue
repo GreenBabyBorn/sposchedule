@@ -48,7 +48,6 @@
   });
 
   function eventPage(event) {
-    console.log(event);
     currentPage.value = event.page + 1;
     rowsPerPage.value = event.rows;
   }
