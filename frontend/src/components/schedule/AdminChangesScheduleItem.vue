@@ -31,6 +31,7 @@
   import AdminChangesScheduleItemRow from './AdminChangesScheduleItemRow.vue';
   import { useNow, useStorage } from '@vueuse/core';
   import type {
+    ChangesSchedules,
     Group,
     Lesson,
     Schedule,
@@ -41,6 +42,9 @@
   import type { SelectFilterEvent } from 'primevue';
   import AdminChangesScheduleItemRowPreview from './AdminChangesScheduleItemRowPreview.vue';
   import { useQueryClient } from '@tanstack/vue-query';
+  import { useScheduleStore } from '@/stores/schedule';
+  import { storeToRefs } from 'pinia';
+  import axios from 'axios';
   // import RCESelect from '../ui/RCESelect.vue';
 
   interface Props {
@@ -71,6 +75,54 @@
 
   const isEdit = ref(false);
   const queryClient = useQueryClient();
+
+  function showError(e: any) {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: e,
+      life: 3000,
+      closable: true,
+    });
+  }
+
+  async function invalidateSchedule() {
+    const updatedSchedule = await queryClient.fetchQuery({
+      queryKey: ['scheduleChanges', group, date],
+      queryFn: async () =>
+        (
+          await axios.get(`/api/groups/${group.value.id}/schedule`, {
+            params: {
+              date: date.value,
+            },
+          })
+        ).data,
+    });
+    await queryClient.setQueryData(
+      [
+        'scheduleChanges',
+        formattedDate,
+        building,
+        selectedCourse,
+        selectedGroup,
+      ],
+
+      (oldData: any) => {
+        if (!oldData) return;
+        const newData: ChangesSchedules = JSON.parse(JSON.stringify(oldData));
+
+        // Асинхронное обновление schedules с помощью for...of
+        for (let i = 0; i < newData.schedules.length; i++) {
+          const s = newData.schedules[i];
+          if (s.group.id === group.value.id) {
+            newData.schedules[i] = updatedSchedule; // Обновление schedule на полученное значение
+          }
+        }
+
+        return newData;
+      }
+    );
+  }
 
   watch(
     () => props.published,
@@ -119,15 +171,10 @@
         });
         // invalidateChange();
       } catch (e: any) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail:
-            e?.response?.data?.message ||
-            'Не удалось конвертировать основное расписание в изменения.',
-          life: 3000,
-          closable: true,
-        });
+        showError(
+          e?.response?.data?.message ||
+            'Не удалось конвертировать основное расписание в изменения.'
+        );
         return;
       }
     }
@@ -145,14 +192,9 @@
         });
         // invalidateChange();
       } catch (e: any) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail:
-            e?.response?.data?.message || 'Не удалось сохранить расписание.',
-          life: 3000,
-          closable: true,
-        });
+        showError(
+          e?.response?.data?.message || 'Не удалось сохранить расписание.'
+        );
         return;
       }
     }
@@ -181,13 +223,7 @@
       newLesson.cabinet = null;
       newLesson.message = null;
     } catch (e: any) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response?.data?.message || 'Не удалось сохранить пару.',
-        life: 3000,
-        closable: true,
-      });
+      showError(e?.response?.data?.message || 'Не удалось сохранить пару.');
       return;
     }
   }
@@ -211,16 +247,11 @@
             semester_id: props.semester.id,
           },
         });
-        queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+        await invalidateSchedule();
+        // queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
         return;
       } catch (e: any) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
+        showError(e?.response.data.message);
         return;
       }
     }
@@ -238,16 +269,14 @@
         lesson: updatingLesson,
       });
     } catch (e: any) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response?.data.message,
-        life: 3000,
-        closable: true,
-      });
+      showError(e?.response?.data.message);
       return;
     }
   }
+
+  const scheduleStore = useScheduleStore();
+  const { formattedDate, selectedCourse, selectedGroup, building } =
+    storeToRefs(scheduleStore);
 
   const { mutateAsync: destroyLesson } = useDestroyLesson();
   async function removeLesson(lesson: Lesson) {
@@ -264,31 +293,21 @@
             semester_id: props.semester.id,
           },
         });
-        queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+        await invalidateSchedule();
+        // queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
       } catch (e: any) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response?.data.message,
-          life: 3000,
-          closable: true,
-        });
+        showError(e?.response.data.message);
         return;
       }
     } else {
       try {
         await destroyLesson({ lesson: lesson, schedule: schedule.value });
         if (schedule.value.lessons.length === 0) {
-          queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
+          await invalidateSchedule();
+          //   queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
         }
       } catch (e: any) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
+        showError(e?.response.data.message);
         return;
       }
     }
@@ -305,13 +324,7 @@
         },
       });
     } catch (e: any) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+      showError(e?.response.data.message);
       return;
     }
   }

@@ -221,7 +221,7 @@
     }
   }
 
-  async function removeLesson(lesson) {
+  async function removeLesson(lesson: any) {
     try {
       await destroyLesson({ lesson });
     } catch (e) {
