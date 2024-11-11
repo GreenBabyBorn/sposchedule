@@ -216,6 +216,7 @@
           subject_id: newLesson.subject?.id,
         },
       });
+      await invalidateSchedule();
 
       newLesson.subject = null;
       newLesson.teachers = [];

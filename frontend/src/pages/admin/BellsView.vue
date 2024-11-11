@@ -5,7 +5,9 @@
   import DatePicker from 'primevue/datepicker';
   import InputText from 'primevue/inputtext';
   import Checkbox from 'primevue/checkbox';
-  import DataTable from 'primevue/datatable';
+  import DataTable, {
+    type DataTableExportFunctionOptions,
+  } from 'primevue/datatable';
   import Column from 'primevue/column';
   import ToggleSwitch from 'primevue/toggleswitch';
   import {
@@ -33,7 +35,7 @@
 
   const toast = useToast();
 
-  const type = ref('Основное');
+  const type = ref<'Основное' | 'Изменения'>('Основное');
   const typeOptions = ref(['Основное', 'Изменения']);
 
   const typeState = computed(() => {
@@ -76,7 +78,7 @@
 
   const { data: buildingsFethed, isFetched: buildingsFetched } =
     useBuildingsQuery();
-  const building = ref(null);
+  const building = ref<string | undefined>();
   building.value = buildingsFethed.value?.[0].name;
 
   const buildings = computed(() => {
@@ -108,11 +110,21 @@
     building.value = buildingsFethed.value?.[0].name;
   });
 
-  let newPeriod = ref({
+  watch(
+    () => bells?.value?.periods,
+    () => {
+      newPeriod.value.index =
+        Number(
+          bells?.value?.periods?.[bells?.value?.periods?.length - 1]?.index
+        ) + 1 || 0;
+    }
+  );
+
+  let newPeriod = ref<any>({
     index:
       Number(
         bells?.value?.periods?.[bells?.value?.periods?.length - 1]?.index
-      ) + 1,
+      ) + 1 || 0,
     period_from: '',
     period_to: '',
     has_break: false,
@@ -120,7 +132,7 @@
     period_to_after: null,
   });
 
-  function formatTime(dateString) {
+  function formatTime(dateString: any) {
     const date = new Date(dateString);
     // Получаем часы и минуты и добавляем ведущий ноль, если значение меньше 10
     const hours = date.getHours().toString().padStart(2, '0');
@@ -144,7 +156,7 @@
   const bodyBellPeriod = computed(() => {
     let body = {
       ...newPeriod.value,
-      bells_id: data?.value?.id ? data.value.id : newBell.value.data.id,
+      bells_id: data?.value?.id ? data.value.id : newBell.value?.data.id,
       period_to: formatTime(newPeriod.value.period_to),
       period_from: formatTime(newPeriod.value.period_from),
     };
@@ -165,7 +177,7 @@
             date: typeValues[type.value] === 'changes' ? isoDate.value : null,
             week_day: typeValues[type.value] === 'main' ? weekDay.value : null,
           });
-        } catch (e) {
+        } catch (e: any) {
           toast.add({
             severity: 'error',
             summary: 'Ошибка',
@@ -187,7 +199,7 @@
         period_from_after: null,
         period_to_after: null,
       };
-    } catch (e) {
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -207,7 +219,7 @@
     for (let i = 0; i < selectedBells.value.length; i++) {
       try {
         await destroyBells(selectedBells.value[i].id);
-      } catch (e) {
+      } catch (e: any) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -235,7 +247,7 @@
         name: presetName.value,
       });
       presetName.value = '';
-    } catch (e) {
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -247,7 +259,7 @@
     }
   }
   const { mutateAsync: applyPreset } = useApplyPreset();
-  const selectedPreset = ref(null);
+  const selectedPreset = ref<any>(null);
   watch(selectedPreset, async () => {
     if (!selectedPreset.value) return;
     if (!data.value?.id) {
@@ -258,7 +270,7 @@
           date: typeValues[type.value] === 'changes' ? isoDate.value : null,
           week_day: typeValues[type.value] === 'main' ? weekDay.value : null,
         });
-      } catch (e) {
+      } catch (e: any) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -272,12 +284,12 @@
 
     try {
       await applyPreset({
-        bells_id: !data.value?.id ? newBell.value.data.id : bells.value.id,
+        bells_id: !data.value?.id ? newBell.value?.data.id : bells.value.id,
         preset_id: selectedPreset.value.id,
       });
 
       selectedPreset.value = null;
-    } catch (e) {
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -297,11 +309,11 @@
     }
   );
 
-  const onRowEditSave = async event => {
-    let { newData } = event;
+  const onRowEditSave = async (event: DataTableExportFunctionOptions) => {
+    let { data } = event;
     try {
-      await updateBell({ id: newData.id, body: newData });
-    } catch (e) {
+      await updateBell({ id: data.id, body: data });
+    } catch (e: any) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
@@ -349,7 +361,7 @@
       }
 
       if (route.query.building) {
-        building.value = route.query.building;
+        building.value = route.query.building.toString();
       }
 
       if (route.query.weekDay) {
@@ -423,7 +435,7 @@
             "
           /> -->
           <ToggleSwitch
-            v-model="published"
+            v-model="published!"
             :disabled="!data"
             :title="published ? 'Снять с публикации' : 'Опубликовать'"
             @change="

@@ -15,9 +15,9 @@ export function useStoreLesson() {
     mutationFn: async ({ lesson }: { lesson: any }) =>
       (await axios.post(`/api/lessons`, lesson)).data as Lesson,
     onSettled: (data, error, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ['scheduleChanges'],
-      });
+      // queryClient.invalidateQueries({
+      //   queryKey: ['scheduleChanges'],
+      // });
       queryClient.invalidateQueries({
         queryKey: ['scheduleMain'],
       });

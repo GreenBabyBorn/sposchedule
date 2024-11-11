@@ -48,7 +48,6 @@
   const lessons = toRef(() => props.lessons);
   // const scheduleId = toRef(() => props.scheduleId);
   const schedule = toRef(() => props.schedule);
-  console.log(schedule.value);
 
   const published = ref(props.published || false);
 

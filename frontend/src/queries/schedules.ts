@@ -297,7 +297,7 @@ export function useAnalyticsSchedulesQuery(
           params: {
             start_date: start_date.value,
             end_date: end_date.value,
-            groups_ids: groups_ids.value,
+            group_ids: groups_ids.value,
           },
         })
       ).data;
