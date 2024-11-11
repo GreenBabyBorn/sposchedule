@@ -30,8 +30,8 @@ class AppServiceProvider extends ServiceProvider
         Validator::extend('unique_schedule_index', function ($attribute, $value, $parameters, $validator) {
             $data = $validator->getData();
 
-            if (empty($data['schedule_id']) || empty($data['index'])) {
-                return true; // Skip if essential fields are missing, allowing normal validation rules to handle it
+            if (empty($data['schedule_id']) || !isset($data['index'])) {
+                return true;
             }
 
             $scheduleId = $data['schedule_id'];
