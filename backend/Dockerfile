@@ -31,8 +31,23 @@ RUN curl -sS -o installer https://getcomposer.org/installer && php ./installer -
 RUN groupadd -g 1000 www
 RUN useradd -u 1000 -ms /bin/bash -g www www
 
+COPY . /var/www/backend/
+COPY --chown=www:www . /var/www
 USER www
 
-# В контейнере открываем 9000 порт и запускаем сервер php-fpm
+# Устанавливаем зависимости через Composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Оптимизация Laravel
+RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
+
+# Копируем и настраиваем entrypoint
+COPY --chown=www:www ./backend/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Переключаемся на пользователя www
+USER www
+
+# Открываем порт и устанавливаем ENTRYPOINT
 EXPOSE 9000
-CMD ["php-fpm"]
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
