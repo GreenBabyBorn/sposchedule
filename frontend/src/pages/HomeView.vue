@@ -1,6 +1,10 @@
 <script setup lang="ts">
   import ScheduleItem from '@/components/schedule/PublicScheduleItem.vue';
-  import { dateRegex, reducedWeekDays } from '@/composables/constants';
+  import {
+    dateRegex,
+    reducedWeekDays,
+    type FullWeekDays,
+  } from '@/composables/constants';
   import { usePublicBellsQuery } from '@/queries/bells';
   import { useBuildingsQuery } from '@/queries/buildings';
   import { useGroupsPublicQuery } from '@/queries/groups';
@@ -18,7 +22,14 @@
   import InputText from 'primevue/inputtext';
   import Select from 'primevue/select';
   import Skeleton from 'primevue/skeleton';
-  import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+  import {
+    computed,
+    onBeforeUnmount,
+    onMounted,
+    ref,
+    watch,
+    watchEffect,
+  } from 'vue';
   import { useRoute } from 'vue-router';
 
   const route = useRoute();
@@ -32,11 +43,11 @@
   });
 
   const cabinet = ref('');
-  const searchedCabinet = ref('');
+  const searchedCabinet = ref<string | null>();
   const teacher = ref('');
-  const searchedTeacher = ref('');
+  const searchedTeacher = ref<string | null>();
   const subject = ref('');
-  const searchedSubject = ref('');
+  const searchedSubject = ref<string | null>();
 
   const debouncedCabinetFn = useDebounceFn(
     () => (searchedCabinet.value = cabinet.value),
@@ -95,7 +106,7 @@
     searchedSubject
   );
 
-  const { data: groups } = useGroupsPublicQuery(
+  const { data: groups, isFetched: isFetchedGroups } = useGroupsPublicQuery(
     selectedGroup,
     building,
     course
@@ -140,19 +151,19 @@
     { flush: 'sync' }
   );
 
-  onMounted(() => {
-    const {
-      date: queryDate,
-      building: queryBuilding,
-      course: queryCourse,
-      group: queryGroup,
-    } = route.query as Partial<{
-      date: string;
-      building: string;
-      course: string;
-      group: string;
-    }>;
+  const {
+    date: queryDate,
+    building: queryBuilding,
+    course: queryCourse,
+    group: queryGroup,
+  } = route.query as Partial<{
+    date: string;
+    building: string;
+    course: string;
+    group: string;
+  }>;
 
+  onMounted(() => {
     if (queryDate && dateRegex.test(queryDate)) {
       const [day, month, year] = queryDate.split('.').map(Number);
       date.value = new Date(year, month - 1, day);
@@ -162,11 +173,22 @@
 
     building.value = queryBuilding || null;
     course.value = queryCourse ? Number(queryCourse) : null;
-
-    selectedGroup.value = queryGroup || null;
-
+    if (isFetchedGroups.value && queryGroup) {
+      selectedGroup.value = groups.value.find(g => g.name === queryGroup)
+        ? queryGroup
+        : null;
+    }
     updateQueryParams();
   });
+
+  // watchEffect(() => {
+  //   if (isFetchedGroups.value && queryGroup) {
+  //     console.log(groups.value?.find(g => g.name === queryGroup))?.name;
+  //     selectedGroup.value = groups.value?.find(
+  //       g => g.name === queryGroup
+  //     )?.name;
+  //   }
+  // });
 
   const formattedDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
@@ -180,7 +202,7 @@
   const authStore = useAuthStore();
   const { isAuth } = storeToRefs(authStore);
 
-  const headerRef = ref(null);
+  const headerRef = ref<HTMLElement>();
   const headerHeight = ref(0);
 
   const updateHeaderHeight = () => {
@@ -190,7 +212,7 @@
   };
 
   // Используем ResizeObserver для отслеживания изменений размеров header
-  let resizeObserver = null;
+  let resizeObserver: ResizeObserver | null = null;
 
   onMounted(() => {
     resizeObserver = new ResizeObserver(updateHeaderHeight);
@@ -348,7 +370,7 @@
                     reducedWeekDays[
                       useDateFormat(date, 'dddd', {
                         locales: 'ru-RU',
-                      }).value
+                      }).value as FullWeekDays
                     ]
                   }}</small>
                   <small>{{ schedulesChanges?.week_type }}</small>
