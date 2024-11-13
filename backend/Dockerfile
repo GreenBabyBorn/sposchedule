@@ -1,13 +1,8 @@
+FROM nginx:latest AS webserver
+
 FROM php:8.3-fpm
 
-# COPY . /var/www/backend
-# COPY --chown=www:www . /var/www/backend
-WORKDIR /var/www/backend
-
-# COPY composer.lock composer.json /var/www/backend/
-
 RUN apt-get update && apt-get install -y \
-    build-essential \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
@@ -20,34 +15,36 @@ RUN apt-get update && apt-get install -y \
     curl \
     libpq-dev \
     libonig-dev \
-    libzip-dev 
-
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    libzip-dev \
+    && apt-get clean
 
 RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
+RUN curl -sS -o installer https://getcomposer.org/installer \
+	&& php ./installer --install-dir=/usr/local/bin --filename=composer
 
-RUN curl -sS -o installer https://getcomposer.org/installer && php ./installer --install-dir=/usr/local/bin --filename=composer
+WORKDIR /var/www/backend
 
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+RUN groupadd -g 1000 www \
+	&& useradd -u 1000 -ms /bin/bash -g www www
 
-COPY . /var/www/backend/
-COPY --chown=www:www . /var/www
+COPY ./backend .
+
+COPY --from=webserver /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=webserver /etc/nginx /etc/nginx
+COPY --from=webserver /usr/share/nginx /usr/share/nginx
+COPY --from=webserver /usr/lib/nginx /usr/lib/nginx
+
+RUN touch /var/run/nginx.pid \
+        && mkdir -p /var/lib/nginx /var/log/nginx /var/cache/nginx \
+        && chown -R www:www . /var/lib/nginx /var/log/nginx /var/cache/nginx /usr/lib/nginx /var/run/nginx.pid
+
+COPY ./docker/nginx/conf.d/backend.conf /etc/nginx/conf.d/default.conf
 USER www
+RUN composer install --no-dev --optimize-autoloader \
+	&& php artisan config:cache \
+	&& php artisan route:cache \
+	&& php artisan view:cache
 
-# Устанавливаем зависимости через Composer
-RUN composer install --no-dev --optimize-autoloader
+EXPOSE 82
 
-# Оптимизация Laravel
-RUN php artisan config:cache && php artisan route:cache && php artisan view:cache
-
-# Копируем и настраиваем entrypoint
-COPY --chown=www:www ./backend/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-# Переключаемся на пользователя www
-USER www
-
-# Открываем порт и устанавливаем ENTRYPOINT
-EXPOSE 9000
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD nginx && php-fpm

@@ -5,8 +5,10 @@ services:
         build:
             context: .
             dockerfile: ./frontend/Dockerfile
-        volumes:
-            - frontend:/var/www
+        ports:
+            - "8080:80"
+        networks:
+            - app-network
 
     # PHP Service
     php-fpm:
@@ -14,37 +16,11 @@ services:
             context: .
             dockerfile: ./backend/Dockerfile
         restart: unless-stopped
-        working_dir: /var/www/backend
-        volumes:
-            - backend:/var/www
-        networks:
-            - app-network
-
-    # Nginx Service for Static Frontend
-    frontend-webserver:
-        image: nginx:latest
-        restart: unless-stopped
-        depends_on:
-            - node
-        ports:
-            - "8080:80"
-        volumes:
-            - frontend:/var/www
-            - ./docker/nginx/conf.d/frontend.conf:/etc/nginx/conf.d/default.conf
-        networks:
-            - app-network
-
-    # Nginx Service for Laravel API
-    backend-webserver:
-        image: nginx:latest
-        restart: unless-stopped
-        depends_on:
-            - php-fpm
         ports:
             - "82:80"
-        volumes:
-            - backend:/var/www
-            - ./docker/nginx/conf.d/backend.conf:/etc/nginx/conf.d/default.conf
+        working_dir: /var/www/backend
+        depends_on:
+            - db
         networks:
             - app-network
 
@@ -71,5 +47,3 @@ networks:
 # Docker Volumes
 volumes:
     db:
-    frontend:
-    backend:

@@ -1,19 +1,18 @@
-FROM node:20
-
+FROM node:20 AS frontend-builder
 WORKDIR /var/www/frontend
-
-
-# Install dependencies
 RUN apt-get update && apt-get install -y \
     vim \
     zip \
     unzip \
     curl
 
-COPY . /var/www/frontend/
+COPY ./frontend .
 COPY --chown=node:node . /var/www
 
-# Change current user
 USER node
 
-CMD ["sh", "-c", "npm install &&  npm run build"]
+RUN npm install && npm run build
+
+FROM nginx:latest
+COPY --from=frontend-builder /var/www/frontend/dist /var/www/frontend/dist
+COPY ./docker/nginx/conf.d/frontend.conf /etc/nginx/conf.d/default.conf
