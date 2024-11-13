@@ -1,15 +1,4 @@
 services:
-    # PHP Service
-    app:
-        build:
-            context: ./
-            dockerfile: ./backend/Dockerfile
-        restart: unless-stopped
-        working_dir: /var/www/backend
-        volumes:
-            - .:/var/www
-        networks:
-            - app-network
 
     # Node Service (запускается только при сборке фронтенда)
     node:
@@ -17,17 +6,17 @@ services:
             context: .
             dockerfile: ./frontend/Dockerfile
         volumes:
-            - .:/var/www
+            - frontend:/var/www
 
-    # Nginx Service for Laravel API
-    api-webserver:
-        image: nginx:latest
+    # PHP Service
+    php-fpm:
+        build:
+            context: .
+            dockerfile: ./backend/Dockerfile
         restart: unless-stopped
-        ports:
-            - "82:80"
+        working_dir: /var/www/backend
         volumes:
-            - .:/var/www
-            - ./docker/nginx/conf.d/api.conf:/etc/nginx/conf.d/default.conf
+            - backend:/var/www
         networks:
             - app-network
 
@@ -35,11 +24,27 @@ services:
     frontend-webserver:
         image: nginx:latest
         restart: unless-stopped
+        depends_on:
+            - node
         ports:
             - "8080:80"
         volumes:
-            - .:/var/www
+            - frontend:/var/www
             - ./docker/nginx/conf.d/frontend.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            - app-network
+
+    # Nginx Service for Laravel API
+    backend-webserver:
+        image: nginx:latest
+        restart: unless-stopped
+        depends_on:
+            - php-fpm
+        ports:
+            - "82:80"
+        volumes:
+            - backend:/var/www
+            - ./docker/nginx/conf.d/backend.conf:/etc/nginx/conf.d/default.conf
         networks:
             - app-network
 
@@ -66,3 +71,5 @@ networks:
 # Docker Volumes
 volumes:
     db:
+    frontend:
+    backend:
