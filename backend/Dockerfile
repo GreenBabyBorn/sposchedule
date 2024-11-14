@@ -3,24 +3,18 @@ FROM nginx:latest AS webserver
 FROM php:8.3-fpm
 
 RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg62-turbo-dev \
-    libfreetype6-dev \
-    locales \
-    zip \
-    jpegoptim optipng pngquant gifsicle \
-    vim \
-    unzip \
-    git \
-    curl \
-    libpq-dev \
-    libonig-dev \
-    libzip-dev \
-    && apt-get clean
+        nano vim zip unzip curl locales procps \
+        libpq-dev libonig-dev libzip-dev \
+        && apt-get clean
 
 RUN docker-php-ext-install pdo_pgsql mbstring zip exif pcntl
 RUN curl -sS -o installer https://getcomposer.org/installer \
 	&& php ./installer --install-dir=/usr/local/bin --filename=composer
+
+ADD https://github.com/nicolas-van/multirun/releases/download/1.1.3/multirun-x86_64-linux-gnu-1.1.3.tar.gz /tmp/multirun.tar.gz
+RUN tar -xzf /tmp/multirun.tar.gz -C /usr/sbin/ \
+            && rm /tmp/multirun.tar.gz \
+            && chmod +x /usr/sbin/multirun
 
 WORKDIR /var/www/backend
 
@@ -47,4 +41,4 @@ RUN composer install --no-dev --optimize-autoloader \
 
 EXPOSE 82
 
-CMD nginx && php-fpm
+CMD ["multirun", "nginx -g \"daemon off;\"", "php-fpm"]
