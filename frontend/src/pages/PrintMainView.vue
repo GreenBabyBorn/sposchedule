@@ -16,6 +16,15 @@
   import LoadingBar from '@/components/LoadingBar.vue';
 
   const route = useRoute();
+  const {
+    buildings: queryBuildings,
+    semester: querySemester,
+    course: queryCourse,
+  } = route.query as Partial<{
+    buildings: string;
+    semester: string;
+    course: string;
+  }>;
 
   const selectedSemester = ref(null);
   const { data: semesters, isFetched: semestersFetched } = useSemestersQuery();
@@ -139,23 +148,23 @@
   watchEffect(() => {
     if (semestersFetched.value && buildingsFetched.value) {
       // Восстанавливаем семестр, если query параметр "semester" существует и данные загружены
-      if (route.query.semester) {
+      if (querySemester) {
         selectedSemester.value = semesters.value?.find(
-          item => item.id === Number(route.query.semester)
+          item => item.id === Number(querySemester)
         );
       }
 
       // Восстанавливаем здания, если query параметр "buildings" существует и данные загружены
-      if (route.query.buildings) {
-        const buildingNames = route.query.buildings.toString(); // если строка, разбиваем на массив
+      if (queryBuildings) {
+        const buildingNames = queryBuildings.toString(); // если строка, разбиваем на массив
         selectedBuildings.value = buildings.value?.filter(building =>
           buildingNames.includes(building.value)
         );
       }
 
       // Восстанавливаем курс, если query параметр "course" существует
-      if (route.query.course) {
-        course.value = Number(route.query.course);
+      if (queryCourse) {
+        course.value = Number(queryCourse);
       }
     }
   });

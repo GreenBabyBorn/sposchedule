@@ -266,7 +266,6 @@
 
     try {
       await updateLesson({
-        schedule: schedule.value,
         lesson: updatingLesson,
       });
     } catch (e: any) {
@@ -302,7 +301,7 @@
       }
     } else {
       try {
-        await destroyLesson({ lesson: lesson, schedule: schedule.value });
+        await destroyLesson({ lesson: lesson });
         if (schedule.value.lessons.length === 0) {
           await invalidateSchedule();
           //   queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });

@@ -6,30 +6,22 @@ export const useSchedulePublicStore = defineStore(
   'useSchedulePublicStore',
   () => {
     const route = useRoute();
-    const selectedGroup = ref(null);
     const queryParams = ref(route.query);
+
+    const selectedGroup = ref<string | null>(null);
+    const date = ref<Date | null>(null);
     const schedules = ref();
+    const course = ref<number | null>(null);
 
-    const schedulesChanges = ref();
-
-    const date = ref(null);
-    const course = ref(null);
-
-    function setSchedules(scheduless) {
-      schedules.value = toRaw(scheduless ?? []);
-    }
-
-    function setSchedulesChanges(scheduless) {
-      schedulesChanges.value = toRaw(scheduless ?? []);
+    function setSchedules(newSchedules: unknown) {
+      schedules.value = toRaw(newSchedules ?? []);
     }
 
     return {
-      schedules,
-      setSchedules,
       selectedGroup,
       queryParams,
-      schedulesChanges,
-      setSchedulesChanges,
+      schedules,
+      setSchedules,
       date,
       course,
     };

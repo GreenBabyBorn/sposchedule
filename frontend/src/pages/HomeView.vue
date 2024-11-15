@@ -34,9 +34,8 @@
 
   const route = useRoute();
   const scheduleStore = useSchedulePublicStore();
-  const { course, date, schedulesChanges, selectedGroup } =
-    storeToRefs(scheduleStore);
-  const { setSchedulesChanges } = scheduleStore;
+  const { course, date, schedules, selectedGroup } = storeToRefs(scheduleStore);
+  const { setSchedules } = scheduleStore;
 
   const isoDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
@@ -78,8 +77,9 @@
     return course.value;
   });
 
-  const building = ref(null);
-  const { data: buildingsFethed } = useBuildingsQuery();
+  const building = ref<string | null>(null);
+  const { data: buildingsFethed, isFetched: isFetchedBuildings } =
+    useBuildingsQuery();
   const buildings = computed(() => {
     return (
       buildingsFethed.value?.map(building => ({
@@ -92,7 +92,7 @@
   const { data: courses } = useCoursesQuery(building);
 
   const {
-    data: changesSchedules,
+    data: fetchedSchedules,
     isFetched,
     isError,
     isLoading,
@@ -107,7 +107,6 @@
   );
 
   const { data: groups, isFetched: isFetchedGroups } = useGroupsPublicQuery(
-    selectedGroup,
     building,
     course
   );
@@ -124,12 +123,13 @@
     });
   };
 
-  watch(changesSchedules, setSchedulesChanges);
+  watch(fetchedSchedules, setSchedules);
 
   watch(
     [isoDate, selectedCourse, selectedGroup, building],
     () => {
       updateQueryParams();
+      stop();
     },
     { deep: true }
   );
@@ -163,32 +163,28 @@
     group: string;
   }>;
 
-  onMounted(() => {
-    if (queryDate && dateRegex.test(queryDate)) {
-      const [day, month, year] = queryDate.split('.').map(Number);
-      date.value = new Date(year, month - 1, day);
-    } else {
-      date.value = new Date();
-    }
+  const stop = watchEffect(() => {
+    if (isFetchedGroups.value && isFetchedBuildings.value) {
+      if (queryDate && dateRegex.test(queryDate)) {
+        const [day, month, year] = queryDate.split('.').map(Number);
+        date.value = new Date(year, month - 1, day);
+      } else {
+        date.value = new Date();
+      }
 
-    building.value = queryBuilding || null;
-    course.value = queryCourse ? Number(queryCourse) : null;
-    if (isFetchedGroups.value && queryGroup) {
-      selectedGroup.value = groups.value.find(g => g.name === queryGroup)
-        ? queryGroup
-        : null;
+      if (queryBuilding) {
+        building.value = queryBuilding || null;
+      }
+
+      if (queryCourse) {
+        course.value = queryCourse ? Number(queryCourse) : null;
+      }
+
+      if (queryGroup && groups.value?.find(g => g.name === queryGroup)) {
+        selectedGroup.value = queryGroup || null;
+      }
     }
-    updateQueryParams();
   });
-
-  // watchEffect(() => {
-  //   if (isFetchedGroups.value && queryGroup) {
-  //     console.log(groups.value?.find(g => g.name === queryGroup))?.name;
-  //     selectedGroup.value = groups.value?.find(
-  //       g => g.name === queryGroup
-  //     )?.name;
-  //   }
-  // });
 
   const formattedDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
@@ -240,7 +236,6 @@
   }
 
   const mergedBells = computed(() => {
-    // Функция для сравнения periods между разными корпусами
     const periodsEqual = (periods1, periods2) => {
       if (periods1.length !== periods2.length) return false;
       return periods1.every((p1, index) => {
@@ -255,21 +250,16 @@
         );
       });
     };
-
-    // Группируем звонки по одинаковым периодам
     const grouped = [];
 
     publicBells.value?.forEach(bell => {
-      // Находим группу, у которой совпадают periods
       let group = grouped.find(g =>
         periodsEqual(g.bells.periods, bell.periods)
       );
 
       if (group) {
-        // Если такая группа найдена, добавляем туда здание
         group.building += `, ${bell.building}`;
       } else {
-        // Если группа не найдена, создаем новую
         grouped.push({
           building: String(bell.building),
           bells: bell,
@@ -292,7 +282,7 @@
 
   const headerHidden = ref(false);
 
-  function handleDatePickerBtns(day) {
+  function handleDatePickerBtns(day: 'today' | 'tomorrow') {
     switch (day) {
       case 'today':
         date.value = new Date();
@@ -368,12 +358,12 @@
                 >
                   <small>{{
                     reducedWeekDays[
-                      useDateFormat(date, 'dddd', {
+                      useDateFormat(date as Date, 'dddd', {
                         locales: 'ru-RU',
                       }).value as FullWeekDays
                     ]
                   }}</small>
-                  <small>{{ schedulesChanges?.week_type }}</small>
+                  <small>{{ schedules?.week_type }}</small>
                 </div>
               </template>
               <template #footer>
@@ -420,6 +410,7 @@
             <Select
               v-model="selectedGroup"
               append-to="self"
+              filter-placeholder="Поиск группы"
               empty-filter-message="Группы не найдены"
               filter
               show-clear
@@ -439,7 +430,7 @@
           </div>
           <div class="ml-auto self-center">
             <div
-              v-if="schedulesChanges?.last_updated"
+              v-if="schedules?.last_updated"
               class="flex flex-row flex-wrap items-center gap-1 lg:flex-col lg:items-end lg:gap-0"
             >
               <span class="text-xs leading-none text-surface-400"
@@ -448,12 +439,9 @@
               <time
                 title="Последние обновление"
                 class="text-right text-sm text-surface-400"
-                :datetime="schedulesChanges?.last_updated"
+                :datetime="schedules?.last_updated"
                 >{{
-                  useDateFormat(
-                    schedulesChanges?.last_updated,
-                    'DD.MM.YYYY HH:mm'
-                  )
+                  useDateFormat(schedules?.last_updated, 'DD.MM.YYYY HH:mm')
                 }}</time
               >
             </div>
@@ -553,7 +541,7 @@
       class="flex flex-col gap-4"
     >
       <span
-        v-if="isFetched && !schedulesChanges?.schedules.length"
+        v-if="isFetched && !schedules?.schedules.length"
         class="text-center text-2xl"
         >Ничего не найдено 🧐
       </span>
@@ -568,12 +556,12 @@
           </div>
         </template>
 
-        <template v-else-if="schedulesChanges?.schedules && !isError">
+        <template v-else-if="schedules?.schedules && !isError">
           <ScheduleItem
-            v-for="item in schedulesChanges?.schedules"
+            v-for="item in schedules?.schedules"
             :key="item?.id"
             class="schedule"
-            :date="isoDate"
+            :date="isoDate as string"
             :type="item?.type"
             :group-name="item?.group_name"
             :lessons="item?.lessons"

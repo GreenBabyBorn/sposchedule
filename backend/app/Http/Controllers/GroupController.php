@@ -48,7 +48,7 @@ class GroupController extends Controller
         // Фильтрация по name (конкатенация specialization, course и index)
         if ($request->has('name')) {
             $name = $request->input('name');
-            $query->where('name', 'LIKE', "%{$name}%");
+            $query->where('name', 'ILIKE', "%{$name}%");
         }
 
         // Сортировка
