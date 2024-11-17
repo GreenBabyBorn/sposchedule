@@ -39,7 +39,7 @@
     SubjectWithTeachers,
     Teacher,
   } from './types';
-  import type { SelectFilterEvent } from 'primevue';
+  import { useConfirm, type SelectFilterEvent } from 'primevue';
   import AdminChangesScheduleItemRowPreview from './AdminChangesScheduleItemRowPreview.vue';
   import { useQueryClient } from '@tanstack/vue-query';
   import { useScheduleStore } from '@/stores/schedule';
@@ -62,7 +62,6 @@
 
   const schedule = toRef(() => props.schedule);
   const lessons = toRef(() => props.lessons);
-  // const lessons = ref(props.lessons);
   const dateRef = toRef(() => props.date);
   const semester = toRef(() => props.semester);
   const group = toRef(() => props.group);
@@ -74,7 +73,17 @@
   const toast = useToast();
 
   const isEdit = ref(false);
+
   const queryClient = useQueryClient();
+
+  const scheduleStore = useScheduleStore();
+  const {
+    formattedDate,
+    selectedCourse,
+    selectedGroup,
+    building,
+    schedulesChanges,
+  } = storeToRefs(scheduleStore);
 
   function showError(e: any) {
     toast.add({
@@ -155,7 +164,7 @@
 
   const { mutateAsync: storeSchedule, data: newSchedule } =
     useStoreScheduleChange();
-  const { mutateAsync: storeLesson } = useStoreLesson();
+  const { mutateAsync: storeLesson, data: createdLesson } = useStoreLesson();
 
   async function addNewLesson() {
     // Если тип расписания 'main', конвертируем его в изменения
@@ -216,6 +225,25 @@
           subject_id: newLesson.subject?.id,
         },
       });
+
+      for (let s of schedulesChanges.value!.schedules) {
+        if (
+          s.lessons?.find(
+            l =>
+              l.cabinet === newLesson.cabinet &&
+              l.index === newLesson.index &&
+              l.schedule_id !== scheduleIdforLesson
+          )
+        ) {
+          toast.add({
+            severity: 'warn',
+            summary: 'Внимание',
+            detail: `Кабинет ${newLesson.cabinet} уже используется в расписании ${s.group.name} ${newLesson.index} парой`,
+            life: 3000,
+          });
+        }
+      }
+
       await invalidateSchedule();
 
       newLesson.subject = null;
@@ -237,6 +265,23 @@
   async function editLesson(item: Lesson) {
     if (!item.id) return;
     // if (!item.message == !item.subject) return;
+    for (let s of schedulesChanges.value!.schedules) {
+      if (
+        s.lessons?.find(
+          l =>
+            l.cabinet === item.cabinet &&
+            l.index === item.index &&
+            l.schedule_id !== item.schedule_id
+        )
+      ) {
+        toast.add({
+          severity: 'warn',
+          summary: 'Внимание',
+          detail: `Кабинет ${item.cabinet} уже используется в расписании ${s.group.name} ${item.index} парой`,
+          life: 3000,
+        });
+      }
+    }
 
     if (type.value === 'main') {
       try {
@@ -273,10 +318,6 @@
       return;
     }
   }
-
-  const scheduleStore = useScheduleStore();
-  const { formattedDate, selectedCourse, selectedGroup, building } =
-    storeToRefs(scheduleStore);
 
   const { mutateAsync: destroyLesson } = useDestroyLesson();
   async function removeLesson(lesson: Lesson) {
