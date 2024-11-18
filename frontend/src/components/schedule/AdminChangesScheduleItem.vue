@@ -39,7 +39,7 @@
     SubjectWithTeachers,
     Teacher,
   } from './types';
-  import { useConfirm, type SelectFilterEvent } from 'primevue';
+  import { type SelectFilterEvent } from 'primevue';
   import AdminChangesScheduleItemRowPreview from './AdminChangesScheduleItemRowPreview.vue';
   import { useQueryClient } from '@tanstack/vue-query';
   import { useScheduleStore } from '@/stores/schedule';
@@ -232,14 +232,18 @@
             l =>
               l.cabinet === newLesson.cabinet &&
               l.index === newLesson.index &&
-              l.schedule_id !== scheduleIdforLesson
+              l.schedule_id !== scheduleIdforLesson &&
+              l.cabinet !== null &&
+              newLesson.cabinet !== null &&
+              l.cabinet.length > 1 &&
+              newLesson.cabinet.length > 1
           )
         ) {
           toast.add({
             severity: 'warn',
             summary: 'Внимание',
             detail: `Кабинет ${newLesson.cabinet} уже используется в расписании ${s.group.name} ${newLesson.index} парой`,
-            life: 3000,
+            life: 5000,
           });
         }
       }
@@ -271,14 +275,18 @@
           l =>
             l.cabinet === item.cabinet &&
             l.index === item.index &&
-            l.schedule_id !== item.schedule_id
+            l.schedule_id !== item.schedule_id &&
+            l.cabinet !== null &&
+            item.cabinet !== null &&
+            l.cabinet.length > 1 &&
+            item.cabinet.length > 1
         )
       ) {
         toast.add({
           severity: 'warn',
           summary: 'Внимание',
           detail: `Кабинет ${item.cabinet} уже используется в расписании ${s.group.name} ${item.index} парой`,
-          life: 3000,
+          life: 5000,
         });
       }
     }
