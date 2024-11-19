@@ -230,12 +230,12 @@
         if (
           s.lessons?.find(
             l =>
-              l.cabinet.trim() === newLesson.cabinet &&
+              l.cabinet === newLesson.cabinet &&
               l.index === newLesson.index &&
               l.schedule_id !== scheduleIdforLesson &&
               l.cabinet !== null &&
               newLesson.cabinet !== null &&
-              l.cabinet.trim().length > 1 &&
+              l.cabinet.length > 1 &&
               newLesson.cabinet.length > 1
           )
         ) {
@@ -273,13 +273,13 @@
       if (
         s.lessons?.find(
           l =>
-            l.cabinet.trim() === item.cabinet.trim() &&
+            l.cabinet === item.cabinet &&
             l.index === item.index &&
             l.schedule_id !== item.schedule_id &&
             l.cabinet !== null &&
             item.cabinet !== null &&
-            l.cabinet.trim().length > 1 &&
-            item.cabinet.trim().length > 1
+            l.cabinet.length > 1 &&
+            item.cabinet.length > 1
         )
       ) {
         toast.add({
