@@ -39,7 +39,7 @@
   <tr v-if="lesson?.index >= 0">
     <td>
       <InputNumber
-        v-model="lesson.index"
+        v-model.trim="lesson.index"
         input-id="integeronly"
         input-class="w-full text-center"
         placeholder="№"
@@ -61,7 +61,7 @@
     <td v-show="lesson?.message" colspan="2/1">
       <div class="table-subrow">
         <Textarea
-          v-model="lesson.message"
+          v-model.trim="lesson.message"
           placeholder="Введите сообщение для группы"
           class="w-full"
           @change="editLesson(lesson)"
@@ -71,7 +71,7 @@
     <td v-if="!lesson?.message">
       <div v-if="lesson?.subject" class="text-left">
         <Select
-          v-model="lesson.subject"
+          v-model.lazy="lesson.subject"
           data-key="name"
           filter
           class="w-full text-left"
@@ -84,7 +84,7 @@
       <div v-else class="text-red-400">Предмет не найден</div>
       <div v-if="lesson.teachers" class="text-left">
         <MultiSelect
-          v-model="lesson.teachers"
+          v-model.trim="lesson.teachers"
           data-key="name"
           filter
           placeholder="Преподаватель"
@@ -99,7 +99,7 @@
     <td v-show="!lesson.message">
       <div v-if="lesson.id" class="text-right">
         <InputText
-          v-model="lesson.cabinet"
+          v-model.trim="lesson.cabinet"
           class="w-full text-center"
           size="small"
           placeholder="Кабинет"
@@ -108,7 +108,7 @@
       </div>
       <div v-if="lesson.id" class="text-right">
         <InputText
-          v-model="lesson.building"
+          v-model.trim="lesson.building"
           class="w-full text-center"
           placeholder="Корпус"
           size="small"

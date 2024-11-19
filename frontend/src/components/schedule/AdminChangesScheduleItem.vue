@@ -556,7 +556,7 @@
           <tr v-if="isEdit" class="border-t-4 border-surface-600">
             <td>
               <InputNumber
-                v-model="newLesson.index"
+                v-model.trim="newLesson.index"
                 input-id="integeronly"
                 input-class="w-full text-center"
                 placeholder="№"
@@ -606,7 +606,7 @@
               </div>
               <div class="table-subrow">
                 <MultiSelect
-                  v-model="newLesson.teachers"
+                  v-model.trim="newLesson.teachers"
                   data-key="name"
                   :reset-filter-on-hide="true"
                   :auto-filter-focus="true"
@@ -627,7 +627,7 @@
             <td v-show="!newLessonMessageState">
               <div class="table-subrow">
                 <InputText
-                  v-model="newLesson.cabinet"
+                  v-model.trim="newLesson.cabinet"
                   size="small"
                   class="w-full text-center"
                   placeholder="Кабинет"
@@ -635,7 +635,7 @@
               </div>
               <div class="table-subrow">
                 <InputText
-                  v-model="newLesson.building"
+                  v-model.trim="newLesson.building"
                   size="small"
                   class="w-full text-center"
                   placeholder="Корпус"
