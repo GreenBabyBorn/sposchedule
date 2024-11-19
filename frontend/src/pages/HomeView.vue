@@ -541,7 +541,7 @@
       class="flex flex-col gap-4"
     >
       <span
-        v-if="isFetched && !schedules?.schedules.length"
+        v-if="isFetched && !schedules?.schedules?.length"
         class="text-center text-2xl"
         >Ничего не найдено 🧐
       </span>
