@@ -124,11 +124,7 @@
     updateQueryParams();
   });
 
-  const { data: groups } = useGroupsPublicQuery(
-    selectedGroup,
-    building,
-    course
-  );
+  const { data: groups } = useGroupsPublicQuery(building, course);
 
   const { data: buildingsFethed } = useBuildingsQuery();
   const buildings = computed(() => {
@@ -254,6 +250,7 @@
           :options="groups"
           option-label="name"
           placeholder="Группа"
+          filter-placeholder="Поиск группы"
         />
         <Button
           target="_blank"
