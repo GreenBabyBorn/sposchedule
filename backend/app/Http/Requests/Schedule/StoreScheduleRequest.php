@@ -63,6 +63,9 @@ class StoreScheduleRequest extends FormRequest
                         ->where('type', $type);
                 }),
             ],
+            'semester_id' => 'required|exists:semesters,id',
+            'lessons' => 'nullable|array',
+
             'type' => [
                 'required',
                 Rule::in(['main', 'changes']),

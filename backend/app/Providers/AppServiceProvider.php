@@ -36,33 +36,15 @@ class AppServiceProvider extends ServiceProvider
 
             $scheduleId = $data['schedule_id'];
             $index = $data['index'];
-            $weekType = array_key_exists('week_type', $data) ? $data['week_type'] : null;
+            $weekType = $data['week_type'];
 
-
-            // Check for existing lessons
             $existingLessons = Lesson::where('schedule_id', $scheduleId)
-                ->where('index', $index)
-                ->get();
+            ->where('index', $index)
+            ->where('week_type', $weekType)
+            ->exists();
 
-            // Check for a conflicting week type
-            $hasSameType = $existingLessons->contains(function ($lesson) use ($weekType) {
-                return $lesson->week_type === $weekType;
-            });
-
-            if ($hasSameType) {
-                return false;
-            }
-
-            // Allow opposite week types
-            if ($weekType === 'ЧИСЛ' || $weekType === 'ЗНАМ') {
-                $oppositeType = $weekType === 'ЧИСЛ' ? 'ЗНАМ' : 'ЧИСЛ';
-                $oppositeExists = $existingLessons->contains('week_type', $oppositeType);
-
-                return $oppositeExists || $existingLessons->isEmpty();
-            }
-
-            return $existingLessons->isEmpty();
-        }, 'Невозможно добавить урок: дублирование schedule_id и index.');
+            return !$existingLessons;
+        }, 'Номер пары уже существует для данного расписания.');
 
         RateLimiter::for('api', function (Request $request) {
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\HistoryLogger;
 use App\Http\Requests\Schedule\StoreScheduleRequest;
 use App\Http\Requests\Schedule\UpdateScheduleRequest;
+use App\Http\Requests\Lesson\StoreLessonRequest;
 use App\Http\Resources\LessonResource;
 use App\Http\Resources\ScheduleResource;
 use App\Http\Resources\SemesterResource;
@@ -19,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Http\Resources\TeacherResource;
+use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
 {
@@ -125,19 +127,66 @@ class ScheduleController extends Controller
      *
      * @return mixed|\Illuminate\Http\JsonResponse
      */
-    public function createScheduleWithChanges(Request $request)
+    // public function createScheduleWithChanges(Request $request)
+    // {
+    //     $scheduleData = $request->json()->all();
+
+    //     $group = DB::table('groups')->find($scheduleData['group_id']);
+    //     if (! $group) {
+    //         return response()->json(['error' => 'Группа не найдена'], 404);
+    //     }
+
+    //     if (! isset($scheduleData['semester_id']) || ! DB::table('semesters')->find($scheduleData['semester_id'])) {
+    //         return response()->json(['error' => 'Семестр не найден'], 404);
+    //     }
+    //     $carbonDate = Carbon::parse($request->input('date'));
+    //     $newScheduleId = DB::table('schedules')->insertGetId([
+    //         'group_id' => $scheduleData['group_id'],
+    //         'type' => 'changes',
+    //         'date' => $carbonDate,
+    //         'semester_id' => $scheduleData['semester_id'],
+    //         'created_at' => now(),
+    //         'updated_at' => now(),
+    //     ]);
+    //     if (isset($scheduleData['lessons']) && is_array($scheduleData['lessons']) && ! empty($scheduleData['lessons'])) {
+    //         foreach ($scheduleData['lessons'] as $lessonData) {
+    //             $lessonId = DB::table('lessons')->insertGetId([
+    //                 'schedule_id' => $newScheduleId,
+    //                 'subject_id' => $lessonData['subject']['id'],
+    //                 'index' => $lessonData['index'],
+    //                 'week_type' => $lessonData['week_type'],
+    //                 'cabinet' => $lessonData['cabinet'],
+    //                 'building' => $lessonData['building'],
+    //                 'message' => $lessonData['message'] ?? null,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]);
+
+    //             if (! empty($lessonData['teachers'])) {
+    //                 foreach ($lessonData['teachers'] as $teacher) {
+    //                     DB::table('lesson_teacher')->insert([
+    //                         'lesson_id' => $lessonId,
+    //                         'teacher_id' => $teacher['id'],
+    //                         'created_at' => now(),
+    //                         'updated_at' => now(),
+    //                     ]);
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return response()->json([
+    //         'schedule_id' => $newScheduleId,
+    //         'message' => 'Новое расписание с изменениями успешно создано',
+    //     ]);
+    // }
+    public function createScheduleWithChanges(StoreScheduleRequest $request)
     {
-        $scheduleData = $request->json()->all();
+        // Валидация расписания уже выполнена через StoreScheduleRequest
+        $scheduleData = $request->validated();
 
-        $group = DB::table('groups')->find($scheduleData['group_id']);
-        if (! $group) {
-            return response()->json(['error' => 'Группа не найдена'], 404);
-        }
-
-        if (! isset($scheduleData['semester_id']) || ! DB::table('semesters')->find($scheduleData['semester_id'])) {
-            return response()->json(['error' => 'Семестр не найден'], 404);
-        }
-        $carbonDate = Carbon::parse($request->input('date'));
+        // Создаем новое расписание
+        $carbonDate = Carbon::parse($scheduleData['date']);
         $newScheduleId = DB::table('schedules')->insertGetId([
             'group_id' => $scheduleData['group_id'],
             'type' => 'changes',
@@ -146,22 +195,48 @@ class ScheduleController extends Controller
             'created_at' => now(),
             'updated_at' => now(),
         ]);
-        if (isset($scheduleData['lessons']) && is_array($scheduleData['lessons']) && ! empty($scheduleData['lessons'])) {
+
+        // Массив для хранения всех уроков
+        $lessons = [];
+
+        // Если уроки переданы, проходимся по ним
+        if (!empty($scheduleData['lessons']) && is_array($scheduleData['lessons'])) {
             foreach ($scheduleData['lessons'] as $lessonData) {
+                // Убедитесь, что передаете все данные, включая schedule_id, для уникальности
+                $lessonData['schedule_id'] = $newScheduleId;
+
+                // Валидация каждого урока
+                $validator = Validator::make($lessonData, (new StoreLessonRequest())->rules());
+
+                if ($validator->fails()) {
+                    return response()->json([
+                        'message' => $validator->errors()->first(),
+                        'errors' => $validator->errors(),
+                    ], 422);
+                }
+
+                $lessonValidated = $validator->validated();
+
+                // Создаем урок
                 $lessonId = DB::table('lessons')->insertGetId([
                     'schedule_id' => $newScheduleId,
-                    'subject_id' => $lessonData['subject']['id'],
-                    'index' => $lessonData['index'],
-                    'week_type' => $lessonData['week_type'],
-                    'cabinet' => $lessonData['cabinet'],
-                    'building' => $lessonData['building'],
-                    'message' => $lessonData['message'] ?? null,
+                    'subject_id' => $lessonValidated['subject']['id'],
+                    'index' => $lessonValidated['index'],
+                    'week_type' => $lessonValidated['week_type'],
+                    'cabinet' => $lessonValidated['cabinet'],
+                    'building' => $lessonValidated['building'],
+                    'message' => $lessonValidated['message'] ?? null,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
 
-                if (! empty($lessonData['teachers'])) {
-                    foreach ($lessonData['teachers'] as $teacher) {
+                // Добавление данных урока в массив
+                $lessonValidated['id'] = $lessonId;
+                $lessons[] = $lessonValidated;
+
+                // Привязка учителей
+                if (!empty($lessonValidated['teachers'])) {
+                    foreach ($lessonValidated['teachers'] as $teacher) {
                         DB::table('lesson_teacher')->insert([
                             'lesson_id' => $lessonId,
                             'teacher_id' => $teacher['id'],
@@ -173,11 +248,13 @@ class ScheduleController extends Controller
             }
         }
 
-        return response()->json([
-            'schedule_id' => $newScheduleId,
-            'message' => 'Новое расписание с изменениями успешно создано',
-        ]);
+        // Получаем полное расписание, включая уроки
+        $newSchedule = DB::table('schedules')->where('id', $newScheduleId)->first();
+
+        // Возвращаем полное расписание с уроками
+        return response()->json($newSchedule);
     }
+
 
     /**
      * Summary of getChangesSchedules

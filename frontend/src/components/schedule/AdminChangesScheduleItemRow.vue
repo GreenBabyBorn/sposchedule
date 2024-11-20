@@ -16,6 +16,7 @@
   }
 
   const props = defineProps<Props>();
+  const initialLesson = JSON.parse(JSON.stringify(props.lesson));
 
   const teachers = toRef(() => props.teachers);
   const subjects = toRef(() => props.subjects);
@@ -32,6 +33,7 @@
   };
 
   const editLesson = (lesson: Lesson) => {
+    if (JSON.stringify(initialLesson) === JSON.stringify(lesson)) return;
     emit('editLesson', lesson);
   };
 </script>

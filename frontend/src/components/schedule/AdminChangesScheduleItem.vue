@@ -116,7 +116,7 @@
         selectedGroup,
       ],
 
-      (oldData: any) => {
+      (oldData: unknown) => {
         if (!oldData) return;
         const newData: ChangesSchedules = JSON.parse(JSON.stringify(oldData));
 
@@ -156,6 +156,7 @@
     cabinet: null,
     message: null,
   });
+
   watch(lessons, () => {
     newLesson.index =
       Number(lessons.value?.slice(-1)?.[0]?.index) + 1 || newLesson.index;
@@ -167,6 +168,15 @@
   const { mutateAsync: storeLesson, data: createdLesson } = useStoreLesson();
 
   async function addNewLesson() {
+    if (lessons.value.find(l => l.index === newLesson.index)) {
+      toast.add({
+        severity: 'error',
+        summary: 'Ошибка',
+        detail: `Пара с таким номером уже существует`,
+        life: 3000,
+      });
+      return;
+    }
     // Если тип расписания 'main', конвертируем его в изменения
     if (type.value === 'main') {
       try {
@@ -174,6 +184,7 @@
           body: {
             group_id: props.group.id,
             lessons: lessons.value,
+            type: 'changes',
             date: props.date,
             semester_id: props.semester.id,
           },
@@ -213,7 +224,7 @@
     if (schedule.value.id && type.value !== 'main') {
       scheduleIdforLesson = schedule.value.id;
     } else if (type.value === 'main') {
-      scheduleIdforLesson = newChanges.value?.schedule_id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
+      scheduleIdforLesson = newChanges.value?.id; // Убедитесь, что newChanges имеет значение перед доступом к его свойствам
     } else {
       scheduleIdforLesson = newSchedule.value?.id; // Тоже необходимо проверить наличие значения
     }
@@ -223,6 +234,7 @@
           ...newLesson,
           schedule_id: scheduleIdforLesson,
           subject_id: newLesson.subject?.id,
+          week_type: null,
         },
       });
 
@@ -268,6 +280,16 @@
 
   async function editLesson(item: Lesson) {
     if (!item.id) return;
+
+    if (lessons.value.find(l => l.index === item.index && l.id !== item.id)) {
+      toast.add({
+        severity: 'error',
+        summary: 'Ошибка',
+        detail: `Пара с таким номером уже существует`,
+        life: 3000,
+      });
+      return;
+    }
     // if (!item.message == !item.subject) return;
     for (let s of schedulesChanges.value!.schedules) {
       if (
@@ -296,9 +318,11 @@
         await createScheduleWithChanges({
           body: {
             group_id: props.group.id,
+            type: 'changes',
             lessons: schedule.value?.lessons,
             date: props.date,
             semester_id: props.semester.id,
+            week_type: null,
           },
         });
         await invalidateSchedule();
@@ -338,8 +362,10 @@
           body: {
             group_id: props.group.id,
             lessons: lessonsForChanges,
+            type: 'changes',
             date: props.date,
             semester_id: props.semester.id,
+            week_type: null,
           },
         });
         await invalidateSchedule();
