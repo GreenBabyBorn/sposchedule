@@ -127,7 +127,6 @@
             newData.schedules[i] = updatedSchedule; // Обновление schedule на полученное значение
           }
         }
-
         return newData;
       }
     );

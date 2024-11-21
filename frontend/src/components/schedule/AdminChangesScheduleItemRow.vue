@@ -41,7 +41,7 @@
   <tr v-if="lesson?.index >= 0">
     <td>
       <InputNumber
-        v-model.trim="lesson.index"
+        v-model.trim.number="lesson.index"
         input-id="integeronly"
         input-class="w-full text-center"
         placeholder="№"

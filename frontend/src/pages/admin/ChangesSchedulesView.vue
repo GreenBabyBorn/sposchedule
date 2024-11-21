@@ -70,9 +70,7 @@
     selectedGroup
   );
 
-  watchEffect(() => {
-    return setSchedulesChanges(changesSchedules.value);
-  });
+  watch(changesSchedules, setSchedulesChanges, { deep: true });
 
   watch(
     [formattedDate, building, selectedCourse, selectedGroup],
