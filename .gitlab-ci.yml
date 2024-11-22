@@ -1,6 +1,10 @@
 stages:
   - deploy
 
+default:
+  tags:
+    - cloud-ru
+
 deploy:
   stage: deploy
   script:
