@@ -327,60 +327,54 @@ class ScheduleController extends Controller
         }
 
         $query = "
-            SELECT 
-                g.id as group_id,
-                g.name as group_name,
-                s.id as schedule_id,
-                s.published as published,
-                s.week_day,
-                s.type,
-                s.updated_at,
-                json_build_object(
-                    'id', g.id,
-                    'name', g.name
-                ) as group,
-                json_agg(
+            SELECT  g.id as group_id,
+                    g.name as group_name,
+                    s.id as schedule_id, 
+                    s.published as published, 
+                    s.week_day, 
+                    s.type, 
+                    s.updated_at,
                     json_build_object(
-                        'id', l.id,
-                        'index', l.index,
-                        'schedule_id', s.id,
-                        'subject', json_build_object(
-                            'id', subj.id,
-                            'name', subj.name
-                        ),
-                        'week_type', l.week_type,
-                        'cabinet', l.cabinet,
-                        'building', l.building,
-                        'message', l.message,
-                        'teachers', COALESCE(lt.teachers, '[]'::json)
-                    )
-                ) as lessons
-            FROM 
-                groups g
-            JOIN 
-                schedules s ON g.id = s.group_id
-            LEFT JOIN 
-                lessons l ON s.id = l.schedule_id
-            LEFT JOIN 
-                subjects subj ON l.subject_id = subj.id
-            LEFT JOIN LATERAL (
-                SELECT json_agg(
-                    json_build_object(
-                        'id', t.id,
-                        'name', t.name
-                    )
-                ) as teachers
-                FROM lesson_teacher lt
-                JOIN teachers t ON lt.teacher_id = t.id
-                WHERE lt.lesson_id = l.id
-            ) lt ON true
-            WHERE 
+                        'id', g.id,
+                        'name', g.name
+                    ) as group,
+                    json_agg(
+                        json_build_object(
+                            'id', l.id, 
+                            'index', l.index, 
+                            'schedule_id', s.id, 
+                            'subject', json_build_object(
+                                'id', subj.id,
+                                'name', subj.name
+                            ), 
+                            'week_type', l.week_type, 
+                            'cabinet', l.cabinet,
+                            'building', l.building,
+                            'message', l.message,
+                            'teachers', COALESCE(
+                                (
+                                    SELECT json_agg(
+                                        json_build_object(
+                                            'id', t.id,
+                                            'name', t.name
+                                        )
+                                    )
+                                    FROM lesson_teacher lt
+                                    JOIN teachers t ON lt.teacher_id = t.id
+                                    WHERE lt.lesson_id = l.id
+                                ), '[]'::json
+                            ) 
+                        )
+                    ) as lessons
+            FROM groups g
+            LEFT JOIN schedules s ON g.id = s.group_id
+            LEFT JOIN lessons l ON s.id = l.schedule_id
+            LEFT JOIN subjects subj ON l.subject_id = subj.id
+         
+            WHERE (
                 (s.type = 'changes' AND s.date = :date)
                 OR (s.type = 'main' AND s.published = TRUE AND s.week_day = :week_day AND s.semester_id = :semester_id)
-            GROUP BY 
-                g.id, g.name, s.id, s.published, s.week_day, s.type, s.updated_at
-            ORDER BY 
-                g.name;
+            )
         ";
 
         $params = [
@@ -412,7 +406,7 @@ class ScheduleController extends Controller
             $params['group_name'] = "%{$groupName}%";
         }
 
-        // $query .= ' GROUP BY g.name, s.id, g.id ORDER BY g.name';
+        $query .= ' GROUP BY g.name, s.id, g.id ORDER BY g.name';
 
         $schedules = DB::select($query, $params);
 

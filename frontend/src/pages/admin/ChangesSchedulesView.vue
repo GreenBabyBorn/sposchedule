@@ -122,7 +122,7 @@
     updateQueryParams();
   });
 
-  const { data: groups } = useGroupsPublicQuery(building, course);
+  const { data: groups } = useGroupsPublicQuery(null, building, course);
 
   const { data: buildingsFethed } = useBuildingsQuery();
   const buildings = computed(() => {
