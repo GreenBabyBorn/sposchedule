@@ -8,6 +8,10 @@ default:
 deploy:
   stage: deploy
   script:
+    - echo "Setting up environment files..."
+    - echo "$backend_env" > ./backend/.env
+    - echo "$frontend_env" > ./frontend/.env
+
     - echo "Getting Commit SHA..."
     - export SHA_SHORT=$(git rev-parse --short HEAD)
     - echo "SHA_SHORT=${SHA_SHORT}" >> .gitlab-ci.env
@@ -16,15 +20,11 @@ deploy:
     - export IMAGE_TAG="dev-${SHA_SHORT}"
     - echo "IMAGE_TAG=${IMAGE_TAG}" >> .gitlab-ci.env
 
-    - echo "Pulling latest changes from the dev branch..."
-    - cd /home/green/sposchedule
-    - git pull origin dev
-
     - echo "Stopping and removing old containers..."
-    - docker compose -f /home/green/sposchedule/docker-compose.prod.yml -p sposchedule down
+    - docker compose -f docker-compose.prod.yml -p sposchedule down
 
     - echo "Rebuilding and starting containers..."
-    - docker compose -f /home/green/sposchedule/docker-compose.prod.yml -p sposchedule up -d --build
+    - docker compose -f docker-compose.prod.yml -p sposchedule up -d --build
 
   only:
     - dev
