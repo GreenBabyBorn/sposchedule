@@ -9,8 +9,8 @@ deploy:
   stage: deploy
   script:
     - echo "Setting up environment files..."
-    - echo -e "${backend_env}"  > ./backend/.env
-    - echo -e "${frontend_env}" > ./frontend/.env
+    - cp "${backend_env}"  ./backend/.env
+    - cp "${frontend_env}"  ./frontend/.env
 
     - echo "Getting Commit SHA..."
     - export SHA_SHORT=$(git rev-parse --short HEAD)
