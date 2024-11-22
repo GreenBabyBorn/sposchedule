@@ -39,7 +39,9 @@ class TeacherController extends Controller
         in_array($orderDirection, ['asc', 'desc'])) {
             $query->orderBy($orderField, $orderDirection);
         }
-
+        if ($request->query('subjects', false)) {
+            $query->with('subjects');
+        }
         // Получаем отфильтрованные группы
         $teachers = $query->get();
 

@@ -27,7 +27,9 @@ class SubjectController extends Controller
         in_array($orderDirection, ['asc', 'desc'])) {
             $query->orderBy($orderField, $orderDirection);
         }
-
+        if ($request->query('teachers', false)) {
+            $query->with('teachers');
+        }
         // Получаем отфильтрованные группы
         $subjects = $query->get();
 

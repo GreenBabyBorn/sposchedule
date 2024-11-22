@@ -96,6 +96,7 @@
     isFetched,
     isError,
     isLoading,
+    isFetching,
   } = usePublicSchedulesQuery(
     isoDate,
     building,
@@ -549,7 +550,7 @@
         >Расписание ещё не выложили, либо в расписании ошибка.</span
       >
       <div class="schedules">
-        <template v-if="isLoading">
+        <template v-if="isLoading || isFetching">
           <div v-for="item in 32" :key="item" class="schedule">
             <Skeleton height="2rem" class="mb-4" />
             <Skeleton height="10rem" />

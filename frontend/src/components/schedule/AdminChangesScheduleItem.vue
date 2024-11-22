@@ -237,28 +237,6 @@
         },
       });
 
-      for (let s of schedulesChanges.value!.schedules) {
-        if (
-          s.lessons?.find(
-            l =>
-              l.cabinet === newLesson.cabinet &&
-              l.index === newLesson.index &&
-              l.schedule_id !== scheduleIdforLesson &&
-              l.cabinet !== null &&
-              newLesson.cabinet !== null &&
-              l.cabinet.length > 1 &&
-              newLesson.cabinet.length > 1
-          )
-        ) {
-          toast.add({
-            severity: 'warn',
-            summary: 'Внимание',
-            detail: `Кабинет ${newLesson.cabinet} уже используется в расписании ${s.group.name} ${newLesson.index} парой`,
-            life: 5000,
-          });
-        }
-      }
-
       await invalidateSchedule();
 
       newLesson.subject = null;
@@ -290,27 +268,6 @@
       return;
     }
     // if (!item.message == !item.subject) return;
-    for (let s of schedulesChanges.value!.schedules) {
-      if (
-        s.lessons?.find(
-          l =>
-            l.cabinet === item.cabinet &&
-            l.index === item.index &&
-            l.schedule_id !== item.schedule_id &&
-            l.cabinet !== null &&
-            item.cabinet !== null &&
-            l.cabinet.length > 1 &&
-            item.cabinet.length > 1
-        )
-      ) {
-        toast.add({
-          severity: 'warn',
-          summary: 'Внимание',
-          detail: `Кабинет ${item.cabinet} уже используется в расписании ${s.group.name} ${item.index} парой`,
-          life: 5000,
-        });
-      }
-    }
 
     if (type.value === 'main') {
       try {
@@ -439,11 +396,8 @@
   };
 
   const enabledEdit = useStorage('enableEdit', false);
-
   const { data: subjects } = useSubjectsQuery({ teachers: true });
-
   const { data: teachers } = useTeachersQuery({ subjects: true });
-
   const subject = toRef(() => newLesson?.subject);
 
   const { data: teachersFromSubjectMain, isSuccess } =

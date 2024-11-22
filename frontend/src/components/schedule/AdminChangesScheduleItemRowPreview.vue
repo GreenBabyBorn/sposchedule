@@ -1,16 +1,42 @@
 <script setup lang="ts">
-  import { toRef } from 'vue';
+  import { computed, toRef } from 'vue';
   import type { Lesson } from './types';
+  import { useScheduleStore } from '@/stores/schedule';
+  import { storeToRefs } from 'pinia';
 
   interface Props {
     lesson: Lesson;
     isEdit: boolean;
   }
 
+  const scheduleStore = useScheduleStore();
+  const { schedulesChanges } = storeToRefs(scheduleStore);
+
   const props = defineProps<Props>();
 
   const isEdit = toRef(() => props.isEdit);
   const lesson = toRef(() => props.lesson);
+
+  const isDuplicateCabinet = computed(() => {
+    for (let s of schedulesChanges.value!.schedules) {
+      if (
+        s.lessons?.find(
+          l =>
+            l.cabinet === lesson.value.cabinet &&
+            l.index === lesson.value.index &&
+            l.building === lesson.value.building &&
+            l.schedule_id !== lesson.value.schedule_id &&
+            l.cabinet !== null &&
+            lesson.value.cabinet !== null &&
+            l.cabinet.length > 1 &&
+            lesson.value.cabinet.length > 1
+        )
+      ) {
+        return true;
+      }
+    }
+    return false;
+  });
 </script>
 <template>
   <tr v-if="lesson?.index >= 0">
@@ -45,7 +71,17 @@
     </td>
     <td v-show="!lesson.message">
       <div v-if="lesson.id" class="text-right">
-        <span v-if="!isEdit" class="p-1">{{ lesson.cabinet }}</span>
+        <span
+          v-if="!isEdit"
+          :class="{ 'text-orange-400': isDuplicateCabinet }"
+          :title="
+            isDuplicateCabinet
+              ? 'Кабинет на эту пару уже используется в другом расписании'
+              : ''
+          "
+          class="p-1"
+          >{{ lesson.cabinet }}</span
+        >
       </div>
       <div v-if="lesson.id" class="text-right">
         <span v-if="!isEdit" class="p-1 opacity-50">{{

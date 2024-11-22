@@ -3,23 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Facades\HistoryLogger;
+use App\Http\Requests\Lesson\StoreLessonRequest;
 use App\Http\Requests\Schedule\StoreScheduleRequest;
 use App\Http\Requests\Schedule\UpdateScheduleRequest;
-use App\Http\Requests\Lesson\StoreLessonRequest;
 use App\Http\Resources\LessonResource;
 use App\Http\Resources\ScheduleResource;
 use App\Http\Resources\SemesterResource;
 use App\Http\Resources\SkinnyGroup;
+use App\Http\Resources\TeacherResource;
 use App\Models\Group;
 use App\Models\Lesson;
 use App\Models\Schedule;
-use App\Models\Teacher;
-use App\Models\Subject;
 use App\Models\Semester;
+use App\Models\Subject;
+use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use App\Http\Resources\TeacherResource;
 use Illuminate\Support\Facades\Validator;
 
 class ScheduleController extends Controller
@@ -71,6 +71,7 @@ class ScheduleController extends Controller
             action: 'Обновлено '.($schedule->type === 'main' ? 'основное' : 'измененное').
             ' расписание на '.($schedule->week_day ?? Carbon::parse($schedule->date)->translatedFormat('d F Y')).' для группы '.$schedule->group?->name
         );
+
         return new ScheduleResource($schedule);
     }
 
@@ -200,7 +201,7 @@ class ScheduleController extends Controller
         $lessons = [];
 
         // Если уроки переданы, проходимся по ним
-        if (!empty($scheduleData['lessons']) && is_array($scheduleData['lessons'])) {
+        if (! empty($scheduleData['lessons']) && is_array($scheduleData['lessons'])) {
             foreach ($scheduleData['lessons'] as $lessonData) {
                 // Убедитесь, что передаете все данные, включая schedule_id, для уникальности
                 $lessonData['schedule_id'] = $newScheduleId;
@@ -235,7 +236,7 @@ class ScheduleController extends Controller
                 $lessons[] = $lessonValidated;
 
                 // Привязка учителей
-                if (!empty($lessonValidated['teachers'])) {
+                if (! empty($lessonValidated['teachers'])) {
                     foreach ($lessonValidated['teachers'] as $teacher) {
                         DB::table('lesson_teacher')->insert([
                             'lesson_id' => $lessonId,
@@ -254,7 +255,6 @@ class ScheduleController extends Controller
         // Возвращаем полное расписание с уроками
         return response()->json($newSchedule);
     }
-
 
     /**
      * Summary of getChangesSchedules
@@ -327,54 +327,60 @@ class ScheduleController extends Controller
         }
 
         $query = "
-            SELECT  g.id as group_id,
-                    g.name as group_name,
-                    s.id as schedule_id, 
-                    s.published as published, 
-                    s.week_day, 
-                    s.type, 
-                    s.updated_at,
+            SELECT 
+                g.id as group_id,
+                g.name as group_name,
+                s.id as schedule_id,
+                s.published as published,
+                s.week_day,
+                s.type,
+                s.updated_at,
+                json_build_object(
+                    'id', g.id,
+                    'name', g.name
+                ) as group,
+                json_agg(
                     json_build_object(
-                        'id', g.id,
-                        'name', g.name
-                    ) as group,
-                    json_agg(
-                        json_build_object(
-                            'id', l.id, 
-                            'index', l.index, 
-                            'schedule_id', s.id, 
-                            'subject', json_build_object(
-                                'id', subj.id,
-                                'name', subj.name
-                            ), 
-                            'week_type', l.week_type, 
-                            'cabinet', l.cabinet,
-                            'building', l.building,
-                            'message', l.message,
-                            'teachers', COALESCE(
-                                (
-                                    SELECT json_agg(
-                                        json_build_object(
-                                            'id', t.id,
-                                            'name', t.name
-                                        )
-                                    )
-                                    FROM lesson_teacher lt
-                                    JOIN teachers t ON lt.teacher_id = t.id
-                                    WHERE lt.lesson_id = l.id
-                                ), '[]'::json
-                            ) 
-                        )
-                    ) as lessons
-            FROM groups g
-            LEFT JOIN schedules s ON g.id = s.group_id
-            LEFT JOIN lessons l ON s.id = l.schedule_id
-            LEFT JOIN subjects subj ON l.subject_id = subj.id
-         
-            WHERE (
+                        'id', l.id,
+                        'index', l.index,
+                        'schedule_id', s.id,
+                        'subject', json_build_object(
+                            'id', subj.id,
+                            'name', subj.name
+                        ),
+                        'week_type', l.week_type,
+                        'cabinet', l.cabinet,
+                        'building', l.building,
+                        'message', l.message,
+                        'teachers', COALESCE(lt.teachers, '[]'::json)
+                    )
+                ) as lessons
+            FROM 
+                groups g
+            JOIN 
+                schedules s ON g.id = s.group_id
+            LEFT JOIN 
+                lessons l ON s.id = l.schedule_id
+            LEFT JOIN 
+                subjects subj ON l.subject_id = subj.id
+            LEFT JOIN LATERAL (
+                SELECT json_agg(
+                    json_build_object(
+                        'id', t.id,
+                        'name', t.name
+                    )
+                ) as teachers
+                FROM lesson_teacher lt
+                JOIN teachers t ON lt.teacher_id = t.id
+                WHERE lt.lesson_id = l.id
+            ) lt ON true
+            WHERE 
                 (s.type = 'changes' AND s.date = :date)
                 OR (s.type = 'main' AND s.published = TRUE AND s.week_day = :week_day AND s.semester_id = :semester_id)
-            )
+            GROUP BY 
+                g.id, g.name, s.id, s.published, s.week_day, s.type, s.updated_at
+            ORDER BY 
+                g.name;
         ";
 
         $params = [
@@ -406,7 +412,7 @@ class ScheduleController extends Controller
             $params['group_name'] = "%{$groupName}%";
         }
 
-        $query .= ' GROUP BY g.name, s.id, g.id ORDER BY g.name';
+        // $query .= ' GROUP BY g.name, s.id, g.id ORDER BY g.name';
 
         $schedules = DB::select($query, $params);
 
@@ -439,7 +445,7 @@ class ScheduleController extends Controller
                 }
             }
 
-            if (empty($filteredLessons) && !$schedule->type) {
+            if (empty($filteredLessons) && ! $schedule->type) {
                 continue;
             }
 
@@ -487,7 +493,7 @@ class ScheduleController extends Controller
     {
         $request->validate([
             'date' => ['required', 'date'],
-            ]);
+        ]);
 
         $date = $request->input('date');
         $carbonDate = Carbon::parse($date);
@@ -603,7 +609,7 @@ class ScheduleController extends Controller
                 }
             }
 
-            if (empty($filteredLessons) && !$schedule->type) {
+            if (empty($filteredLessons) && ! $schedule->type) {
                 continue;
             }
 
@@ -622,7 +628,6 @@ class ScheduleController extends Controller
 
         return response()->json($finalSchedule);
     }
-
 
     /**
      * Summary of getPublicSchedules
@@ -1303,7 +1308,7 @@ class ScheduleController extends Controller
             ->whereDate('end', '>=', $data['date'])
             ->first();
 
-        if (!$semester) {
+        if (! $semester) {
             return response()->json(['message' => 'Семестр не найден для указанной даты'], 404);
         }
 
@@ -1338,7 +1343,7 @@ class ScheduleController extends Controller
             ->whereDate('end', '>=', Carbon::parse($data['date']))
             ->first();
 
-        if (!$semester) {
+        if (! $semester) {
             return response()->json(['message' => 'Семестр не найден для указанной даты'], 404);
         }
 
@@ -1355,12 +1360,10 @@ class ScheduleController extends Controller
         // Получаем уникальных преподавателей, которые ведут указанный предмет в этих расписаниях
         $teachers = Teacher::whereHas('lessons', function ($query) use ($schedules, $data) {
             $query->whereIn('schedule_id', $schedules)
-                  ->where('subject_id', $data['subject_id']);
+                ->where('subject_id', $data['subject_id']);
         })->distinct()->get();
 
         return TeacherResource::collection($teachers);
 
     }
-
-
 }
