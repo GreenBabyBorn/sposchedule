@@ -5,6 +5,7 @@ services:
         build:
             context: .
             dockerfile: ./frontend/Dockerfile
+        image: sposchedule-frontend:${IMAGE_TAG}
         ports:
             - "8080:80"
         networks:
@@ -15,6 +16,7 @@ services:
         build:
             context: .
             dockerfile: ./backend/Dockerfile
+        image: sposchedule-backend:${IMAGE_TAG}
         restart: unless-stopped
         ports:
             - "82:80"
