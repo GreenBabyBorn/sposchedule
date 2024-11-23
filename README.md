@@ -26,7 +26,7 @@
 
 ### DevOps
 
-- **GitHub Actions** — для CI/CD.
+- **GitLab** — для CI/CD.
 - **Docker Compose** — для развертывания приложения.
 
 

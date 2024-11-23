@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import DatePicker from 'primevue/datepicker';
   import ChangesScheduleItem from '@/components/schedule/AdminChangesScheduleItem.vue';
-  import { computed, onMounted, watch, watchEffect } from 'vue';
+  import { onMounted, watch } from 'vue';
   import {
     useChangesSchedulesQuery,
     useCoursesQuery,
@@ -35,15 +35,6 @@
   const { setSchedulesChanges } = scheduleStore;
 
   const { data: courses } = useCoursesQuery(building);
-
-  const coursesWithLabel = computed(() => {
-    return (
-      courses.value?.map(course => ({
-        label: `${course.course} курс`,
-        value: course.course,
-      })) || []
-    );
-  });
 
   const updateQueryParams = () => {
     router.replace({
@@ -125,29 +116,17 @@
   const { data: groups } = useGroupsPublicQuery(null, building, course);
 
   const { data: buildingsFethed } = useBuildingsQuery();
-  const buildings = computed(() => {
-    return (
-      buildingsFethed.value?.map(building => ({
-        value: building.name,
-        label: `${building.name} корпус`,
-      })) || []
-    );
-  });
 
-  function handleDatePickerBtns(day: 'today' | 'tomorrow') {
-    switch (day) {
-      case 'today':
-        date.value = new Date();
-        break;
-
-      case 'tomorrow': {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        date.value = tomorrow;
-        break;
-      }
-    }
-  }
+  const handleDatePickerBtns = {
+    today: () => {
+      date.value = new Date();
+    },
+    tomorrow: () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      date.value = tomorrow;
+    },
+  };
 </script>
 
 <template>
@@ -211,13 +190,13 @@
                 severity="secondary"
                 size="small"
                 label="Сегодня"
-                @click="handleDatePickerBtns('today')"
+                @click="handleDatePickerBtns.today"
               />
               <Button
                 severity="secondary"
                 size="small"
                 label="Завтра"
-                @click="handleDatePickerBtns('tomorrow')"
+                @click="handleDatePickerBtns.tomorrow"
               />
             </div>
           </template>
@@ -226,7 +205,12 @@
           v-model="building"
           title="Корпус"
           show-clear
-          :options="buildings"
+          :options="
+            buildingsFethed?.map(building => ({
+              value: building.name,
+              label: `${building.name} корпус`,
+            })) || []
+          "
           option-label="label"
           option-value="value"
           placeholder="Корпус"
@@ -234,7 +218,12 @@
         <Select
           v-model="course"
           show-clear
-          :options="coursesWithLabel"
+          :options="
+            courses?.map(course => ({
+              label: `${course.course} курс`,
+              value: course.course,
+            })) || []
+          "
           option-label="label"
           option-value="value"
           placeholder="Курс"
