@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { ref } from 'vue';
-  import DataTable from 'primevue/datatable';
+  import DataTable, {
+    type DataTableRowEditSaveEvent,
+  } from 'primevue/datatable';
   import Column from 'primevue/column';
   import InputText from 'primevue/inputtext';
   import Button from 'primevue/button';
@@ -14,6 +16,7 @@
     useDestroySemester,
   } from '@/queries/semesters';
   import { useConfirm } from 'primevue/useconfirm';
+  import { isAxiosError } from 'axios';
 
   const { data: semesters } = useSemestersQuery();
 
@@ -22,12 +25,12 @@
   const newSemesterError = ref(false);
 
   const editingRows = ref([]);
-  const selectedSemesters = ref([]);
+  const selectedSemesters = ref<{ id: number }[] | null>([]);
 
   const dates = ref();
   const years = ref();
 
-  const indexSemester = ref(1);
+  const indexSemester = ref('1');
   // const yearsSemester = ref(new Date(years.value[0]).getFullYear() + new Date(years.value[1]).getFullYear())
   // const startSemester = ref(dates.value[0])
   // const endSemester = ref(dates.value[1])
@@ -43,15 +46,18 @@
         end: dates.value[1],
       });
     } catch (e) {
-      newSemesterError.value = true;
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
-      // inputSemester = { years: '', index: 1 }
+      if (isAxiosError(e)) {
+        newSemesterError.value = true;
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
+        // inputSemester = { years: '', index: 1 }
+      }
+
       return;
     }
     newSemesterError.value = false;
@@ -59,18 +65,19 @@
   };
 
   const { mutateAsync, isPending: isUpdated } = useUpdateSemester();
-  const onRowEditSave = async event => {
+  const onRowEditSave = async (event: DataTableRowEditSaveEvent) => {
     let { newData } = event;
     try {
       await mutateAsync({ id: newData.id, body: newData });
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+      if (isAxiosError(e))
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
       return;
     }
   };
@@ -78,19 +85,20 @@
   const { mutateAsync: destroySemester, isPending: isDestroyed } =
     useDestroySemester();
   const deleteSemesters = async () => {
-    if (!selectedSemesters.value.length) return;
+    if (!selectedSemesters.value?.length) return;
 
     for (let i = 0; i < selectedSemesters.value.length; i++) {
       try {
         await destroySemester(selectedSemesters.value[i].id);
       } catch (e) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
+        if (isAxiosError(e))
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail: e.response?.data.message,
+            life: 3000,
+            closable: true,
+          });
         return;
       }
     }
@@ -198,7 +206,7 @@
           <div class="flex justify-between">
             <Button
               severity="danger"
-              :disabled="!selectedSemesters.length || !semesters.length"
+              :disabled="!selectedSemesters?.length || !semesters.length"
               type="button"
               icon="pi pi-trash"
               label="Удалить"

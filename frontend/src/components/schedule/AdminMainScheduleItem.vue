@@ -61,10 +61,7 @@
 
     try {
       await updateLesson({
-        lesson: {
-          ...lesson,
-          subject_id: lesson.subject.id,
-        },
+        lesson: { ...lesson, subject_id: lesson.subject.id },
       });
     } catch (e) {
       showError(e);
@@ -253,7 +250,7 @@
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
-        detail: e?.response.data.message,
+        detail: e.response?.data.message,
         life: 3000,
         closable: true,
       });

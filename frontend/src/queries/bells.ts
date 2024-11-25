@@ -1,8 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
-import { computed } from 'vue';
+import { computed, type Ref } from 'vue';
 
-export function useBellsQuery(type, building, weekDay?, date?) {
+export function useBellsQuery(
+  type: Ref,
+  building: Ref,
+  weekDay?: Ref,
+  date?: Ref
+) {
   const typeValues = {
     Основное: 'main',
     Изменения: 'changes',
@@ -24,7 +29,7 @@ export function useBellsQuery(type, building, weekDay?, date?) {
   });
 }
 
-export function usePublicBellsQuery(building, date) {
+export function usePublicBellsQuery(building: Ref, date: Ref) {
   const enabled = computed(() => Boolean(date?.value));
 
   return useQuery({
@@ -43,7 +48,7 @@ export function usePublicBellsQuery(building, date) {
     },
   });
 }
-export function usePublicBellsPrintQuery(buildings, date) {
+export function usePublicBellsPrintQuery(buildings: Ref, date: Ref) {
   const enabled = computed(() => Boolean(date?.value));
 
   return useQuery({

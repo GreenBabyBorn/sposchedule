@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { useDateFormat } from '@vueuse/core';
-  import DataTable from 'primevue/datatable';
+  import DataTable, { type DataTablePageEvent } from 'primevue/datatable';
   import Column from 'primevue/column';
   import { FilterMatchMode } from '@primevue/core/api';
   import { useHistoryQuery } from '@/queries/history';
@@ -33,7 +33,7 @@
   //             await destroyHistory(selectedHistories.value[i].id)
   //         }
   //         catch (e) {
-  //             toast.add({ severity: 'error', summary: 'Ошибка', detail: e?.response.data.message, life: 3000, closable: true });
+  //             toast.add({ severity: 'error', summary: 'Ошибка', detail: e.response?.data.message, life: 3000, closable: true });
   //             return
   //         }
   //     }
@@ -47,7 +47,7 @@
     created_at: { value: null, matchMode: FilterMatchMode.DATE_IS },
   });
 
-  function eventPage(event) {
+  function eventPage(event: DataTablePageEvent) {
     currentPage.value = event.page + 1;
     rowsPerPage.value = event.rows;
   }

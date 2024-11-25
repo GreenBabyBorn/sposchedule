@@ -7,6 +7,7 @@
   import { useUserUpdate } from '@/queries/users';
   import { reactive } from 'vue';
   import { useToast } from 'primevue/usetoast';
+  import { isAxiosError } from 'axios';
 
   const toast = useToast();
   const authStore = useAuthStore();
@@ -33,13 +34,14 @@
         closable: true,
       });
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+      if (isAxiosError(e))
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
       return;
     }
   }
@@ -57,13 +59,14 @@
         closable: true,
       });
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+      if (isAxiosError(e))
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
       return;
     }
     password.password = '';

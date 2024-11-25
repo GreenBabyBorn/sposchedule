@@ -2,7 +2,6 @@ import type {
   ChangesSchedules,
   Group,
   MainSchedule,
-  Schedule,
 } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
@@ -64,39 +63,6 @@ export function useChangesSchedulesQuery(
 
   return query;
 }
-
-// export function useChangesScheduleQuery(schedule_id: number, enabled: any) {
-//   const e = computed(() => Boolean(enabled.value));
-//   return useQuery({
-//     enabled: e,
-//     queryKey: ['schedule', schedule_id],
-//     queryFn: async () => {
-//       console.log('ФЕТЧ ОДНОГО РАСПИАНИЯ');
-//       return (await axios.get(`/api/schedules/${schedule_id}`))
-//         .data as Schedule;
-//     },
-//   });
-// }
-
-// export function useChangesGroupScheduleQuery(
-//   date: Ref<any>,
-//   group: Ref<Group>,
-//   enabled: Ref<boolean>
-// ) {
-//   return useQuery({
-//     enabled: enabled,
-//     queryKey: ['schedule', date, group],
-//     queryFn: async () => {
-//       return (
-//         await axios.get(`/api/groups/${group.value.id}/schedule`, {
-//           params: {
-//             date: date?.value,
-//           },
-//         })
-//       ).data as Schedule;
-//     },
-//   });
-// }
 
 export function usePrintChangesSchedulesQuery(date: Ref<any>) {
   const enabled = computed(() => Boolean(date.value));
@@ -166,24 +132,10 @@ export function useCreateScheduleWithChanges() {
   const updateSemesterMutation = useMutation({
     mutationFn: async ({ body }: any) =>
       (await axios.post(`/api/schedules/changes`, body)).data as any,
-    // onSuccess: () => {
-    //   queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
-    // },
   });
   return updateSemesterMutation;
 }
-// export function useUpdateSchedule() {
-//   const queryClient = useQueryClient();
-//   const updateSemesterMutation = useMutation({
-//     mutationFn: ({ id, body }: any) =>
-//       axios.patch(`/api/schedules/${id}`, body),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
-//       queryClient.invalidateQueries({ queryKey: ['scheduleMain'] });
-//     },
-//   });
-//   return updateSemesterMutation;
-// }
+
 export function useUpdateSchedule() {
   const queryClient = useQueryClient();
 

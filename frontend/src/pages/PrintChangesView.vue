@@ -12,10 +12,12 @@
   import {
     monthDeclensions,
     dayNamesWithPreposition,
+    type FullWeekDays,
+    type MonthKey,
   } from '@/composables/constants';
 
   const route = useRoute();
-  const date = ref(null);
+  const date = ref<Date>();
 
   onMounted(() => {
     const dateQuery = route.query?.date as string;
@@ -23,14 +25,13 @@
     if (dateQuery) {
       const [day, month, year] = dateQuery.split('.').map(Number);
 
-      // Проверяем, что все значения (day, month, year) действительно числа
       if (day && month && year) {
         date.value = new Date(year, month - 1, day);
       } else {
-        date.value = new Date(); // Если дата не валидна, устанавливаем текущую дату
+        date.value = new Date();
       }
     } else {
-      date.value = new Date(); // Если query параметр отсутствует, устанавливаем текущую дату
+      date.value = new Date();
     }
   });
 
@@ -43,7 +44,7 @@
     usePrintChangesSchedulesQuery(formattedDate);
 
   const blocks1_5 = computed(() => {
-    const chunkSize = 4; // Размер подмассива
+    const chunkSize = 4;
     const result = [];
 
     for (
@@ -56,9 +57,8 @@
         i + chunkSize
       );
 
-      // Добавление пустых объектов, если подмассив меньше чем 4 элемента
       while (chunk.length < chunkSize) {
-        chunk.push({}); // или chunk.push(null); в зависимости от того, что должно быть в пустых местах
+        chunk.push({});
       }
 
       result.push(chunk);
@@ -68,7 +68,7 @@
   });
 
   const blocks6 = computed(() => {
-    const chunkSize = 4; // Размер подмассива
+    const chunkSize = 4;
     const result = [];
 
     for (
@@ -81,9 +81,8 @@
         i + chunkSize
       );
 
-      // Добавление пустых объектов, если подмассив меньше чем 4 элемента
       while (chunk.length < chunkSize) {
-        chunk.push({}); // или chunk.push(null); в зависимости от того, что должно быть в пустых местах
+        chunk.push({});
       }
 
       result.push(chunk);
@@ -154,7 +153,7 @@
             dayNamesWithPreposition[
               useDateFormat(date, 'dddd', {
                 locales: 'ru-RU',
-              }).value
+              }).value as FullWeekDays
             ]
           }}
           {{
@@ -166,7 +165,7 @@
               monthDeclensions[
                 useDateFormat(date, 'MMMM', {
                   locales: 'ru-RU',
-                }).value
+                }).value as MonthKey
               ]
             } ${
               useDateFormat(date, 'YYYY', {
@@ -282,7 +281,7 @@
             dayNamesWithPreposition[
               useDateFormat(date, 'dddd', {
                 locales: 'ru-RU',
-              }).value
+              }).value as FullWeekDays
             ]
           }}
           {{
@@ -294,7 +293,7 @@
               monthDeclensions[
                 useDateFormat(date, 'MMMM', {
                   locales: 'ru-RU',
-                }).value
+                }).value as MonthKey
               ]
             } ${
               useDateFormat(date, 'YYYY', {

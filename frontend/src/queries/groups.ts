@@ -1,8 +1,9 @@
 import type { Group } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
+import type { Ref } from 'vue';
 
-export function useGroupsQuery(name?, building?, course?) {
+export function useGroupsQuery(name?: Ref, building?: Ref, course?: Ref) {
   return useQuery({
     queryKey: ['groups', name, building, course],
     queryFn: async () => {
@@ -18,7 +19,7 @@ export function useGroupsQuery(name?, building?, course?) {
     },
   });
 }
-export function useGroupsPublicQuery(name?, building?, course?) {
+export function useGroupsPublicQuery(name?: Ref, building?: Ref, course?: Ref) {
   return useQuery({
     queryKey: ['groups', name, building, course],
     queryFn: async () => {
@@ -63,36 +64,10 @@ export function useUpdateGroup() {
 export function useDestroyGroup() {
   const queryClient = useQueryClient();
   const destroyGroupMutation = useMutation({
-    mutationFn: id => axios.delete(`/api/groups/${id}`),
+    mutationFn: (id: number) => axios.delete(`/api/groups/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
     },
   });
   return destroyGroupMutation;
 }
-
-// export function useStoreSemesterForGroup() {
-//   const queryClient = useQueryClient();
-//   let storeGroupMutation = useMutation({
-//     mutationFn: ({ id, semester_id }: any) =>
-//       axios.post(`/api/groups/${id}/semesters`, { semester_id }),
-//     onSuccess: () => {
-//       // queryClient.invalidateQueries({ queryKey: ['groups'] });
-//     },
-//   });
-//   return storeGroupMutation;
-// }
-
-// export function useDestroySemesterForGroup() {
-//   const queryClient = useQueryClient();
-//   let storeGroupMutation = useMutation({
-//     mutationFn: ({ id, semester_id }: any) =>
-//       axios.delete(`/api/groups/${id}/semesters`, {
-//         data: { semester_id },
-//       }),
-//     onSuccess: () => {
-//       // queryClient.invalidateQueries({ queryKey: ['groups'] });
-//     },
-//   });
-//   return storeGroupMutation;
-// }

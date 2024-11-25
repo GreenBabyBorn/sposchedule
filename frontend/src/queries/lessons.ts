@@ -5,6 +5,7 @@ import type {
   ChangesSchedules,
   Lesson,
   Schedule,
+  WeekTypeLesson,
 } from '@/components/schedule/types';
 import { useScheduleStore } from '@/stores/schedule';
 
@@ -38,7 +39,7 @@ export function useUpdateLesson() {
     selectedMainSemester,
   } = storeToRefs(scheduleStore);
   const updateLessonMutation = useMutation({
-    mutationFn: async ({ lesson }: { lesson: Lesson }) =>
+    mutationFn: async ({ lesson }: { lesson: Lesson | WeekTypeLesson }) =>
       (await axios.patch(`/api/lessons/${lesson.id}`, lesson)).data,
     onMutate: async ({ lesson }) => {
       await queryClient.cancelQueries({

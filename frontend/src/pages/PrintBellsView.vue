@@ -13,29 +13,27 @@
   import {
     dayNamesWithPreposition,
     monthDeclensions,
+    type FullWeekDays,
+    type MonthKey,
   } from '@/composables/constants';
+  import { type Bell, type BellsPeriod } from '@/components/bells/types';
 
   const route = useRoute();
 
-  const date = ref(null);
+  const date = ref<Date>();
   const formattedDate = computed(() => {
     return date.value ? useDateFormat(date.value, 'DD.MM.YYYY').value : null;
   });
 
   const { data: buildingsData, isFetched: buildingsFetched } =
     useBuildingsQuery();
-  const selectedBuildings = ref(null);
-  const buildings = computed(() => {
-    return (
-      buildingsData.value?.map(building => ({
-        value: building.name,
-        label: `${building.name} корпус`,
-      })) || []
-    );
-  });
+
+  const selectedBuildings = ref<{ value: string; label: string }[] | null>(
+    null
+  );
 
   const buildingsArray = computed(() => {
-    return [selectedBuildings.value?.map(obj => obj.value)];
+    return selectedBuildings.value?.map(obj => obj.value);
   });
 
   function printPage() {
@@ -52,13 +50,7 @@
     });
   }
 
-  watch(
-    [date, selectedBuildings],
-    () => {
-      updateQueryParams();
-    },
-    { deep: true }
-  );
+  watch([date, selectedBuildings], updateQueryParams, { deep: true });
 
   watchEffect(() => {
     if (buildingsFetched.value) {
@@ -69,11 +61,14 @@
         date.value = new Date(year, month - 1, day);
       }
       if (route.query.buildings) {
-        const buildingNames = route.query.buildings.toString(); // если строка, разбиваем на массив
-
-        selectedBuildings.value = buildings.value?.filter(building =>
-          buildingNames.includes(building.value)
-        );
+        const buildingNames = route.query.buildings.toString();
+        selectedBuildings.value =
+          buildingsData.value
+            ?.filter(building => buildingNames.includes(building.name))
+            .map(building => ({
+              value: building.name,
+              label: `${building.name} корпус`,
+            })) || null;
       }
     }
   });
@@ -82,11 +77,13 @@
     usePublicBellsPrintQuery(buildingsArray, formattedDate);
 
   const mergedBells = computed(() => {
-    // Функция для сравнения periods между разными корпусами
-    const periodsEqual = (periods1, periods2) => {
-      if (periods1.length !== periods2.length) return false;
-      return periods1.every((p1, index) => {
-        const p2 = periods2[index];
+    const periodsEqual = (
+      firstPeriods: BellsPeriod[],
+      secondPeriods: BellsPeriod[]
+    ) => {
+      if (firstPeriods.length !== secondPeriods.length) return false;
+      return firstPeriods.every((p1, index) => {
+        const p2 = secondPeriods[index];
         return (
           p1.index === p2.index &&
           p1.has_break === p2.has_break &&
@@ -98,20 +95,16 @@
       });
     };
 
-    // Группируем звонки по одинаковым периодам
-    const grouped = [];
+    const grouped: { building: string; bells: Bell }[] = [];
 
-    publicBells.value?.forEach(bell => {
-      // Находим группу, у которой совпадают periods
+    publicBells.value?.forEach((bell: Bell) => {
       let group = grouped.find(g =>
         periodsEqual(g.bells.periods, bell.periods)
       );
 
       if (group) {
-        // Если такая группа найдена, добавляем туда здание
         group.building += `, ${bell.building}`;
       } else {
-        // Если группа не найдена, создаем новую
         grouped.push({
           building: String(bell.building),
           bells: bell,
@@ -125,8 +118,8 @@
   const getIndexesFromBells = computed(() => {
     const indexes = new Set<number>();
     mergedBells.value?.forEach(bell => {
-      bell.bells.periods.forEach(period => {
-        indexes.add(period.index);
+      bell.bells.periods.forEach((period: BellsPeriod) => {
+        indexes.add(+period.index);
       });
     });
     return Array.from(indexes).sort((a, b) => a - b);
@@ -148,7 +141,12 @@
       v-model="selectedBuildings"
       :max-selected-labels="2"
       :selected-items-label="'{0} выбрано'"
-      :options="buildings"
+      :options="
+        buildingsData?.map(building => ({
+          value: building.name,
+          label: `${building.name} корпус`,
+        })) || []
+      "
       placeholder="Корпуса"
       option-label="label"
     />
@@ -168,7 +166,7 @@
           dayNamesWithPreposition[
             useDateFormat(date, 'dddd', {
               locales: 'ru-RU',
-            }).value
+            }).value as FullWeekDays
           ]
         }}
         {{
@@ -180,7 +178,7 @@
             monthDeclensions[
               useDateFormat(date, 'MMMM', {
                 locales: 'ru-RU',
-              }).value
+              }).value as MonthKey
             ]
           } ${
             useDateFormat(date, 'YYYY', {
@@ -241,7 +239,7 @@
                     v-for="period in bell.bells.periods"
                     :key="period.index"
                   >
-                    <td v-if="period?.index === index">
+                    <td v-if="+period?.index === index">
                       <div>
                         {{ period.period_from }} - {{ period.period_to }}
                       </div>
@@ -253,7 +251,9 @@
                   </template>
                   <td
                     v-if="
-                      !bell.bells.periods.find(period => period.index === index)
+                      !bell.bells.periods.find(
+                        (period: BellsPeriod) => +period.index === index
+                      )
                     "
                   />
                 </template>

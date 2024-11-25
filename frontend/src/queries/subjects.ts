@@ -42,7 +42,7 @@ export function useUpdateSubject() {
 export function useDestroySubject() {
   const queryClient = useQueryClient();
   const destroySubjectMutation = useMutation({
-    mutationFn: id => axios.delete(`/api/subjects/${id}`),
+    mutationFn: (id: number) => axios.delete(`/api/subjects/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['subjects'], exact: true });
     },

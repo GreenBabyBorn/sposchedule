@@ -9,6 +9,7 @@
   import LoadingBar from '../components/LoadingBar.vue';
   import { useDebounceFn } from '@vueuse/core';
   import Checkbox from 'primevue/checkbox';
+  import { isAxiosError } from 'axios';
 
   const authStore = useAuthStore();
   const { isAuth } = storeToRefs(authStore);
@@ -34,8 +35,10 @@
     try {
       await login(credentials);
     } catch (e) {
-      error.value = e?.response.data;
-
+      if (isAxiosError(e)) error.value = e.response?.data;
+      else {
+        console.error(e);
+      }
       return;
     }
     if (isAuth) router.push('/admin/schedules/changes');

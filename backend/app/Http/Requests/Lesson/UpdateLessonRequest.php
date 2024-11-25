@@ -55,6 +55,7 @@ class UpdateLessonRequest extends FormRequest
         return [
             'subject_id.required' => 'Поле "ID предмета" обязательно для заполнения.',
             'subject_id.exists' => 'Предмет с указанным ID не найден.',
+            'subject.id.exists' => 'Предмет с указанным ID не найден.',
             'schedule_id.required' => 'Поле "ID расписания" обязательно для заполнения.',
             'schedule_id.exists' => 'Расписание с указанным ID не найдено.',
             'cabinet.required' => 'Поле "Кабинет" обязательно для заполнения.',

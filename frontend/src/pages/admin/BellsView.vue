@@ -223,7 +223,7 @@
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
-          detail: e?.response.data.message,
+          detail: e.response?.data.message,
           life: 3000,
           closable: true,
         });
@@ -317,7 +317,7 @@
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
-        detail: e?.response.data.message,
+        detail: e.response?.data.message,
         life: 3000,
         closable: true,
       });

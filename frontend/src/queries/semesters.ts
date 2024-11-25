@@ -1,21 +1,22 @@
+import type { Semester } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
-import { computed } from 'vue';
+import { computed, type Ref } from 'vue';
 
 export function useSemestersQuery() {
   return useQuery({
     queryKey: ['semesters'],
-    queryFn: async () => (await axios.get('/api/semesters')).data,
+    queryFn: async () => (await axios.get('/api/semesters')).data as Semester[],
   });
 }
 
-export function useSemesterShowQuery(id) {
+export function useSemesterShowQuery(id: Ref) {
   const enabled = computed(() => Boolean(id?.value));
   return useQuery({
     enabled: enabled,
     queryKey: ['semesters', id],
     queryFn: async () => {
-      return await axios.get(`/api/semesters/${id?.value}`);
+      return (await axios.get(`/api/semesters/${id?.value}`)).data as Semester;
     },
   });
 }
@@ -49,7 +50,7 @@ export function useUpdateSemester() {
 export function useDestroySemester() {
   const queryClient = useQueryClient();
   const destroySemesterMutation = useMutation({
-    mutationFn: id => axios.delete(`/api/semesters/${id}`),
+    mutationFn: (id: number) => axios.delete(`/api/semesters/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['semesters'] });
     },

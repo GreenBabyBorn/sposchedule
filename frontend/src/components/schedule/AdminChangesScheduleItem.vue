@@ -285,7 +285,7 @@
         // queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
         return;
       } catch (e: any) {
-        showError(e?.response.data.message);
+        showError(e.response?.data.message);
         return;
       }
     }
@@ -327,7 +327,7 @@
         await invalidateSchedule();
         // queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
       } catch (e: any) {
-        showError(e?.response.data.message);
+        showError(e.response?.data.message);
         return;
       }
     } else {
@@ -338,7 +338,7 @@
           //   queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
         }
       } catch (e: any) {
-        showError(e?.response.data.message);
+        showError(e.response?.data.message);
         return;
       }
     }
@@ -355,7 +355,7 @@
         },
       });
     } catch (e: any) {
-      showError(e?.response.data.message);
+      showError(e.response?.data.message);
       return;
     }
   }

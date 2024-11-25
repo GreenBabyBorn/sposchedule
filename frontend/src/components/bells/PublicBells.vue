@@ -3,6 +3,7 @@
   import { useBellsStore } from '@/stores/bells';
   import { storeToRefs } from 'pinia';
   import { computed, toRef, watch } from 'vue';
+  import type { BellsPeriod, Bell } from './types';
 
   const props = defineProps<{
     building: string | null;
@@ -25,7 +26,7 @@
   });
 
   const mergedBells = computed(() => {
-    const periodsEqual = (periods1, periods2) => {
+    const periodsEqual = (periods1: BellsPeriod[], periods2: BellsPeriod[]) => {
       if (periods1.length !== periods2.length) return false;
       return periods1.every((p1, index) => {
         const p2 = periods2[index];
@@ -39,9 +40,9 @@
         );
       });
     };
-    const grouped = [];
+    const grouped: { building: string; bells: Bell }[] = [];
 
-    publicBells.value?.forEach(bell => {
+    publicBells.value?.forEach((bell: Bell) => {
       let group = grouped.find(g =>
         periodsEqual(g.bells.periods, bell.periods)
       );
@@ -62,8 +63,8 @@
   const getIndexesFromBells = computed(() => {
     const indexes = new Set<number>();
     mergedBells.value?.forEach(bell => {
-      bell.bells.periods.forEach(period => {
-        indexes.add(period.index);
+      bell.bells.periods.forEach((period: BellsPeriod) => {
+        indexes.add(+period.index);
       });
     });
     return Array.from(indexes).sort((a, b) => a - b);
@@ -115,7 +116,7 @@
                 v-for="period in bell.bells.periods"
                 :key="period.index"
               >
-                <td v-if="period?.index === index">
+                <td v-if="+period?.index === index">
                   <div class="text-nowrap">
                     {{ period.period_from }} - {{ period.period_to }}
                   </div>
@@ -127,7 +128,9 @@
               </template>
               <td
                 v-if="
-                  !bell.bells.periods.find(period => period.index === index)
+                  !bell.bells.periods.find(
+                    (period: BellsPeriod) => +period.index === index
+                  )
                 "
               />
             </template>

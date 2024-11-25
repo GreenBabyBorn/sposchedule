@@ -1,3 +1,4 @@
+import type { Bell } from '@/components/bells/types';
 import { defineStore } from 'pinia';
 import { computed, ref, toRaw } from 'vue';
 
@@ -7,11 +8,11 @@ export const useBellsStore = defineStore('useBellsStore', () => {
 
   const isFetchedPublicBells = ref(false);
 
-  function setBells(newBells) {
+  function setBells(newBells: Bell[]) {
     bells.value = toRaw(newBells ?? []);
   }
 
-  function setPublicBells(newBells) {
+  function setPublicBells(newBells: Bell[]) {
     publicBells.value = toRaw(newBells ?? []);
   }
 

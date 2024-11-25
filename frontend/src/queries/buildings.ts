@@ -41,7 +41,7 @@ export function useUpdateBuilding() {
 export function useDestroyBuilding() {
   const queryClient = useQueryClient();
   const destroyuildingMutation = useMutation({
-    mutationFn: name => axios.delete(`/api/buildings/${name}`),
+    mutationFn: (name: string) => axios.delete(`/api/buildings/${name}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['buildings'] });
     },

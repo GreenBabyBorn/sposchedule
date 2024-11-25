@@ -1,8 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
+import type { Ref } from 'vue';
 // import { computed } from 'vue';
 
-export function useHistoryQuery(page, rows, searchTerm) {
+export function useHistoryQuery(page: Ref, rows: Ref, searchTerm: Ref) {
   // const enabled = computed(() => {
   //   return Boolean((page.value && rows.value) || searchTerm.value);
   // });

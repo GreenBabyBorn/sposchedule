@@ -14,6 +14,7 @@
   import Button from 'primevue/button';
   import router from '@/router';
   import LoadingBar from '@/components/LoadingBar.vue';
+  import type { Semester } from '@/components/schedule/types';
 
   const route = useRoute();
   const {
@@ -26,10 +27,10 @@
     course: string;
   }>;
 
-  const selectedSemester = ref(null);
+  const selectedSemester = ref<Semester | null>(null);
   const { data: semesters, isFetched: semestersFetched } = useSemestersQuery();
 
-  const course = ref(null);
+  const course = ref<number | null>(null);
   const { data: courses } = useCoursesQuery();
 
   const coursesWithLabel = computed(() => {
@@ -43,7 +44,9 @@
 
   const { data: buildingsData, isFetched: buildingsFetched } =
     useBuildingsQuery();
-  const selectedBuildings = ref(null);
+  const selectedBuildings = ref<{ value: string; label: string }[] | null>(
+    null
+  );
   const buildings = computed(() => {
     return (
       buildingsData.value?.map(building => ({
@@ -58,7 +61,7 @@
   });
 
   const buildingsArray = computed(() => {
-    return [selectedBuildings.value?.map(obj => obj.value)];
+    return selectedBuildings.value?.map(obj => obj.value) || [];
   });
 
   const { data: mainSchedules, isSuccess } = usePrintMainSchedulesQuery(
@@ -80,20 +83,11 @@
   const authStore = useAuthStore();
   const { isAuth } = storeToRefs(authStore);
 
-  // watch([isFetchedAfterMount, isSuccess], async () => {
-  //     if (isFetchedAfterMount.value && isSuccess.value) {
-  //         // Ждём, пока контент будет полностью отрендерен
-  //         await nextTick();
-
-  //         // window.print();
-
-  //     }
-  // });
-
-  const daysOfWeek = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'];
+  const daysOfWeek = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ'] as const;
+  type DayOfWeek = (typeof daysOfWeek)[number];
 
   const getIndexesFromWeekdays = computed(() => {
-    const daysIndexes = {
+    const daysIndexes: Record<DayOfWeek, Set<number>> = {
       ПН: new Set(),
       ВТ: new Set(),
       СР: new Set(),
@@ -110,9 +104,12 @@
         }
       }
     }
-    const result = {};
+    const result: Record<DayOfWeek, number[]> = {} as Record<
+      DayOfWeek,
+      number[]
+    >;
     for (const day in daysIndexes) {
-      result[day] = Array.from(daysIndexes[day]).sort(
+      result[day as DayOfWeek] = Array.from(daysIndexes[day as DayOfWeek]).sort(
         (a: number, b: number) => a - b
       );
     }
@@ -147,22 +144,19 @@
 
   watchEffect(() => {
     if (semestersFetched.value && buildingsFetched.value) {
-      // Восстанавливаем семестр, если query параметр "semester" существует и данные загружены
       if (querySemester) {
-        selectedSemester.value = semesters.value?.find(
-          item => item.id === Number(querySemester)
-        );
+        selectedSemester.value =
+          semesters.value?.find(item => item.id === Number(querySemester)) ||
+          null;
       }
 
-      // Восстанавливаем здания, если query параметр "buildings" существует и данные загружены
       if (queryBuildings) {
-        const buildingNames = queryBuildings.toString(); // если строка, разбиваем на массив
+        const buildingNames = queryBuildings.toString();
         selectedBuildings.value = buildings.value?.filter(building =>
           buildingNames.includes(building.value)
         );
       }
 
-      // Восстанавливаем курс, если query параметр "course" существует
       if (queryCourse) {
         course.value = Number(queryCourse);
       }

@@ -13,10 +13,10 @@ export type Lesson = {
   index: number;
   schedule_id: number;
   subject: Subject;
-  week_type?: string;
+  week_type: string | null;
   cabinet: string;
   building: string;
-  message: string;
+  message: string | null;
   teachers?: Teacher[];
 };
 
@@ -71,7 +71,9 @@ export type WeekTypeLesson = {
   cabinet: string;
   building: string;
   subject: Subject;
+  subject_id?: number;
   teachers: Teacher[];
+  message: string | null;
 };
 
 export type Group = {
@@ -80,6 +82,15 @@ export type Group = {
   specilization: string;
   course: number;
   index: string;
-  semesters: any[];
+  semesters: Semester[];
   buidings: any[];
+};
+
+export type Semester = {
+  id: number;
+  index: string;
+  years: string;
+  start: string;
+  end: string;
+  groups?: Group[];
 };

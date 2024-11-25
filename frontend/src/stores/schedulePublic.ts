@@ -9,11 +9,11 @@ export const useSchedulePublicStore = defineStore(
     const queryParams = ref(route.query);
 
     const selectedGroup = ref<string | null>(null);
-    const date = ref<Date | null>(null);
+    const date = ref<Date>();
     const schedules = ref();
     const course = ref<number | null>(null);
 
-    function setSchedules(newSchedules: unknown) {
+    function setSchedules(newSchedules) {
       schedules.value = toRaw(newSchedules ?? []);
     }
 

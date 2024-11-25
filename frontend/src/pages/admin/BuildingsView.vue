@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue';
-  import DataTable from 'primevue/datatable';
+  import DataTable, {
+    type DataTableRowEditSaveEvent,
+  } from 'primevue/datatable';
   import Column from 'primevue/column';
   import InputText from 'primevue/inputtext';
   import Button from 'primevue/button';
@@ -12,12 +14,14 @@
     useDestroyBuilding,
     useStoreBuilding,
     useUpdateBuilding,
+    type Building,
   } from '@/queries/buildings';
+  import { isAxiosError } from 'axios';
 
   const toast = useToast();
 
   const editingRows = ref([]);
-  const selectedBuildings = ref([]);
+  const selectedBuildings = ref<Building[] | null>([]);
 
   const { data: buildings } = useBuildingsQuery();
 
@@ -27,40 +31,43 @@
     location: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
   });
   const { mutateAsync: updateBuilding } = useUpdateBuilding();
-  async function onRowEditSave(event) {
+  const onRowEditSave = async (event: DataTableRowEditSaveEvent) => {
     let { newData, index } = event;
     try {
       await updateBuilding({
-        name: buildings.value[index].name,
+        name: buildings.value?.[index].name,
         body: newData,
       });
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+      if (isAxiosError(e)) {
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
+      }
       return;
     }
-  }
+  };
 
   const { mutateAsync: storeSubject } = useStoreBuilding();
   const addSubject = async () => {
     try {
       await storeSubject(newBuilding);
     } catch (e) {
-      // newSubjectError.value = true
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
-      newBuilding.name = '';
-      newBuilding.location = '';
+      if (isAxiosError(e)) {
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
+        newBuilding.name = '';
+        newBuilding.location = '';
+      }
       return;
     }
     // newSubjectError.value = false
@@ -70,19 +77,20 @@
 
   const { mutateAsync: destroyBuilding } = useDestroyBuilding();
   const deleteBuildings = async () => {
-    if (!selectedBuildings.value.length) return;
+    if (!selectedBuildings.value?.length) return;
 
     for (let i = 0; i < selectedBuildings.value.length; i++) {
       try {
         await destroyBuilding(selectedBuildings.value[i].name);
       } catch (e) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
+        if (isAxiosError(e))
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail: e.response?.data.message,
+            life: 3000,
+            closable: true,
+          });
         return;
       }
     }
@@ -141,7 +149,7 @@
         <template #header>
           <div class="flex flex-wrap justify-between gap-2">
             <Button
-              :disabled="!selectedBuildings.length || !buildings.length"
+              :disabled="!selectedBuildings?.length || !buildings?.length"
               severity="danger"
               type="button"
               icon="pi pi-trash"

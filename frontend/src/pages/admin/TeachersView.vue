@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { ref } from 'vue';
-  import DataTable from 'primevue/datatable';
+  import DataTable, {
+    type DataTableRowEditSaveEvent,
+  } from 'primevue/datatable';
   import Column from 'primevue/column';
   import InputText from 'primevue/inputtext';
   import MultiSelect from 'primevue/multiselect';
@@ -18,6 +20,8 @@
   import Chip from 'primevue/chip';
   import { FilterMatchMode } from '@primevue/core/api';
   import Dialog from 'primevue/dialog';
+  import { isAxiosError } from 'axios';
+  import type { Teacher } from '@/components/schedule/types';
 
   const { data: teachers } = useTeachersQuery({ subjects: true });
 
@@ -28,7 +32,7 @@
   const newTeacherError = ref(false);
 
   const editingRows = ref([]);
-  const selectedTeachers = ref([]);
+  const selectedTeachers = ref<Teacher[] | null>([]);
 
   const { mutateAsync: mergeTeachers } = useMergeTeachers();
   const mergeTeacherName = ref('');
@@ -47,7 +51,7 @@
   const { mutateAsync: updateTeacher, isPending: isUpdated } =
     useUpdateTeacher();
 
-  const onRowEditSave = async event => {
+  const onRowEditSave = async (event: DataTableRowEditSaveEvent) => {
     let { newData } = event;
     try {
       await updateTeacher({
@@ -57,20 +61,23 @@
         },
       });
     } catch (e) {
-      if (newData.id !== e?.response.data.teacher_id) {
-        firstMergeTeacher.value = newData.id;
-        secondMergeTeacher.value = e?.response.data.teacher_id;
-        mergeTeacherName.value = newData.name;
-        visible.value = true;
-        return;
+      if (isAxiosError(e)) {
+        if (newData.id !== e.response?.data.teacher_id) {
+          firstMergeTeacher.value = newData.id;
+          secondMergeTeacher.value = e.response?.data.teacher_id;
+          mergeTeacherName.value = newData.name;
+          visible.value = true;
+          return;
+        }
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
       }
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+
       return;
     }
   };
@@ -78,19 +85,20 @@
   const { mutateAsync: destroyTeacher, isPending: isDestroyed } =
     useDestroyTeacher();
   const deleteTeachers = async () => {
-    if (!selectedTeachers.value.length) return;
+    if (!selectedTeachers.value?.length) return;
 
     for (let i = 0; i < selectedTeachers.value.length; i++) {
       try {
         await destroyTeacher(selectedTeachers.value[i].id);
       } catch (e) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
+        if (isAxiosError(e))
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail: e.response?.data.message,
+            life: 3000,
+            closable: true,
+          });
         return;
       }
     }
@@ -104,15 +112,18 @@
         name: newTeacherName.value,
       });
     } catch (e) {
-      newTeacherError.value = true;
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
-      newTeacherName.value = '';
+      if (isAxiosError(e)) {
+        newTeacherError.value = true;
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
+        newTeacherName.value = '';
+      }
+
       return;
     }
     newTeacherError.value = false;
@@ -203,7 +214,7 @@
           <div class="flex flex-wrap justify-between gap-2">
             <Button
               severity="danger"
-              :disabled="!selectedTeachers.length || !teachers.length"
+              :disabled="!selectedTeachers?.length || !teachers?.length"
               type="button"
               icon="pi pi-trash"
               label="Удалить"

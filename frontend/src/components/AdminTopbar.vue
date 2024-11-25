@@ -16,7 +16,7 @@
       await logout();
       router.push('/admin/login');
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   }
 </script>
@@ -45,7 +45,7 @@
         <Button
           severity="contrast"
           as="router-link"
-          :label="user?.name"
+          :label="user?.name || 'Пользователь'"
           text
           to="/admin/user"
         />

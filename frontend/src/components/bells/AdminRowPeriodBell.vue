@@ -6,6 +6,8 @@
   import { useDestroyBellPeriod, useUpdateBellPeriod } from '@/queries/bells';
   import { useToast } from 'primevue/usetoast';
   import InputText from 'primevue/inputtext';
+  import { isAxiosError } from 'axios';
+  import type { BellsPeriod } from './types';
 
   const toast = useToast();
 
@@ -26,17 +28,17 @@
   const { mutateAsync: updatePeriod } = useUpdateBellPeriod();
   const { mutateAsync: destroyPeriod } = useDestroyBellPeriod();
 
-  function formatTime(time) {
+  function formatTime(time: Date | string | null) {
     if (Object.prototype.toString.call(time) === '[object Date]') {
-      const hours = time.getHours().toString().padStart(2, '0');
-      const minutes = time.getMinutes().toString().padStart(2, '0');
+      const hours = (time as Date).getHours().toString().padStart(2, '0');
+      const minutes = (time as Date).getMinutes().toString().padStart(2, '0');
       return `${hours}:${minutes}`;
     }
 
     return time;
   }
 
-  async function editPeriod(period) {
+  async function editPeriod(period: BellsPeriod) {
     let body = {
       ...period,
       period_from: formatTime(period.period_from),
@@ -46,8 +48,8 @@
       period.has_break &&
       (period.period_from_after || period.period_to_after)
     ) {
-      body.period_from_after = formatTime(period.period_from_after);
-      body.period_to_after = formatTime(period.period_to_after);
+      body.period_from_after = formatTime(period.period_from_after) as Date;
+      body.period_to_after = formatTime(period.period_to_after) as Date;
     } else if (!period.has_break) {
       body.period_from_after = null;
       body.period_to_after = null;
@@ -59,27 +61,29 @@
         body,
       });
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response?.data.message || 'Не удалось обновить период',
-        life: 3000,
-        closable: true,
-      });
+      if (isAxiosError(e))
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e?.response?.data.message || 'Не удалось обновить период',
+          life: 3000,
+          closable: true,
+        });
     }
   }
 
-  async function deletePeriod(id) {
+  async function deletePeriod(id: number) {
     try {
       await destroyPeriod(id);
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response?.data.message,
-        life: 3000,
-        closable: true,
-      });
+      if (isAxiosError(e))
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e?.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
     }
   }
 </script>

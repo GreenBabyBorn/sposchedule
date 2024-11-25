@@ -3,30 +3,24 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 export const useAuthStore = defineStore('useAuthStore', () => {
-  const user = ref(null);
+  const user = ref<{
+    email: string | null;
+    name: string;
+  }>();
 
-  const register = async credentials => {
-    await axios.post('/api/register', credentials);
-  };
-
-  const login = async credentials => {
+  const login = async (credentials: {
+    email: string;
+    password: string;
+    remember: boolean;
+  }) => {
     await axios.get('/sanctum/csrf-cookie');
     await axios.post('/api/login', credentials);
   };
 
   const logout = async () => {
     await axios.post('/api/logout');
-    user.value = null;
+    user.value = undefined;
   };
-
-  // const fetchUser = async () => {
-  //   try {
-  //     const response = await axios.get('/api/user');
-  //     user.value = response.data;
-  //   } catch (e) {
-  //     return e;
-  //   }
-  // };
 
   const isAuth = computed(() => {
     return Boolean(user.value);
@@ -35,9 +29,8 @@ export const useAuthStore = defineStore('useAuthStore', () => {
   return {
     user,
     isAuth,
-    register,
+
     login,
     logout,
-    // fetchUser,
   };
 });

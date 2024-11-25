@@ -1,9 +1,9 @@
 import type { Teacher } from '@/components/schedule/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import axios from 'axios';
-import { computed } from 'vue';
+import { computed, type Ref } from 'vue';
 
-export function useTeachersQuery(query?) {
+export function useTeachersQuery(query?: object) {
   return useQuery({
     queryKey: ['teachers', query],
     queryFn: async () =>
@@ -40,7 +40,7 @@ export function useUpdateTeacher() {
 export function useDestroyTeacher() {
   const queryClient = useQueryClient();
   const destroyTeacherMutation = useMutation({
-    mutationFn: id => axios.delete(`/api/teachers/${id}`),
+    mutationFn: (id: number) => axios.delete(`/api/teachers/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['teachers'], exact: true });
     },
@@ -63,9 +63,12 @@ export function useMergeTeachers() {
   return storeSubjectMutation;
 }
 
-export function useTeachersFromSubjectQuery(subject, group, date) {
+export function useTeachersFromSubjectQuery(
+  subject: Ref,
+  group: Ref,
+  date: Ref
+) {
   const enabled = computed(() => {
-    // console.log(subject.value?.id, group.value?.id, date.value);
     return Boolean(subject.value?.id && group.value?.id && date.value);
   });
   return useQuery({

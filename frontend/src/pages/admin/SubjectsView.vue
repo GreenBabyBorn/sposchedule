@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { ref } from 'vue';
-  import DataTable from 'primevue/datatable';
+  import DataTable, {
+    type DataTableRowEditSaveEvent,
+  } from 'primevue/datatable';
   import Column from 'primevue/column';
   import InputText from 'primevue/inputtext';
   import Button from 'primevue/button';
@@ -16,6 +18,8 @@
   import Textarea from 'primevue/textarea';
   import { FilterMatchMode } from '@primevue/core/api';
   import Dialog from 'primevue/dialog';
+  import { isAxiosError } from 'axios';
+  import type { Subject } from '@/components/schedule/types';
 
   const { data: subjects } = useSubjectsQuery();
 
@@ -25,7 +29,7 @@
   const newSubjectError = ref(false);
 
   const editingRows = ref([]);
-  const selectedSubjects = ref([]);
+  const selectedSubjects = ref<Subject[] | null>([]);
 
   const { mutateAsync: mergeSubjects } = useMergeSubjects();
   const mergeSubjectName = ref('');
@@ -40,26 +44,29 @@
     visible.value = false;
   }
   const { mutateAsync, isPending: isUpdated } = useUpdateSubject();
-  const onRowEditSave = async event => {
+  const onRowEditSave = async (event: DataTableRowEditSaveEvent) => {
     let { newData, data } = event;
     if (data.name === newData.name) return;
     try {
       await mutateAsync({ id: newData.id, body: newData });
     } catch (e) {
-      if (newData.id !== e?.response.data.subject_id) {
-        firstMergeSubject.value = newData.id;
-        secondMergeSubject.value = e?.response.data.subject_id;
-        mergeSubjectName.value = newData.name;
-        visible.value = true;
-        return;
+      if (isAxiosError(e)) {
+        if (newData.id !== e.response?.data.subject_id) {
+          firstMergeSubject.value = newData.id;
+          secondMergeSubject.value = e.response?.data.subject_id;
+          mergeSubjectName.value = newData.name;
+          visible.value = true;
+          return;
+        }
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
       }
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+
       return;
     }
   };
@@ -67,19 +74,20 @@
   const { mutateAsync: destroySubject, isPending: isDestroyed } =
     useDestroySubject();
   const deleteSubjects = async () => {
-    if (!selectedSubjects.value.length) return;
+    if (!selectedSubjects.value?.length) return;
 
     for (let i = 0; i < selectedSubjects.value.length; i++) {
       try {
         await destroySubject(selectedSubjects.value[i].id);
       } catch (e) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
+        if (isAxiosError(e))
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail: e.response?.data.message,
+            life: 3000,
+            closable: true,
+          });
         return;
       }
     }
@@ -91,15 +99,18 @@
     try {
       await storeSubject(newSubjectName.value);
     } catch (e) {
-      newSubjectError.value = true;
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
-      newSubjectName.value = '';
+      if (isAxiosError(e)) {
+        newSubjectError.value = true;
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
+        newSubjectName.value = '';
+      }
+
       return;
     }
     newSubjectError.value = false;
@@ -113,8 +124,8 @@
     // Разделяем введенные предметы на массив строк, убирая пустые строки и пробелы
     const subjects = importingSubjects.value
       .split('\n')
-      .map(subject => subject.trim())
-      .filter(subject => subject);
+      .map((subject: string) => subject.trim())
+      .filter((subject: string) => subject);
 
     // Проходим по каждому предмету и отправляем его на сервер
     for (const subject of subjects) {
@@ -131,18 +142,19 @@
           closable: true,
         });
       } catch (e) {
-        // Обработка ошибки при отправке
-        newSubjectError.value = true;
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail:
-            e?.response?.data?.message ||
-            `Ошибка при добавлении предмета "${subject}"`,
-          life: 3000,
-          closable: true,
-        });
-        continue; // Продолжаем с следующего предмета
+        if (isAxiosError(e)) {
+          newSubjectError.value = true;
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail:
+              e?.response?.data?.message ||
+              `Ошибка при добавлении предмета "${subject}"`,
+            life: 3000,
+            closable: true,
+          });
+        }
+        continue;
       }
     }
 
@@ -254,7 +266,7 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <Button
               severity="danger"
-              :disabled="!selectedSubjects.length || !subjects.length"
+              :disabled="!selectedSubjects?.length || !subjects?.length"
               type="button"
               icon="pi pi-trash"
               label="Удалить"

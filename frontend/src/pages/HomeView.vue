@@ -274,7 +274,7 @@
                 >
                   <small>{{
                     reducedWeekDays[
-                      useDateFormat(date as Date, 'dddd', {
+                      useDateFormat(date, 'dddd', {
                         locales: 'ru-RU',
                       }).value as FullWeekDays
                     ]
@@ -472,8 +472,8 @@
         >Расписание ещё не выложили, либо в расписании ошибка.</span
       >
       <div class="schedules">
-        <template v-if="!isFetched || isError">
-          <div v-for="item in 32" :key="item" class="schedule">
+        <template v-if="!isFetched">
+          <div v-for="item in 32" :key="item">
             <Skeleton height="2rem" class="mb-4" />
             <Skeleton height="10rem" />
           </div>
@@ -483,7 +483,6 @@
           <ScheduleItem
             v-for="item in schedules?.schedules"
             :key="item?.id"
-            class="schedule"
             :date="formattedDate!"
             :type="item?.type"
             :group-name="item?.group_name"

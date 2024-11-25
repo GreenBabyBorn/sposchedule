@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import { ref } from 'vue';
-  import DataTable from 'primevue/datatable';
+  import DataTable, {
+    type DataTableRowEditSaveEvent,
+  } from 'primevue/datatable';
   import Column from 'primevue/column';
   import Select from 'primevue/select';
   import InputText from 'primevue/inputtext';
@@ -20,6 +22,8 @@
   import { useSemestersQuery } from '@/queries/semesters';
   import { useConfirm } from 'primevue/useconfirm';
   import { useBuildingsQuery } from '@/queries/buildings';
+  import { isAxiosError } from 'axios';
+  import type { Group } from '@/components/schedule/types';
 
   const toast = useToast();
   const { data: groups } = useGroupsQuery();
@@ -28,7 +32,7 @@
   const newGroupError = ref(false);
 
   const editingRows = ref([]);
-  const selectedGroups = ref([]);
+  const selectedGroups = ref<Group[]>([]);
   const courses = [
     {
       label: 1,
@@ -50,7 +54,7 @@
 
   const { mutateAsync: updateGroup, isPending: isUpdated } = useUpdateGroup();
 
-  const onRowEditSave = async event => {
+  const onRowEditSave = async (event: DataTableRowEditSaveEvent) => {
     let { newData } = event;
 
     try {
@@ -59,13 +63,14 @@
         body: newData,
       });
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
+      if (isAxiosError(e))
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
       return;
     }
   };
@@ -95,14 +100,16 @@
         buildings: selectedBuildings.value,
       });
     } catch (e) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: e?.response.data.message,
-        life: 3000,
-        closable: true,
-      });
-      newGroupName.value = '';
+      if (isAxiosError(e)) {
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: e.response?.data.message,
+          life: 3000,
+          closable: true,
+        });
+        newGroupName.value = '';
+      }
     }
 
     newGroupError.value = false;
@@ -145,13 +152,14 @@
       try {
         await destroyGroup(selectedGroups.value[i].id);
       } catch (e) {
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail: e?.response.data.message,
-          life: 3000,
-          closable: true,
-        });
+        if (isAxiosError(e))
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail: e.response?.data.message,
+            life: 3000,
+            closable: true,
+          });
         return;
       }
     }
@@ -172,13 +180,11 @@
   const importingGroups = ref();
 
   const parseAndSendGroups = async () => {
-    // Разделяем введенные группы на массив строк, убирая пустые строки и пробелы
     const groups = importingGroups.value
       .split('\n')
-      .map(group => group.trim())
-      .filter(group => group);
+      .map((group: string) => group.trim())
+      .filter((group: string) => group);
 
-    // Проходим по каждой группе и отправляем её на сервер
     for (const group of groups) {
       if (!regexGroup.test(group)) {
         toast.add({
@@ -188,11 +194,10 @@
           life: 3000,
           closable: true,
         });
-        continue; // Пропускаем группу с неверным форматом
+        continue;
       }
 
       try {
-        // Отправляем данные на сервер
         await storeSubject({
           specialization: group.split('-')[0],
           course: group.split('-')[1][0],
@@ -201,7 +206,6 @@
           buildings: selectedBuildings.value,
         });
 
-        // Успешное добавление группы
         toast.add({
           severity: 'success',
           summary: 'Успех',
@@ -210,20 +214,19 @@
           closable: true,
         });
       } catch (e) {
-        // Обработка ошибки при отправке
-        toast.add({
-          severity: 'error',
-          summary: 'Ошибка',
-          detail:
-            e?.response?.data?.message ||
-            `Ошибка при добавлении группы ${group}`,
-          life: 3000,
-          closable: true,
-        });
+        if (isAxiosError(e))
+          toast.add({
+            severity: 'error',
+            summary: 'Ошибка',
+            detail:
+              e?.response?.data?.message ||
+              `Ошибка при добавлении группы ${group}`,
+            life: 3000,
+            closable: true,
+          });
       }
     }
 
-    // Очистка поля после завершения отправки
     importingGroups.value = '';
     selectedSemesters.value = [];
     selectedBuildings.value = [];
@@ -316,7 +319,7 @@
           <div class="flex flex-wrap items-center justify-between gap-2">
             <Button
               severity="danger"
-              :disabled="!selectedGroups.length || !groups.length"
+              :disabled="!selectedGroups.length || !groups?.length"
               type="button"
               icon="pi pi-trash"
               label="Удалить"

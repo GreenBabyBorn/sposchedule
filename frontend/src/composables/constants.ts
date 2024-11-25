@@ -1,12 +1,8 @@
-export type FullWeekDays =
-  | 'понедельник'
-  | 'вторник'
-  | 'среда'
-  | 'четверг'
-  | 'пятница'
-  | 'суббота'
-  | 'воскресенье';
-export const reducedWeekDays: Record<FullWeekDays, string> = {
+export type FullWeekDays = keyof typeof reducedWeekDays;
+
+export type MonthKey = keyof typeof monthDeclensions;
+
+export const reducedWeekDays = {
   понедельник: 'ПН',
   вторник: 'ВТ',
   среда: 'СР',

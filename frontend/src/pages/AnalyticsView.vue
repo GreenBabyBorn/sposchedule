@@ -8,11 +8,12 @@
   import { computed, ref } from 'vue';
   import { useAnalyticsSchedulesQuery } from '@/queries/schedules';
   import { useDateFormat } from '@vueuse/core';
+  import type { Group } from '@/components/schedule/types';
 
   const { data: groups } = useGroupsQuery();
 
   const rangeDates = ref(null);
-  const selectedGroups = ref(null);
+  const selectedGroups = ref<Group[] | null>(null);
 
   const start_date = computed(() =>
     rangeDates.value?.[0]
@@ -38,9 +39,13 @@
 
   const exportCSV = () => {
     // Формируем данные для экспорта
-    const exportData = [];
+    const exportData: {
+      group_name: string;
+      subject: string;
+      hours: string;
+    }[] = [];
 
-    data.value.forEach(row => {
+    data.value.forEach((row: { group_name: string; subjects: object }) => {
       Object.entries(row.subjects).forEach(([subject, hours]) => {
         exportData.push({
           group_name: row.group_name,
