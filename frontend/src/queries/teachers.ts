@@ -42,7 +42,7 @@ export function useDestroyTeacher() {
   const destroyTeacherMutation = useMutation({
     mutationFn: (id: number) => axios.delete(`/api/teachers/${id}`),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['teachers'], exact: true });
+      queryClient.invalidateQueries({ queryKey: ['teachers'] });
     },
   });
   return destroyTeacherMutation;
