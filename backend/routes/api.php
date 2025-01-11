@@ -11,6 +11,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\LoadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,8 @@ Route::middleware('throttle:api')->group(function () {
     Route::apiResource('buildings', BuildingController::class)->parameters([
         'buildings' => 'name',
     ]);
+
+    Route::apiResource('loads', LoadController::class)->only(['index', 'show']);
 });
 
 // Маршруты, требующие аутентификации
@@ -66,12 +69,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('bells', BellController::class)->except(['index', 'show']);
     Route::apiResource('bells-periods', BellsPeriodController::class)->except(['index', 'show']);
 
-    // Route::post('/groups/{group}/semesters', [GroupController::class, 'attachSemester'])->where(['semester' => '[0-9]+']);
-    // Route::delete('/groups/{group}/semesters', [GroupController::class, 'detachSemester'])->where(['semester' => '[0-9]+']);
     Route::apiResource('groups', GroupController::class)->except(['index', 'show']);
 
-    // Route::post('/lessons/{lesson}/teachers', [LessonController::class, 'attachTeacher'])->where(['lesson' => '[0-9]+']);
-    // Route::delete('/lessons/{lesson}/teachers', [LessonController::class, 'detachTeacher'])->where(['lesson' => '[0-9]+']);
     Route::apiResource('lessons', LessonController::class)->except(['index', 'show']);
 
     Route::patch('/schedules/{schedule}/lessons/{lesson}', [LessonController::class, 'updateScheduleLesson']);
@@ -81,10 +80,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('/subjects/merge', [SubjectController::class, 'merge']);
     Route::apiResource('subjects', SubjectController::class)->except(['index', 'show']);
-    // Route::post('/teachers/{teacher}/subjects', [TeacherController::class, 'attachSubject'])->where(['teacher' => '[0-9]+']);
-    // Route::delete('/teachers/{teacher}/subjects', [TeacherController::class, 'detachSubject'])->where(['teacher' => '[0-9]+']);
     Route::post('/teachers/merge', [TeacherController::class, 'mergeTeachers']);
     Route::apiResource('teachers', TeacherController::class)->except(['index', 'show']);
 
     Route::apiResource('semesters', SemesterController::class)->except(['index', 'show']);
+
+    Route::apiResource('loads', LoadController::class)->except(['index', 'show']);
 });

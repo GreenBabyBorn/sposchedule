@@ -51,6 +51,10 @@ class LessonController extends Controller
     public function update(UpdateLessonRequest $request, Lesson $lesson)
     {
         $lesson->update($request->validated());
+        if($request->has('subject.id')) {
+            $lesson->subject_id = $request->subject['id'];
+            $lesson->save();
+        }
         if ($request->has('teachers') && is_array($request->teachers)) {
             $teachersIds = array_column($request->teachers, 'id');
             $lesson->teachers()->sync($teachersIds);

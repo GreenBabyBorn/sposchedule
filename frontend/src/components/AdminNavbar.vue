@@ -56,6 +56,11 @@
       icon: 'pi pi-list',
       route: '/admin/history',
     },
+    {
+      label: 'Нагрузка',
+      icon: 'pi pi-clock',
+      route: '/admin/load',
+    },
   ]);
 </script>
 

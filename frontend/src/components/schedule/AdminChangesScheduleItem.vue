@@ -167,15 +167,15 @@
   const { mutateAsync: storeLesson, data: createdLesson } = useStoreLesson();
 
   async function addNewLesson() {
-    if (lessons.value.find(l => l.index === newLesson.index)) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: `Пара с таким номером уже существует`,
-        life: 3000,
-      });
-      return;
-    }
+    // if (lessons.value.find(l => l.index === newLesson.index)) {
+    //   toast.add({
+    //     severity: 'error',
+    //     summary: 'Ошибка',
+    //     detail: `Пара с таким номером уже существует`,
+    //     life: 3000,
+    //   });
+    //   return;
+    // }
     // Если тип расписания 'main', конвертируем его в изменения
     if (type.value === 'main') {
       try {
@@ -258,15 +258,15 @@
   async function editLesson(item: Lesson) {
     if (!item.id) return;
 
-    if (lessons.value.find(l => l.index === item.index && l.id !== item.id)) {
-      toast.add({
-        severity: 'error',
-        summary: 'Ошибка',
-        detail: `Пара с таким номером уже существует`,
-        life: 3000,
-      });
-      return;
-    }
+    // if (lessons.value.find(l => l.index === item.index && l.id !== item.id)) {
+    //   toast.add({
+    //     severity: 'error',
+    //     summary: 'Ошибка',
+    //     detail: `Пара с таким номером уже существует`,
+    //     life: 3000,
+    //   });
+    //   return;
+    // }
     // if (!item.message == !item.subject) return;
 
     if (type.value === 'main') {

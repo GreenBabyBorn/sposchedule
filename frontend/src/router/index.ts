@@ -80,6 +80,15 @@ const router = createRouter({
       },
     },
     {
+      path: '/admin/load',
+      name: RouteNamesEnum.load,
+      component: () => import('@/pages/admin/LoadView.vue'),
+      meta: {
+        layout: AppLayoutsEnum.admin,
+        title: 'Нагрузка',
+      },
+    },
+    {
       path: '/admin/user',
       name: RouteNamesEnum.user,
       component: () => import('@/pages/admin/UserView.vue'),

@@ -25,6 +25,8 @@ class UpdateLessonRequest extends FormRequest
         $lessonId = $this->route('lesson') ? $this->route('lesson')->id : null;
         return [
             'subject_id' => 'nullable|exists:subjects,id',
+            'subject.id' => 'nullable|exists:subjects,id',
+
             'schedule_id' => 'nullable|exists:schedules,id',
             'cabinet' => 'nullable|string|max:255',
             'index' => [

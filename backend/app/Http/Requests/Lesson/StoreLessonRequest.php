@@ -35,7 +35,7 @@ class StoreLessonRequest extends FormRequest
                     'integer',
                     'min:0',
                     'max:10',
-                    'unique_schedule_index'
+                    // 'unique_schedule_index'
                 ],
                 'teachers' => 'nullable|array',
             ];
@@ -53,7 +53,7 @@ class StoreLessonRequest extends FormRequest
                     'integer',
                     'min:0',
                     'max:10',
-                    'unique_schedule_index'
+                    // 'unique_schedule_index'
                 ],
                 'building' => 'nullable|string|min:1',
                 'teachers' => 'nullable|array',

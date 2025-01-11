@@ -104,7 +104,7 @@
       <div class="flex flex-col items-center justify-center gap-2 py-2">
         <div class="flex items-center gap-2">
           <DatePicker
-            id="datepicker-timeonly"
+            :id="`datepicker-timeonly${period.period_from}`"
             v-model="period.period_from"
             input-class="text-center"
             time-only
@@ -113,7 +113,7 @@
           />
           -
           <DatePicker
-            id="datepicker-timeonly"
+            :id="`datepicker-timeonly${period.period_to}`"
             v-model="period.period_to"
             input-class="text-center"
             time-only
@@ -123,7 +123,7 @@
         </div>
         <div v-if="period.has_break" class="flex items-center gap-2">
           <DatePicker
-            id="datepicker-timeonly"
+            :id="`datepicker-timeonly${period.period_from_after}`"
             v-model="period.period_from_after"
             input-class="text-center"
             time-only
@@ -132,7 +132,7 @@
           />
           -
           <DatePicker
-            id="datepicker-timeonly"
+            :id="`datepicker-timeonly${period.period_to_after}`"
             v-model="period.period_to_after"
             input-class="text-center"
             time-only
