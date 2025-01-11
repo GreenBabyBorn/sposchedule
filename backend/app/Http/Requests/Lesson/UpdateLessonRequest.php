@@ -37,10 +37,10 @@ class UpdateLessonRequest extends FormRequest
                 'max:10',
                 // 'unique_schedule_index:{$lessonId}',
 
-                Rule::unique('lessons')
-                ->where('schedule_id', $this->input('schedule_id'))
-                ->where('week_type', $this->input('week_type'))
-                ->ignore($this->route('lesson')->id)
+                // Rule::unique('lessons')
+                // ->where('schedule_id', $this->input('schedule_id'))
+                // ->where('week_type', $this->input('week_type'))
+                // ->ignore($this->route('lesson')->id)
             ],
             'building' => 'nullable|integer|min:1',
             'message' => 'nullable|string|max:255',
