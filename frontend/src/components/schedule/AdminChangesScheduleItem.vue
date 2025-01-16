@@ -281,6 +281,9 @@
           },
         });
         await invalidateSchedule();
+        item = newChanges.value?.lessons?.find(
+          (lesson: Lesson) => lesson.index === item.index
+        );
         // queryClient.invalidateQueries({ queryKey: ['scheduleChanges'] });
         return;
       } catch (e: any) {
@@ -288,18 +291,23 @@
         return;
       }
     }
-    const updatingLesson = computed(() => {
-      return (props.type as ScheduleType) === 'main'
-        ? newChanges.value?.lessons.find(
-            (lesson: Lesson) => lesson.index === item.index
-          )
-        : item;
-    });
+
+    // const updatingLesson = computed(() => {
+    //   return newChanges?.value?.type === 'main'
+    //     ? newChanges.value?.lessons.find(
+    //         (lesson: Lesson) => lesson.index === item.index
+    //       )
+    //     : item;
+    // });
 
     try {
-      console.log(updatingLesson.value);
+      if (props.schedule.id !== item.schedule_id) return;
+      console.log(props.type, item);
       await updateLesson({
-        lesson: updatingLesson.value,
+        lesson: {
+          ...item,
+          schedule_id: props.schedule.id,
+        },
       });
     } catch (e: any) {
       showError(e?.response?.data.message);
