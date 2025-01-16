@@ -1,9 +1,8 @@
 <script setup lang="ts">
   import MultiSelect from 'primevue/multiselect';
-  // import Select from 'primevue/select';
+  import Select from 'primevue/select';
   import CustomSelect from '../ui/custom/select/index';
   import InputText from 'primevue/inputtext';
-
   import InputNumber from 'primevue/inputnumber';
 
   import Textarea from 'primevue/textarea';
@@ -289,17 +288,18 @@
         return;
       }
     }
-
-    const updatingLesson: Lesson =
-      (type.value as ScheduleType) === 'main'
+    const updatingLesson = computed(() => {
+      return (props.type as ScheduleType) === 'main'
         ? newChanges.value?.lessons.find(
             (lesson: Lesson) => lesson.index === item.index
           )
         : item;
+    });
 
     try {
+      console.log(updatingLesson.value);
       await updateLesson({
-        lesson: updatingLesson,
+        lesson: updatingLesson.value,
       });
     } catch (e: any) {
       showError(e?.response?.data.message);
@@ -564,24 +564,36 @@
 
             <td v-show="!newLessonMessageState">
               <div class="table-subrow flex flex-col">
-                <CustomSelect
+                <!-- <Select
+                  v-model.lazy="newLesson.subject"
+                  data-key="name"
+                  filter
+                  class="w-full text-left"
+                  :options="subjects"
+                  size="small"
+                  option-label="name"
+                /> -->
+                <!-- <CustomSelect
                   v-model="newLesson.subject"
                   data-key="name"
+                  filter
                   editable
                   placeholder="Предмет"
                   class="w-full text-left"
                   :options="subjects"
                   option-label="name"
-                ></CustomSelect>
-                <!-- <Select
-                v-model="newLesson.subject"
-                data-key="name"
-                editable
-                placeholder="Предмет"
-                class="w-full text-left"
-                :options="subjects"
-                option-label="name"
-              /> -->
+                ></CustomSelect> -->
+                <Select
+                  v-model="newLesson.subject"
+                  data-key="name"
+                  filter
+                  filter-placeholder="Фильтр"
+                  editable
+                  placeholder="Предмет"
+                  class="w-full text-left"
+                  :options="subjects"
+                  option-label="name"
+                />
               </div>
               <div class="table-subrow">
                 <MultiSelect
