@@ -28,3 +28,34 @@ deploy:
 
   only:
     - dev
+
+stages:
+  - deploy
+
+default:
+  tags:
+    - beget
+
+deploy:
+  stage: deploy
+  script:
+    - echo "Setting up environment files..."
+    - cp "${backend_env}"  ./backend/.env
+    - cp "${frontend_env}"  ./frontend/.env
+
+    - echo "Getting Commit SHA..."
+    - export SHA_SHORT=$(git rev-parse --short HEAD)
+    - echo "SHA_SHORT=${SHA_SHORT}" >> .gitlab-ci.env
+    
+    - echo "Setting Image Tag..."
+    - export IMAGE_TAG="master-${SHA_SHORT}"
+    - echo "IMAGE_TAG=${IMAGE_TAG}" >> .gitlab-ci.env
+
+    - echo "Stopping and removing old containers..."
+    - docker compose -f docker-compose.prod.yml -p sposchedule down
+
+    - echo "Rebuilding and starting containers..."
+    - docker compose -f docker-compose.prod.yml -p sposchedule up -d --build
+
+  only:
+    - master
