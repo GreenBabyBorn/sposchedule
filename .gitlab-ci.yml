@@ -1,13 +1,10 @@
 stages:
   - deploy
 
-default:
-  tags:
-    - cloud-ru
-    - beget
-
 deploy_dev:
   stage: deploy
+  tags:
+    - cloud-ru  # Выполнять на сервере с тегом cloud-ru
   script:
     - echo "Setting up environment files..."
     - cp "${backend_env}" ./backend/.env
@@ -27,11 +24,13 @@ deploy_dev:
     - echo "Rebuilding and starting containers..."
     - docker compose -f docker-compose.prod.yml -p sposchedule up -d --build
 
-  only:
-    - dev
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "dev"
 
 deploy_master:
   stage: deploy
+  tags:
+    - beget  # Выполнять на сервере с тегом beget
   script:
     - echo "Setting up environment files..."
     - cp "${backend_env_master}" ./backend/.env
@@ -52,5 +51,5 @@ deploy_master:
     - echo "Rebuilding and starting containers..."
     - docker compose -f docker-compose.prod.yml -p sposchedule up -d --build
 
-  only:
-    - master
+  rules:
+    - if: $CI_COMMIT_REF_NAME == "master"
