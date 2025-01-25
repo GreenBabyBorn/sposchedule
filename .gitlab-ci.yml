@@ -4,13 +4,14 @@ stages:
 default:
   tags:
     - cloud-ru
+    - beget
 
-deploy:
+deploy_dev:
   stage: deploy
   script:
     - echo "Setting up environment files..."
-    - cp "${backend_env}"  ./backend/.env
-    - cp "${frontend_env}"  ./frontend/.env
+    - cp "${backend_env}" ./backend/.env
+    - cp "${frontend_env}" ./frontend/.env
 
     - echo "Getting Commit SHA..."
     - export SHA_SHORT=$(git rev-parse --short HEAD)
@@ -29,20 +30,13 @@ deploy:
   only:
     - dev
 
-stages:
-  - deploy
-
-default:
-  tags:
-    - beget
-
-deploy:
+deploy_master:
   stage: deploy
   script:
     - echo "Setting up environment files..."
-    - cp "${backend_env_master}"  ./backend/.env
-    - cp "${frontend_env_master}"  ./frontend/.env
-    - cp "${db_env_master}"  ./.env
+    - cp "${backend_env_master}" ./backend/.env
+    - cp "${frontend_env_master}" ./frontend/.env
+    - cp "${db_env_master}" ./.env
 
     - echo "Getting Commit SHA..."
     - export SHA_SHORT=$(git rev-parse --short HEAD)
