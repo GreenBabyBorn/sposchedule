@@ -7,7 +7,7 @@ services:
             dockerfile: ./frontend/Dockerfile
         image: sposchedule-frontend:${IMAGE_TAG}
         ports:
-            - "8080:80"
+            - "127.0.0.1:8080:80"
         networks:
             - app-network
 
@@ -19,7 +19,7 @@ services:
         image: sposchedule-backend:${IMAGE_TAG}
         restart: unless-stopped
         ports:
-            - "82:80"
+            - "127.0.0.1:82:80"
         working_dir: /var/www/backend
         depends_on:
             - db
